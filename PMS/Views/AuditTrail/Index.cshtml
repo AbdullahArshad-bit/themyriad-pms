@@ -1,0 +1,351 @@
+﻿@*@model IEnumerable<PMS.DTO.ViewModels.AuditLogsViewModels.AuditLogsViewModels>*@
+
+
+@using PMS.Common.Classes;
+
+@{
+    ViewBag.Header = "Audit Trail";
+    ViewBag.HeaderDescription = "All Audit Logs";
+    ViewBag.Title = "All Audit Trail | PMS";
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+}
+<style>
+    div.container {
+        max-width: 1200px;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+        </div>
+        <div class="">
+            <div class="">
+                <div class="col-md-2">
+                    <label>From Date</label>
+                    <input name="daterange" id="FromDate" class="form-control from_date" value="@ViewBag.FromDate" placeholder="From Date" />
+                </div>
+                <div class="col-md-2">
+                    <label>To Date</label>
+                    <input name="daterange" id="ToDate" class="form-control to_date" value="@ViewBag.ToDate" placeholder="To Date" />
+                </div>
+                <div class="col-md-2">
+                    <label>User</label>
+                    @Html.DropDownList("UserId", null, "-- All Users --", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                </div>
+                <div class="col-md-2">
+                    <label>Audit Action</label>
+                    @Html.DropDownList("ActionId", null, "-- All Actions --", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                </div>
+                <div class="col-md-2">
+                    <label>Audit Type</label>
+                    <select name="AuditTypeId" id="AuditTypeId" class="form-control select2">
+                        <option value="">-- All Audit Types --</option>
+                        <option value="0">Read</option>
+                        <option value="1">Create</option>
+                        <option value="2">Update</option>
+                        <option value="3">Delete</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label> &nbsp; </label>
+                    <br />
+                    <button type="button" onclick="loadAuditLogsTable();" class="btn btn-themyriad btn-bordered waves-effect w-md button-effect"><i class="fa fa-search"></i> <span>Search</span></button>
+                    <button type="button" onclick="ExportAuditLogs()" class="btn btn-success btn-bordered waves-effect w-md button-effect" style="margin-left: 5px;"> <i class="fa fa-download"> </i> <span> Export Report </span> </button>
+
+                </div>
+             
+            </div>
+            <br />
+        </div>
+        <div class="col-md-12">
+            <hr />
+        </div>
+        <div style="overflow: auto; width:100%">
+            <div class="col-md-12">
+                <table id="persons-table" class="table table-bordered table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>MyriadID</th>
+                            <th>FullName</th>
+                            <th>Audit Action</th>
+                            <th>Audit Type</th>
+                            <th>Reference</th>
+                            <th>Table Name</th>
+                            <th>Time Stamp</th>
+                            <th>Performed By</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_div" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+</div>
+
+@section scripts{
+
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+    <script>
+        var dataTable;
+
+        $(document).ready(function () {
+            //$('#persons-table').DataTable({
+            //    "scrollY": "70vh",
+            //    "scrollCollapse": true,
+            //    "scrollX": "auto",
+
+            //    buttons: [
+            //        'excelHtml5',
+            //    ],
+            //    dom: 'Blfrtip',
+            //    lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            //    columnDefs: [
+            //        { type: 'date-euro', targets: 4 }
+            //    ]
+            //});
+
+            //$('.dataTables_length').addClass('bs-select');
+            loadAuditLogsTable();
+        });
+
+        function GetAuditLogDetails(id) {
+            $.ajax({
+                url: "/AuditTrail/GetAuditLogsDetailByid?id=" + id,
+                method: "Get",
+                dataType: "html",
+                contentType: 'application/json; charset=utf-8',
+                beforeSend: function () { $('#loader').show(); },
+                complete: function () { $('#loader').fadeOut('slow'); },
+                success: function (data) {
+                    $("#modal_div").html(data);
+                    $('#modal_div').modal('show');
+                },
+                error: function (xhr) {
+                    showMessage(xhr.status + " - " + xhr.statusText);
+                }
+            });
+        }
+
+        var startDate = new Date();
+        var FromEndDate = new Date();
+        var ToEndDate = new Date();
+        ToEndDate.setDate(ToEndDate.getDate() + 365);
+
+        $('.from_date').datepicker({
+            weekStart: 1,
+            startDate: '',
+            format: "dd/M/yyyy",
+            autoclose: true
+        })
+            .on('changeDate', function (selected) {
+                startDate = new Date(selected.date.valueOf());
+                $('.to_date').datepicker('setStartDate', startDate);
+            });
+
+        $('.to_date').datepicker({
+            weekStart: 1,
+            startDate: new Date($('.from_date').val()),
+            endDate: ToEndDate,
+            format: "dd/M/yyyy",
+            autoclose: true,
+        })
+            .on('changeDate', function (selected) {
+                FromEndDate = new Date(selected.date.valueOf());
+                FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                $('.from_date').datepicker('setEndDate', FromEndDate);
+            });
+
+        function dateformate(date) {
+            if (date == '' || date == null) {
+                return '';
+            } else {
+                //let d = new Date(parseInt(date.substr(6)));
+                //let _month = parseInt(d.getMonth()) + 1;
+                //let _date = d.getDate() + "/" + _month + "/" + d.getFullYear();
+
+                //return _date;
+
+                let d = new Date(parseInt(date.substr(6)));
+
+                let day = ("0" + d.getDate()).slice(-2);
+                let month = ("0" + (d.getMonth() + 1)).slice(-2);
+                let year = d.getFullYear();
+
+                let hours = ("0" + d.getHours()).slice(-2);
+                let minutes = ("0" + d.getMinutes()).slice(-2);
+                let seconds = ("0" + d.getSeconds()).slice(-2);
+
+                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+            }
+        }
+
+        function loadAuditLogsTable() {
+            ShowLoader();
+
+            //if (dataTable) {
+            //    dataTable.destroy();
+            //}
+
+            if ($.fn.DataTable.isDataTable('#persons-table')) {
+                $('#persons-table').DataTable().clear().destroy();
+                $('#persons-table tbody').empty();
+            }
+
+            var columns = [];
+            //var urlParams = new URLSearchParams(window.location.search);
+
+            //var fromDate = urlParams.get('FromDate') || '';
+            //var toDate = urlParams.get('ToDate') || '';
+            //var userId = urlParams.get('Userid') || '';
+            //var actionId = urlParams.get('ActionId') || '';
+            //var auditTypeId = urlParams.get('AuditTypeId') || '';
+
+            //$('#FromDate').val(fromDate);
+            //$('#ToDate').val(toDate);
+            //$('#UserId').val(userId);
+            //$('#ActionId').val(actionId);
+            //$('#AuditTypeId').val(auditTypeId);
+
+            dataTable = $('#persons-table').DataTable({
+                processing: false,
+                serverSide: true,
+                filter: true,
+                paging: true,
+                searching: true,
+                lengthChange: true,
+                scrollCollapse: true,
+                scrollY: '70vh',
+                scrollX: true,
+                scroller: true,
+                ordering: true,
+                info: true,
+                iDisplayLength: 100,
+                autoWidth: true,
+                responsive: true,
+                destroy: true,
+                columns: columns,
+                language: {
+                    emptyTable: "No record found."
+                },
+                "ajax": {
+                    "url": "/AuditTrail/LoadAuditLogs",
+                    "type": "POST",
+                    "data": function (d) {
+                        d.FromDate = $('#FromDate').val();
+                        d.ToDate = $('#ToDate').val();
+                        d.Userid = $('#UserId').val();
+                        d.ActionId = $('#ActionId').val();
+                        d.AuditTypeId = $('#AuditTypeId').val();
+                    },
+
+                    "datatype": "json",
+                    beforeSend: function () {
+                        ShowLoader();
+                    },
+                    complete: function () {
+                        HideLoader();
+                    },
+                    error: function (xhr, error, thrown) {
+                        console.error('AJAX error:', error, thrown);
+                        HideLoader();
+                    }
+                },
+                columns: [
+                    { data: 'PersonCode' },
+                    { data: 'PersonFullName' },
+                    { data: 'ActionName' },
+                    { data: 'AuditTypeText' },
+                    { data: 'Reference' },
+                    { data: 'TableName' },
+                    {
+                        data: 'TimeStamp',
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.TimeStamp) + '</span>'
+                        }
+                    },
+                    { data: 'UserName' },
+                    {
+                        data: 'Id',
+                        render: function (data, type, row) {
+                            return `<a href="javascript:GetAuditLogDetails(${data})"><i class="fa fa-server"></i></a>`;
+                        }
+                    }
+                ],
+
+            });
+
+        };
+
+        var urlParams = new URLSearchParams(window.location.search);
+
+        function GetAuditLogs() {
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+            var UserId = $('#UserId').val();
+            var ActionId = $('#ActionId').val();
+            var AuditType = $('#AuditTypeId').val();
+            window.location.href = GetFormatedUrl("/AuditTrail/Index?FromDate=" + SD + "&ToDate=" + ED + "&Userid=" + UserId + "&ActionId=" + ActionId + "&AuditTypeId=" + AuditType);
+        };
+
+        function ExportAuditLogs() {
+            var SD = $('#FromDate').val();
+            var ED = $('#ToDate').val();
+            var UserId = $('#UserId').val();
+            var ActionId = $('#ActionId').val();
+            var AuditType = $('#AuditTypeId').val();
+            var searchValue = dataTable ? dataTable.search() : '';
+            var url = "/AuditTrail/ExportAuditLogs?FromDate=" + encodeURIComponent(SD)
+                + "&ToDate=" + encodeURIComponent(ED)
+                + "&Userid=" + encodeURIComponent(UserId)
+                + "&ActionId=" + encodeURIComponent(ActionId)
+                + "&AuditTypeId=" + encodeURIComponent(AuditType)
+                + "&searchValue=" + encodeURIComponent(searchValue);
+            window.location.href = GetFormatedUrl(url);
+        };
+
+    </script>
+
+}
+
+

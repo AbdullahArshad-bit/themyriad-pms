@@ -1,0 +1,311 @@
+﻿﻿@model PMS.DTO.ViewModels.UserManageViewModels.AddUserVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Users";
+    ViewBag.HeaderDescription = "Add New User";
+    ViewBag.Title = "Add User | PMS";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+
+
+
+<div class="box box-danger">
+    @if (User.IsInRole(AppUserRoles.view_users))
+    {
+        <div class="box-header with-border">
+            <div class="input-group-btn">
+                <a href="@Url.Action("Users", "UserManage")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Users</a>
+            </div>
+        </div>
+    }
+
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddUser", "UserManage", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_user_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.UserID)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.IsActive)
+
+                    <div>
+                        <label class="switch">
+                            <input type="checkbox" name="IsActive" id="IsActive" value="@Model.IsActive" @(@Model.IsActive ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    @Html.ValidationMessageFor(x => x.IsActive)
+
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocationId, "Location", new { @class = "control-label required" })
+
+                        @Html.DropDownList("LocationId", null, "-- Location --", htmlAttributes: new { @class = "form-control LocationId", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.LocationId)
+                    </div>
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+
+
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.FullName)
+
+                        @Html.TextBoxFor(x => x.FullName, new { @class = "form-control", placeholder = "Enter full name" })
+
+                        @Html.ValidationMessageFor(x => x.FullName)
+
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Email)
+
+                        @Html.TextBoxFor(x => x.Email, new { @class = "form-control", placeholder = "Enter email" })
+
+                        @Html.ValidationMessageFor(x => x.Email)
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Password)
+
+                        <div class="input-group">
+                            @Html.PasswordFor(x => x.Password, new { @class = "form-control", placeholder = "Enter password", value = Model.Password })
+                            <div class="input-group-addon">
+                                <i class="fa fa-eye toggle-password" data-element="input[name='Password']"></i>
+                            </div>
+                        </div>
+
+                        @Html.ValidationMessageFor(x => x.Password)
+
+                    </div>
+                </div>
+
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.ConfirmPassword)
+
+                        <div class="input-group">
+                            @Html.PasswordFor(x => x.ConfirmPassword, new { @class = "form-control", placeholder = "Enter confirm password", value = Model.ConfirmPassword })
+                            <div class="input-group-addon">
+                                <i class="fa fa-eye toggle-password" data-element="input[name='ConfirmPassword']"></i>
+                            </div>
+                        </div>
+
+                        @Html.ValidationMessageFor(x => x.ConfirmPassword)
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>User Role</label>
+                        @Html.DropDownListFor(model => model.RoleId,
+        new SelectList(Model.RolesList, "RoleId", "RoleName"),
+        "-- please select role --",
+        new { @Class = "form-control select2" })
+
+                        @Html.ValidationMessageFor(x => x.RoleId)
+                    </div>
+                </div>
+
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Gender</label>
+
+                        @Html.DropDownListFor(model => model.Gender,
+        new SelectList(PMS.Common.Globals.Genders, "", ""),
+        "-- Gender --",
+        new { @Class = "form-control" })
+
+                        @Html.ValidationMessageFor(x => x.Gender)
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Phone)
+
+                        @Html.TextBoxFor(x => x.Phone, new { @class = "form-control", placeholder = "Enter phone" })
+
+                        @Html.ValidationMessageFor(x => x.Phone)
+
+                    </div>
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.DOB)
+
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(x => x.DOB, new { id = "datepicker", @Value = Model.DOB.ToString("dd/MMM/yyyy"), type = "datetime", @class = "form-control pull-right", autocomplete = "off", @readonly = "", placeholder = "Select Date" })
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Department)
+
+                        @Html.TextBoxFor(x => x.Department, new { @class = "form-control", placeholder = "Enter department" })
+
+                        @Html.ValidationMessageFor(x => x.Department)
+
+                    </div>
+                </div>
+
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Designation)
+
+                        @Html.TextBoxFor(x => x.Designation, new { @class = "form-control", placeholder = "Enter designation" })
+
+                        @Html.ValidationMessageFor(x => x.Designation)
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Address)
+                        @Html.TextAreaFor(x => x.Address, new { @class = "form-control", placeholder = "Enter address", style = "min-height:125px" })
+                        @Html.ValidationMessageFor(x => x.Address)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+    <script>
+        $(function () {
+            //Date picker
+            $('#datepicker').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy",
+                endDate: '+0d'
+            })
+
+            $('.select2').select2()
+
+
+        })
+
+        //$(function () {
+        //    $('#IsActive').click(function () {
+        //        var checked = $(this).prop('checked');
+
+        //        $(this).val(checked)
+        //    });
+        //});
+
+
+        function setInitialLocation() {
+            var initialLocation = localStorage.getItem("selectedLocation");
+
+            if (initialLocation) {
+                $('#LocationId').val(initialLocation);
+                $("#LocationId").prop('disabled', true);
+
+
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'LocationId',
+                    value: initialLocation
+                }).appendTo('#add_user_form');
+
+            }
+        }
+        $(".toggle-password").click(function () {
+
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            //var input = $($(this).attr("toggle"));
+            var input = $($(this).data('element'));
+            console.log(input);
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
+            }
+        });
+
+        $(document).ready(function () {
+            setInitialLocation();
+        });
+    </script>
+}

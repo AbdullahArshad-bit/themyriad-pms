@@ -1,0 +1,126 @@
+﻿@model PMS.DTO.ViewModels.TransportationViewModels.VehiclePriceVM
+@using PMS.Common.Classes
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Header = "Vehicle Prices";
+    ViewBag.HeaderDescription = "Add Vehicle Price";
+
+}
+@section styles{
+    <!-- bootstrap datepicker -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Bootstrap time Picker -->
+    <link rel="stylesheet" href="~/Assets/plugins/timepicker/bootstrap-timepicker.css">
+}
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Index", "VehiclePrice")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Vehicle Prices</a>
+        </div>
+    </div>
+
+    <!-- form start -->
+    @using (Html.BeginForm("Add", "VehiclePrice", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_VehiclePrice_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.VehiclePriceId)
+<div class="box-body">
+    <div class="row">
+        @if (Model.VehiclePriceId > 0)
+        {
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label>Active</label>
+                    <div>
+                        <label class="switch">
+                            <input type="checkbox" name="IsActive" id="Is_Active"
+                                   value="@Model.IsActive" @(Model.IsActive ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    @Html.ValidationMessageFor(x => x.IsActive)
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label>Active</label>
+                    <div>
+                        <label class="switch">
+                            <input type="checkbox" name="IsActive" id="Is_Active" checked
+                                   value="@Model.IsActive" @(Model.IsActive ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    @Html.ValidationMessageFor(x => x.IsActive)
+                </div>
+            </div>
+        }
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.LocationId, "Location")
+                @Html.DropDownList("LocationId", null, "--- Select Location ---", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                @Html.ValidationMessageFor(x => x.LocationId)
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.PriceName, "Price Name")
+                @Html.TextBoxFor(x => x.PriceName, new { @class = "form-control", placeholder = "Enter Price Name", @required = "required" })
+                @Html.ValidationMessageFor(x => x.PriceName)
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.RouteId, "Route")
+                @Html.DropDownList("RouteId", null, "--- Select Route ---", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                @Html.ValidationMessageFor(x => x.RouteId)
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.FrequencyId, "Frequency Rate")
+                @Html.DropDownList("FrequencyId", null, "--- Select Frequency Rate ---", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                @Html.ValidationMessageFor(x => x.FrequencyId)
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.Price, "Price")
+                @Html.TextBoxFor(x => x.Price, new { @class = "form-control", placeholder = "Enter Price in mins" })
+                @Html.ValidationMessageFor(x => x.Price)
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- bootstrap time picker -->
+    <script src="~/Assets/plugins/timepicker/bootstrap-timepicker.min.js"></script>
+}

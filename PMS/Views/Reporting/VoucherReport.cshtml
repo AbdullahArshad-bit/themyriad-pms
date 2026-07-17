@@ -1,0 +1,522 @@
+@model IEnumerable<PMS.DTO.ViewModels.ReportingViewModels.VoucherReportVM>
+@using PMS.Common.Classes
+
+
+@{
+    ViewBag.Header = "General Ledger Report";
+    ViewBag.HeaderDescription = "General Ledger Report";
+    ViewBag.Title = "General Ledger Report | PMS";
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+}
+<style>
+    .right {
+        text-align: right;
+    }
+</style>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <label>From Date</label>
+                <input name="daterange" type="text" autocomplete="off" id="FromDate" class="form-control from_date" value="@ViewBag.FromDate" placeholder="From Date" />
+            </div>
+            <div class="col-md-2">
+                <label>To Date</label>
+                <input name="daterange" type="text" autocomplete="off" id="ToDate" class="form-control to_date" value="@ViewBag.ToDate" placeholder="To Date" />
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label>Accounts</label>
+                    @Html.DropDownList("AccountId", null, "-- All Accounts --", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label>Student</label>
+                @Html.DropDownList("StudentId", null, "-- All Users --", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+            </div>
+            <div class="col-md-3">
+                <label> &nbsp; </label>
+                <br />
+                <button type="button" onclick="GetReport();" class="btn btn-themyriad btn-bordered waves-effect w-md button-effect"><i class="fa fa-search"></i> <span>Search</span></button>
+                <button type="button" onclick="GetExcel()" class="btn btn-success btn-bordered waves-effect w-md button-effect" style="margin-left: 5px;"> <i class="fa fa-download"> </i> <span> Export Report </span> </button>
+                <button type="button" onclick="ToggleSummaryReport();" class="btn btn-info btn-bordered waves-effect w-md button-effect" style="margin-left: 5px;"> <i class="fa fa-bar-chart"> </i> <span> Summary </span> </button>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <hr />
+        </div>
+        <div class="box-body">
+            <!-- Summary Report Section -->
+            <div id="summaryReportSection" style="display: none;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4><i class="fa fa-bar-chart"></i> Voucher Summary Report</h4>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <button type="button" onclick="ExportSummaryReport()" class="btn btn-success btn-bordered waves-effect w-md button-effect">
+                                    <i class="fa fa-download"></i> <span>Export Summary</span>
+                                </button>
+                            </div>
+                        </div>
+                        <table class="table table-bordered table-striped" id="SummaryReportTable">
+                            <thead>
+                                <tr>
+                                    <th>Account Name</th>
+                                    <th>Total Debit</th>
+                                    <th>Total Credit</th>
+                                    <th>Total Net</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background-color: #f5f5f5; font-weight: bold;">
+                                    <td>Total</td>
+                                    <td class="text-right" id="totalDebit">0.00</td>
+                                    <td class="text-right" id="totalCredit">0.00</td>
+                                    <td class="text-right" id="totalNetAmount">0.00</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <hr />
+            </div>
+
+            <!-- Detail Report Section -->
+            <div id="detailReportSection">
+                <div class="row">
+                    <div class="row" style="margin-bottom:30px">
+                        <div class="col-md-3">
+                            <label>Search By Column:</label>
+                            <select class="form-control" id="column-filter">
+                                <option value="">All Columns</option>
+                                <option value="Code">Voucher Code</option>
+                                <option value="TransactionCode">Transaction Code</option>
+                                <option value="MyriadID">MyriadID</option>
+                                <option value="FullName">FullName</option>
+                                <option value="AccountName">AccountName</option>
+                                <option value="Remarks">Remarks</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3" style="width: 200px;">
+                            <label>Column Visibilty:</label>
+                            <select multiple class="form-control" id="columnvisibilty-filter">
+                                <option value="Code">Voucher Code</option>
+                                <option value="TransactionCode">Transaction Code</option>
+                                <option value="MyriadID">MyriadID</option>
+                                <option value="FullName">FullName</option>
+                                <option value="AccountName">AccountName</option>
+                                <option value="AccountName">Remarks</option>
+                                <option value="DebitAmount">DebitAmount</option>
+                                <option value="CreditAmount">CreditAmount</option>
+                                <option value="CreatedDate">TransactionDate</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <table class="table table-bordered table-striped data-table" id="ReportTable">
+                        <thead>
+                            <tr>
+                                <th>Voucher Code</th>
+                                <th>Transaction Code</th>
+                                <th>TransactionDate</th>
+                                <th>MyriadID</th>
+                                <th>FullName</th>
+                                <th>AccountName</th>
+                                <th>Remarks</th>
+                                <th>DebitAmount</th>
+                                <th>CreditAmount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+    <script>
+
+        var dataTable;
+        var summaryDataTable;
+        var isSummaryView = false;
+
+        $(document).ready(function () {
+            $('#columnvisibilty-filter').multiselect({
+
+                nonSelectedText: 'Select columns to hide',
+                maxHeight: 100,
+                onChange: function (element, checked) {
+
+                    GetReport();
+                },
+            });
+            GetReport();
+        });
+
+        function GetReport() {
+            if (isSummaryView) {
+                loadSummaryTable();
+            } else {
+                loadVoucherTable();
+            }
+        };
+
+        function ToggleSummaryReport() {
+            isSummaryView = !isSummaryView;
+
+            if (isSummaryView) {
+                // Show summary report section
+                $('#summaryReportSection').show();
+                $('#detailReportSection').hide();
+
+                // Change button text and style
+                $('.btn-info').html('<i class="fas fa-list"></i> <span>Detail View</span>').removeClass('btn-info').addClass('btn-warning');
+
+                // Hide filters specific to detail report
+                $('#AccountId').closest('.col-md-2').hide();
+                $('#StudentId').closest('.col-md-3').hide();
+                $('button[onclick="GetExcel()"]').closest('.col-md-1').hide();
+
+                loadSummaryTable();
+            } else {
+                // Show detail report section
+                $('#summaryReportSection').hide();
+                $('#detailReportSection').show();
+
+                // Change button text and style
+                $('.btn-warning').html('<i class="fas fa-chart-bar"></i> <span>Summary</span>').removeClass('btn-warning').addClass('btn-info');
+
+                // Show filters for detail report
+                $('#AccountId').closest('.col-md-2').show();
+                $('#StudentId').closest('.col-md-3').show();
+                $('button[onclick="GetExcel()"]').closest('.col-md-1').show();
+
+                loadVoucherTable();
+            }
+        };
+
+        function loadSummaryTable() {
+            ShowLoader();
+            if (summaryDataTable) {
+                summaryDataTable.destroy();
+            }
+
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+
+            $.ajax({
+                url: '/Reporting/loadVoucherSummaryReportbyAjax',
+                type: 'POST',
+                data: {
+                    fromDate: SD,
+                    toDate: ED
+                },
+                success: function (response) {
+                    var data = response.data;
+                    var tbody = $('#SummaryReportTable tbody');
+                    tbody.empty();
+
+                    var totalDebit = 0;
+                    var totalCredit = 0;
+                    var totalNetAmount = 0;
+
+                    if (data && data.length > 0) {
+                        data.forEach(function (item) {
+                            var debitAmount = parseFloat(item.TotalDebit) || 0;
+                            var creditAmount = parseFloat(item.TotalCredit) || 0;
+                            var netAmount = parseFloat(item.TotalNet) || 0;
+
+                            totalDebit += debitAmount;
+                            totalCredit += creditAmount;
+                            totalNetAmount += netAmount;
+                            var row = '<tr>' +
+                                '<td>' + item.AccountName + '</td>' +
+                                '<td class="text-right">' + debitAmount.toFixed(2) + '</td>' +
+                                '<td class="text-right">' + creditAmount.toFixed(2) + '</td>' +
+                                '<td class="text-right">' + formatNegativeInParentheses(netAmount) + '</td>' +
+                                '</tr>';
+                            tbody.append(row);
+                        });
+
+                        // Update footer totals
+                        $('#totalDebit').text(totalDebit.toFixed(2));
+                        $('#totalCredit').text(totalCredit.toFixed(2));
+                        $('#totalNetAmount').text(formatNegativeInParentheses(totalNetAmount));
+
+                    } else {
+                        tbody.append('<tr><td colspan="3" class="text-center">No data found</td></tr>');
+                        // Reset totals when no data
+                        $('#totalDebit').text('0.00');
+                        $('#totalCredit').text('0.00');
+                        $('#totalNetAmount').text('0.00');
+
+                    }
+
+                    HideLoader();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error loading summary report:', error);
+                    HideLoader();
+                }
+            });
+        };
+
+        function loadVoucherTable() {
+            ShowLoader();
+            if (dataTable) {
+                dataTable.destroy();
+            }
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+            var urlParams = new URLSearchParams(window.location.search);
+            var query = urlParams.get('queryby');
+            var AccountId = $('#AccountId').val();
+            var StudentId = $('#StudentId').val();
+            var isSummaryReport = true;
+            var selectedColumns = $('#columnvisibilty-filter').val();
+            var columns = [];
+            if (selectedColumns) {
+                selectedColumns.forEach(function (columnName) {
+                    var columnDef = {
+                        "data": columnName
+                    };
+                    columns.push(columnDef);
+                });
+            }
+            dataTable = $('#ReportTable').DataTable({
+                processing: false,
+                serverSide: true,
+                filter: true,
+                paging: true,
+                searching: true,
+                lengthChange: true,
+                scrollCollapse: true,
+                scrollY: '70vh',
+                scrollX: true,
+                scroller: true,
+                ordering: true,
+                info: true,
+                iDisplayLength: 100,
+                autoWidth: true,
+                responsive: true,
+                columns: columns,
+                language: {
+                    emptyTable: "No record found."
+                },
+                "ajax": {
+                    "url": "/Reporting/loadVoucherReportbyAjax",
+                    "type": "POST",
+                    "data": function (d) {
+                        d.FromDate = SD;
+                        d.ToDate = ED;
+                        d.AccountId = AccountId;
+                        d.StudentId = StudentId;
+                        d.query = query;
+                        d.isSummaryReport = isSummaryReport;
+                        d.SelectedColumns = selectedColumns;
+                        var selectedColumn = $('#column-filter').val();
+                        if (selectedColumn) {
+                            d.search = {
+                                value: $('#ReportTable_filter input').val(),
+                                column: selectedColumn
+                            };
+                        }
+                        else {
+                            d.search
+                        }
+                        var columnIndex = d.order[0].column;
+
+                        if (columnIndex === 0) {
+                            d.orderBy = d.order[0].column;
+                            d.orderDir = d.order[0].dir;
+                        }
+                        else {
+                            var columnName = d.columns[columnIndex].data;
+                            d.orderBy = columnName;
+                            d.orderDir = d.order[0].dir;
+                        }
+                    },
+                    "datatype": "json",
+                    beforeSend: function () {
+                        ShowLoader();
+                    },
+                    complete: function () {
+                        HideLoader();
+                    },
+                    error: function (xhr, error, thrown) {
+                        console.error('AJAX error:', error, thrown);
+                        HideLoader();
+                    }
+                },
+                columns: [
+
+                    { "data": "Code", visible: !selectedColumns.includes("Code") },
+                    { "data": "TransactionCode", visible: !selectedColumns.includes("TransactionCode") },
+                    {
+                        "data": "VoucherDate",
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.VoucherDate) + '</span>'
+                        },
+                        visible: !selectedColumns.includes("VoucherDate")
+                    },
+                    {
+                        "data": "MyriadID",
+                        "render": function (data, type, full, meta) {
+                            var link = '/payments/PartnerLedger?personId=' + full.StudentId;
+                            return '<a target="_blank" href="' + link + '">' + full.MyriadID + '</a>';
+                        },
+                        "visible": !selectedColumns.includes("MyriadID")
+                    },
+                    { "data": "FullName", visible: !selectedColumns.includes("FullName") },
+                    { "data": "AccountName", visible: !selectedColumns.includes("AccountName") },
+                    { "data": "Remarks", visible: !selectedColumns.includes("Remarks") },
+
+
+                    {
+                        "data": "DebitAmount",
+                        visible: !selectedColumns.includes("DebitAmount"),
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.DebitAmount == null) {
+                                return ``
+                            }
+                            else {
+                                return '<span>' + parseFloat(full.DebitAmount).toFixed(2) + '</span>'
+                            }
+                        },
+                    },
+                    {
+                        "data": "CreditAmount",
+                        visible: !selectedColumns.includes("CreditAmount"),
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.CreditAmount == null) {
+                                return ``
+                            }
+                            else {
+                                return '<span>' + parseFloat(full.CreditAmount).toFixed(2) + '</span>'
+                            }
+                        },
+                    },
+
+
+                ],
+
+            });
+
+        };
+
+        var startDate = new Date();
+        var FromEndDate = new Date();
+        var ToEndDate = new Date();
+        ToEndDate.setDate(ToEndDate.getDate() + 365);
+
+        $('.from_date').datepicker({
+            weekStart: 1,
+            startDate: '',
+            format: "dd/M/yyyy",
+            autoclose: true
+        })
+            .on('changeDate', function (selected) {
+                startDate = new Date(selected.date.valueOf());
+                $('.to_date').datepicker('setStartDate', startDate);
+            });
+        $('.to_date')
+            .datepicker({
+                weekStart: 1,
+                startDate: new Date($('.from_date').val()),
+                endDate: ToEndDate,
+                format: "dd/M/yyyy",
+                autoclose: true,
+
+            })
+            .on('changeDate', function (selected) {
+                FromEndDate = new Date(selected.date.valueOf());
+                FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                $('.from_date').datepicker('setEndDate', FromEndDate);
+            });
+
+
+        function Print() {
+            var ED = $('.to_date').val();
+
+            window.open("/Reporting/GetResidentTrialBalanceDetailPDFReport?ToDate=" + ED, '_blank');
+        }
+        function GetExcel() {
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+            var AccountId = $('#AccountId').val();
+            var StudentId = $('#StudentId').val();
+
+            var url = "/Reporting/ExportVoucherReport?FromDate=" + SD + "&ToDate=" + ED + "&AccountId=" + AccountId + "&StudentId=" + StudentId;
+
+            window.location.href = url;
+        }
+
+        function ExportSummaryReport() {
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+
+            var url = "/Reporting/ExportVoucherSummaryReport?fromDate=" + SD + "&toDate=" + ED;
+
+            window.location.href = url;
+        }
+
+        function dateformate(date) {
+            if (date == '' || date == null) {
+                return '';
+            } else {
+                let d = new Date(parseInt(date.substr(6))); //parse json datetime to datetime
+                let _month = parseInt(d.getMonth()) + 1;
+                let _date = d.getDate() + "/" + _month + "/" + d.getFullYear();
+
+                return _date;
+            }
+        }
+
+        function formatNegativeInParentheses(value) {
+            var numValue = parseFloat(value) || 0;
+            if (numValue < 0) {
+                return '(' + Math.abs(numValue).toFixed(2) + ')';
+            } else {
+                return numValue.toFixed(2);
+            }
+        }
+
+    </script>
+
+}

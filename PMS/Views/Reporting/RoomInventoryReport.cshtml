@@ -1,0 +1,141 @@
+﻿@model IEnumerable<PMS.DTO.ViewModels.ReportingViewModels.RoomInventoryVM>
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Room Inventory Report";
+    ViewBag.HeaderDescription = "Room Inventory Report";
+    ViewBag.Title = "Room Inventory Report | PMS";
+}
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+}
+<style>
+    th, td {
+        white-space: nowrap;
+    }
+
+    .dataTables_scrollFootInner {
+        overflow: visible !important;
+        padding-right: 0px !important;
+    }
+
+    .right {
+        text-align: right;
+    }
+
+    table.dataTable tfoot th {
+        text-align: right;
+    }
+</style>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+
+        <div class="box-body">
+
+            <div style="overflow: auto; width:100%;white-space:nowrap;">
+                <table id="RoomInventoryTable" class="table table-bordered table-striped data-table">
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Bed Space</th>
+                            <th>Room Number</th>
+                            <th>Room Type</th>
+                            <th>Occupancy</th>
+                            <th>Status</th>
+                            <th>Dates</th>
+                            <th>MyriadID</th>
+                            <th>FullName</th>
+                            <th>University</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.LocationName</td>
+                                <td>@item.BedNumber</td>
+                                <td>@item.RoomNumber</td>
+                                <td>@item.RoomType</td>
+                                <td>@item.RoomOccupancy</td>
+                                @{
+                                    if (item.Status == Enumeration.RoomInventoryRptStatus.Allocated.ToString())
+                                    {
+                                        <td><span class='label label-warning'>@item.Status</span></td>
+                                    }
+                                    else if (item.Status == Enumeration.RoomInventoryRptStatus.CheckedIn.ToString())
+                                    {
+                                        <td><span class='label label-primary'>@item.Status</span></td>
+                                    }
+
+                                    else if (item.Status == Enumeration.RoomInventoryRptStatus.Vacant.ToString())
+                                    {
+                                        <td><span class='label label-success'>@item.Status</span></td>
+                                    }
+                                    else
+                                    {
+                                        <td><span class="label label-danger">@item.Status</span></td>
+                                    }
+                                }
+                                <td>@item.Dates</td>
+                                <td>@item.Code</td>
+                                <td>@item.FullName</td>
+                                <td>@item.University</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#RoomInventoryTable').DataTable({
+                //"scrollY": "70vh",
+                //"scrollCollapse": true,
+                //"scrollX": "auto",
+                "paging": true,
+                "searching": true,
+                "lengthChange": true,
+                "ordering": true,
+                "scrollCollapse": true,
+                "scrollY": '70vh',
+                "scrollX": "auto",
+                "iDisplayLength": 100,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+                dom: 'Blfrtip',
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                buttons: [
+                    'excelHtml5',
+                    /*'<button type="button" onclick="Print()" class="dt-button buttons-excel buttons-html5"><i class="fa fa-download"></i></button>'*/
+                ],
+            });
+        });
+        function Print() {
+            window.open("/Reporting/GetRoomInventoryPDFReport", '_blank');
+        }
+    </script>
+
+
+}

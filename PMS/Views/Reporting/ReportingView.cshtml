@@ -1,0 +1,371 @@
+﻿@model IEnumerable<PMS.DTO.ViewModels.ReportingViewModels.ReportingVM>
+
+@{
+    ViewBag.Header = "Customize Report View";
+    ViewBag.HeaderDescription = "Customize Report View";
+    ViewBag.Title = "Customize Report View | PMS";
+}
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+}
+<style>
+    .right {
+        text-align: right;
+    }
+</style>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="">
+            <div class="">
+                <div class="col-md-2">
+                    <label>From Date</label>
+                    <input name="daterange" type="text" autocomplete="off" id="FromDate" class="form-control from_date" value="@ViewBag.FromDate" placeholder="From Date" />
+                </div>
+                <div class="col-md-2">
+                    <label>To Date</label>
+                    <input name="daterange" type="text" autocomplete="off" id="ToDate" class="form-control to_date" value="@ViewBag.ToDate" placeholder="To Date" />
+                </div>
+                <div class="col-md-5">
+                    <label>Student</label>
+                    @Html.DropDownList("StudentId", null, "-- All Users --", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                </div>
+
+                <div class="col-md-1">
+                    <label> &nbsp; </label>
+                    <br />
+                    <button type="button" onclick="ReportingsViewSearch();" class="btn btn-themyriad btn-bordered waves-effect w-md"><i class="fa fa-search"></i> <span>Search</span></button>
+                </div>
+            </div>
+            <br />
+
+        </div>
+        <div class="col-md-12">
+            <hr />
+        </div>
+        <div class="box-body">
+
+            <div style="overflow: auto; width:100%;white-space:nowrap;">
+
+                <table class="table table-bordered table-striped data-table" id="ReportViewTable">
+
+                    <thead>
+
+                        <tr>
+                            <th>Title</th>
+                            <th>PersonID</th>
+                            <th>Myriad ID</th>
+                            <th>Full Name</th>
+                            <th>University</th>
+                            <th>Nationality</th>
+                            <th>Gender</th>
+                            <th>Bed Space</th>
+                            <th>Room</th>
+                            <th>Requests</th>
+                            <th>Bed Occupied</th>
+                            <th>Occupancy</th>
+                            <th>Room Type</th>
+                            <th>Booking Number</th>
+                            <th>Status</th>
+                            <th>Booking Date</th>
+                            <th>MoveIn</th>
+                            <th>MoveOut</th>
+                            <th>CheckIn</th>
+                            <th>CheckOut</th>
+                            <th>Invoice Id</th>
+                            <th>Invoice Date</th>
+                            <th>FromDate</th>
+                            <th>ToDate</th>
+                            <th>Service</th>
+                            <th>Service Price</th>
+                            <th>Invoice Net Amount</th>
+                            <th>Transaction Code</th>
+                            <th>Payment Date</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            @*<th>Remarks</th>*@
+                            <th>Email</th>
+                            <th>Phone</th>
+
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @*@foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Title</td>
+                                <td>@item.PersonID</td>
+                                <td>@item.PersonCode</td>
+                                <td>@item.fullname</td>
+                                <td>@item.universiry</td>
+                                <td>@item.Gender</td>
+                                <td>@item.Bedname</td>
+                                <td>@item.RoomName</td>
+                                <td>@item.AccessibilityRequest</td>
+                                <td>@item.BedOccupied</td>
+                                <td>@item.Occupancy</td>
+                                <td>@item.RoomType</td>
+                                <td>@item.BookingNumber</td>
+                                <td>@item.Status</td>
+                                <td>@item.BookingCreatedDate</td>
+                                <td>@item.MoveIn</td>
+                                <td>@item.MoveOut</td>
+                                <td>@item.CheckIn</td>
+                                <td>@item.CheckOut</td>
+                                <td>@item.invoiceCode</td>
+                                <td>@item.InvoiceDate</td>
+                                <td>@item.Services</td>
+                                <td class="right">@item.ServiceNetPrice</td>
+                                <td class="right">@item.InvoiceNetAmount</td>
+                                <td>@item.Code</td>
+                                <td>@item.PaymentDate</td>
+                                <td class="right">@item.PaymentAmount</td>
+                                <td>@item.PaymentTypeName</td>
+                                <td>@item.email</td>
+                                <td>@item.phone</td>
+                            </tr>
+                        }*@
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+
+
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script>
+   
+            $(document).ready(function () {
+                ReportingsViewSearch();
+            });
+        function ReportingsViewSearch() {
+
+            loadInvoicesTable();
+        };
+        function loadInvoicesTable() {
+
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+            var StudentId = $('#StudentId').val();
+            var table = $('#ReportViewTable').DataTable({
+                serverSide: false,
+                destroy: true,
+                responsive: true,
+                processing: true,
+                paging: true,
+                async: false,
+                "scrollY": "70vh",
+                "scrollX": "70vh",
+                "scrollCollapse": true,
+                "iDisplayLength": 100,
+                dom: 'Blfrtip',
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                buttons: [
+                    'copyHtml5',
+                    'excelHtml5',
+                ],
+                ajax: GetFormatedUrl("/Reporting/loadGenericReportbyAjax?FromDate=" + SD + "&ToDate=" + ED + "&StudentId=" + StudentId),
+                columns: [
+                    { "data": "Title" },
+                    { "data": "PersonID" },
+                    { "data": "PersonCode" },
+                    { "data": "Fullname" },
+                    { "data": "Universiry" },
+                    { "data": "Nationality" },
+                    { "data": "Gender" },
+                    { "data": "Bedname" },
+                    { "data": "RoomName" },
+                    { "data": "AccessibilityRequest" },
+                    { "data": "BedOccupied" },
+                    { "data": "Occupancy" },
+                    { "data": "RoomType" },
+                    { "data": "BookingNumber" },
+                    { "data": "Status" },
+                    { "data": "BookingCreatedDate" },
+                    { "data": "MoveIn" },
+                    { "data": "MoveOut" },
+                    { "data": "CheckIn" },
+                    { "data": "CheckOut" },
+                    { "data": "invoiceCode" },
+                    { "data": "InvoiceDate" },
+                    { "data": "FromDate" },
+                    { "data": "ToDate" },
+                    { "data": "Services" },
+                    { "data": "ServiceNetPrice" },
+                    { "data": "InvoiceNetAmount" },
+                    { "data": "Code" },
+                    { "data": "PaymentDate" },
+                    { "data": "PaymentAmount" },
+                    { "data": "PaymentTypeName" },
+                    { "data": "email" },
+                    { "data": "phone" },
+                ],
+
+                columnDefs: [
+                    {
+                        targets: 15,
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.BookingCreatedDate) + '</span>'
+                        },
+                    },
+                    {
+                        targets: 16,
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.MoveIn) + '</span>'
+                        },
+                    },
+                    {
+                        targets: 17,
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.MoveOut) + '</span>'
+                        },
+                    },
+                    {
+                        targets: 18,
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.CheckIn) + '</span>'
+                        },
+                    },
+                    {
+                        targets: 19,
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.CheckOut) + '</span>'
+                        },
+                    },
+                    {
+                        targets: 21,
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.InvoiceDate) + '</span>'
+                        },
+                    },
+                    {
+                        targets: 22,
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.FromDate) + '</span>'
+                        },
+                    },
+                    {
+                        targets: 23,
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.ToDate) + '</span>'
+                        },
+                    },
+                    {
+                        targets: 25,
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.ServiceNetPrice == null) {
+                                return ``
+                            }
+                            else {
+                            return '<span>' + parseFloat(full.ServiceNetPrice).toFixed(2) + '</span>'
+                            }
+                        },
+                    },
+                    {
+                        targets: 26,
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.InvoiceNetAmount == null) {
+                                return ``
+                            }
+                            else {
+                                return '<span>' + parseFloat(full.InvoiceNetAmount).toFixed(2) + '</span>'
+                            }
+                        },
+                    },
+                    {
+                        targets: 28,
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.PaymentDate) + '</span>'
+                        },
+                    },
+                    {
+                        targets: 29,
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.PaymentAmount == null) {
+                                return ``
+                            }
+                            else {
+                                return '<span>' + parseFloat(full.PaymentAmount).toFixed(2) + '</span>'
+                            }
+                        },
+                    },
+                    
+                ],
+
+            });
+        };
+        function dateformate(date) {
+            if (date == '' || date == null) {
+                return '';
+            } else {
+                let d = new Date(parseInt(date.substr(6))); //parse json datetime to datetime
+                let _month = (d.getMonth() + 1).toString().padStart(2, "0");
+                let _date = d.getDate() + "/" + _month + "/" + d.getFullYear();
+
+                return _date;
+            }
+        }
+      
+    </script>
+    <script type="text/javascript">
+
+        var startDate = new Date();
+        var FromEndDate = new Date();
+        var ToEndDate = new Date();
+        ToEndDate.setDate(ToEndDate.getDate() + 365);
+
+        $('.from_date').datepicker({
+            weekStart: 1,
+            startDate: '',
+            format: "dd/M/yyyy",
+            autoclose: true
+        })
+            .on('changeDate', function (selected) {
+                startDate = new Date(selected.date.valueOf());
+                //startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+
+                $('.to_date').datepicker('setStartDate', startDate);
+            });
+        $('.to_date')
+            .datepicker({
+                weekStart: 1,
+                startDate: new Date($('.from_date').val()),
+                endDate: ToEndDate,
+                format: "dd/M/yyyy",
+                autoclose: true,
+
+            })
+            .on('changeDate', function (selected) {
+                FromEndDate = new Date(selected.date.valueOf());
+                FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                $('.from_date').datepicker('setEndDate', FromEndDate);
+            });
+    </script>
+}

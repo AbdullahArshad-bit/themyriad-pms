@@ -1,0 +1,264 @@
+﻿@using PMS.DTO.ViewModels.ContractViewModels
+@model PreCheckInDocumentationVM
+@{
+    ViewBag.Title = "Accept_documentation_Details";
+    Layout = null;
+}
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@ViewBag.Title</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/Assets/bower_components/font-awesome/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="~/Assets/bower_components/Ionicons/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/Assets/dist/css/AdminLTE.min.css">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="~/Assets/plugins/iCheck/square/_all.css">
+
+    <link href="~/Assets/css/custom.css" rel="stylesheet" />
+    <link href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.9/themes/blitzer/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+    <!-- Google Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <link rel="shortcut icon" type="image/png" href="https://themyriad.com/Assets/images/favicon.png">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-viewport-checker/1.8.8/jquery.viewportchecker.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/additional-methods.min.js"></script>
+    <style>
+
+        @@media only screen and (min-width: 481px) and (max-width:767px) {
+            #hide1 {
+                display: none;
+            }
+        }
+
+        @@media only screen and (min-width: 320px) and (max-width:480px) {
+            #hide1 {
+                display: none;
+            }
+        }
+
+        @@media only screen and (min-width: 878px) {
+            #hide {
+                display: none;
+            }
+        }
+
+        @@media only screen and (min-width: 768px)and (max-width: 877px) {
+            #hide {
+                display: none;
+            }
+        }
+        /*body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .wrapper {
+            text-align: center;
+        }*/
+
+        .signature-pad {
+            border: 1px solid #ccc;
+            background-color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            margin: 5px;
+        }
+
+        .login-box-msg {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+
+<body class="hold-transition login-page">
+    <script type="text/javascript">
+         
+    </script>
+
+    <div class="login-box">
+        <div class="login-logo">
+            <a href="#">
+                <img src="https://www.themyriad.com/Assets/images/logo.png" alt="logo">
+            </a>
+        </div>
+        <!-- /.login-logo -->
+        <div class="login-box-body">
+            <p class="login-box-msg" style="margin-bottom: 20px;">@Model.DocumentationName</p>
+
+            <div class="col-md-12">
+                <div id="dialog"></div>
+            </div>
+
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+
+            @using (Html.BeginForm("Accept_documentation_Details", "Account", FormMethod.Post, new { onsubmit = "getSignaturePad()" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(x => x.Id)
+
+                <div class="row col-md-12">
+                    <div id="dialog"></div>
+                    <br />
+                    <br />
+                </div>
+
+                <div class="row col-md-12">
+                    <div class="form-group has-feedback text-center">
+                        <canvas id="signature-pad" class="signature-pad" style="max-width: 100%; border: 1px solid #ccc;" width="400" height="200"></canvas>
+                        <textarea id="signature-result" name="StudentSignature" hidden></textarea>
+                        <img src="" id="signature-img-result" hidden name="StudentSignature" />
+                        <button id="clear" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-8">
+                        <div class="checkbox">
+                            <label>
+
+                                @Html.CheckBoxFor(x => x.IsSignedTerms) I Agree with <a href="https://themyriad.com/Terms-conditions" target="_blank">Terms & Conditions.</a>
+                            </label>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                    <!-- /.col -->
+                </div>
+                <div class="row">
+                    <div class="col-xs-8">
+                        <div class="checkbox">
+                            <label>
+
+                                @Html.CheckBoxFor(x => x.IsSignedCodeOfConduct) I Agree with <a href="https://themyriad.com/code-of-conduct" target="_blank">Code of Conduct.</a>
+                            </label>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                    <!-- /.col -->
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <button type="submit" class="btn btn-themyriad btn-block btn-flat btn-submit">I Accept Agreement</button>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- /.login-box-body -->
+    </div>
+    <!-- /.login-box -->
+    <!-- jQuery 3 -->
+    <script src="~/Assets/bower_components/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap 3.3.7 -->
+    <script src="~/Assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- iCheck -->
+    <script src="~/Assets/plugins/iCheck/icheck.min.js"></script>
+
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
+
+
+
+    <script>
+
+        var signaturePad = new SignaturePad(document.getElementById('signature-pad'), {
+            backgroundColor: 'rgba(255, 255, 255, 0)',
+            penColor: 'rgb(0, 0, 0)'
+        });
+        function getSignaturePad() {
+            var imageData = signaturePad.toDataURL('image/png');
+            $('#signature-result').val(imageData)
+            $('#signature-img-result').attr('src', "data:" + imageData);
+        }
+        $('#clear').click(function (e) {
+            e.preventDefault();
+            signaturePad.clear();
+        })
+        $(function () {
+
+            var object = "<div id='hide1'><object data=\"{FileName}\" type=\"application/pdf\" width=\"100%\" height=\"600px\">";
+            object += "</object></div>";
+            object += "<div id='hide'>If you are unable to view file, you can download from here </br></br><div class='col-md-12 text-center'><a class='btn btn-primary btn-flat' href =\"{FileName}\">Download</a></div></div>";
+            object = object.replace(/{FileName}/g, '@Model.DocumentationUrl');
+            $("#dialog").html(object);
+            $('.btn-submit').attr('disabled', true)
+        })
+
+
+        //$('#IsSigned').on('change', function () {
+        //    if ($(this).prop("checked") == true) {
+        //        $('.btn-submit').attr('disabled', false)
+
+        //    }
+        //    else {
+        //        $('.btn-submit').attr('disabled', true)
+
+        //    }
+        //});
+
+        $('input[type="checkbox"]').on('change', function () {
+            if ($('#IsSignedTerms').prop("checked") && $('#IsSignedCodeOfConduct').prop("checked")) {
+                $('.btn-submit').attr('disabled', false);
+            } else {
+                $('.btn-submit').attr('disabled', true);
+            }
+        });
+
+
+    </script>
+
+
+    <style>
+            .login-box, .register-box {
+                width: 50%;
+                margin: 1% auto !important;
+            }
+            /* @@media screen and (min-width: 601px) {
+            .login-box, .register-box {
+                width: 50%;
+            }
+        }*/
+
+            @@media screen and (max-width: 600px) {
+                .login-box, .register-box {
+                    width: 100%;
+                    margin: 11% auto !important;
+                }
+            }
+    </style>
+
+</body>
+
+
+
+</html>
+

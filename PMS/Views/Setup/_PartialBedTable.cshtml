@@ -1,0 +1,48 @@
+﻿@{
+    var beds = ViewBag.BedSpaces as List<PMS.EF.BedSpace>;
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Bed</th>
+            <th>Description</th>
+            <th>Available</th>
+            <th>Action</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @for (int i = 0; i < beds.Count; i++)
+        {
+            <tr>
+                <td>
+                    <div class="form-group">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="bed" value="@beds[i].BedSpaceID" @(i == 0 ? "checked" : "")>
+                                @beds[i].BedName
+                            </label>
+                        </div>
+                    </div>
+                </td>
+                <td>@beds[i].BedDescription</td>
+                <td>
+                    @if (@beds[i].Status == true)
+                    {
+                        <span class="label label-success">Yes</span>
+                    }
+                    else
+                    {
+                        <span class="label label-danger">No</span>
+
+                    }
+                </td>
+                <td class="menu-icons" style="text-align:inherit">
+                    <a title="Edit" href="#" class="form_modal" data-id="@beds[i].BedSpaceID" data-view="bed"><i class="fa fa-edit"></i></a>
+                    <a title="Delete" href="#" data-view="bed" data-href="@Url.Action("DeleteBed" ,"Setup", new { id = beds[i].BedSpaceID })" data-toggle="modal" data-target="#confirm-delete-async"><i class="fa fa-remove"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

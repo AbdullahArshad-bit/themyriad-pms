@@ -1,0 +1,601 @@
+﻿@model IEnumerable<PMS.DTO.ViewModels.ReportingViewModels.AgeingReportVM>
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Ageing Report";
+    ViewBag.HeaderDescription = "Ageing Report";
+    ViewBag.Title = "Ageing Report | PMS";
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+}
+
+<style>
+    th, td {
+        white-space: nowrap;
+    }
+
+    .dataTables_scrollFootInner {
+        overflow: visible !important;
+        padding-right: 0px !important;
+    }
+
+    .right {
+        text-align: right;
+    }
+
+    table.dataTable tfoot th {
+        text-align: right;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <label>From Date</label>
+                <input name="daterange" type="text" autocomplete="off" id="FromDate" class="form-control from_date" value="@ViewBag.FromDate" placeholder="From Date" />
+            </div>
+            <div class="col-md-2">
+                <label>Date</label>
+                <input name="daterange" id="ToDate" autocomplete="off" class="form-control to_date" value="@ViewBag.ToDate" placeholder="To Date" />
+            </div>
+
+            <div class="col-md-3">
+                <label>Student</label>
+                @Html.DropDownList("StudentId", null, "-- All Users --", htmlAttributes: new { @class = "form-control select2" })
+            </div>
+            <div class="col-md-3">
+                <label> &nbsp; </label>
+                <br />
+                <button type="button" onclick="GetAgeingDetail();" class="btn btn-themyriad btn-bordered waves-effect w-md"><i class="fa fa-search"></i> <span>Search</span></button>
+                <button type="button" onclick="GetExcel()" class="btn btn-success btn-bordered waves-effect w-md button-effect" style="margin-left: 5px;"> <i class="fa fa-download"> </i> <span> Export Report </span> </button>
+
+            </div>
+            <div class="col-md-2">
+                <label> &nbsp; </label>
+                <br />
+
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <hr />
+        </div>
+
+        <div class="box-body">
+            <div class="row">
+                <div class="row" style="margin-bottom:30px">
+                    <div class="col-md-3">
+                        <label>Search By Column:</label>
+                        <select class="form-control" id="column-filter">
+                            <option value="">All Columns</option>
+                            <option value="Title">Title</option>
+                            <option value="MyriadID">MyriadID</option>
+                            <option value="FullName">FullName</option>
+                            <option value="Gender">Gender</option>
+                            <option value="BedSpace">Bed Space</option>
+                            <option value="Room">Room</option>
+                            <option value="RoomType">Room Type</option>
+                            <option value="Commitment">Commitment</option>
+                            <option value="MoveIn">MoveIn</option>
+                            <option value="MoveOut">MoveOut</option>
+                            <option value="CheckIn">CheckIn</option>
+                            <option value="CheckOut">CheckOut</option>
+                            <option value="Email">Email</option>
+                            <option value="Phone">Phone</option>
+                            @*<option value="BSPCreatedDate">BSPCreatedDate</option>*@
+                            <option value="University">University</option>
+                            <option value="Status">Status</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3" style="width: 200px;">
+                        <label>Column Visibilty:</label>
+                        <select multiple class="form-control" id="columnvisibilty-filter">
+                            <option value="Title">Title</option>
+                            <option value="MyriadID">MyriadID</option>
+                            <option value="FullName">FullName</option>
+                            <option value="Gender">Gender</option>
+                            <option value="BedSpace">Bed Space</option>
+                            <option value="Room">Room</option>
+                            <option value="RoomType">Room Type</option>
+                            <option value="Commitment">Commitment</option>
+                            <option value="MoveIn">MoveIn</option>
+                            <option value="MoveOut">MoveOut</option>
+                            <option value="CheckIn">CheckIn</option>
+                            <option value="CheckOut">CheckOut</option>
+                            <option value="Email">Email</option>
+                            <option value="Phone">Phone</option>
+                            @*<option value="BSPCreatedDate">BSPCreatedDate</option>*@
+                            <option value="University">University</option>
+                            <option value="Status">Status</option>
+                            <option value="OutstandingAmount">OutstandingAmount</option>
+                            <option value="Last0To7DaysBalance">Last0To7DaysBalance</option>
+                            <option value="Last8To30DaysBalance">Last8To30DaysBalance</option>
+                            <option value="Last31To60DaysBalance">Last31To60DaysBalance</option>
+                            <option value="Last61To120DaysBalance">Last61To120DaysBalance</option>
+                            <option value="Last121To180DaysBalance">Last121To180DaysBalance</option>
+                            <option value="Above180DaysBalance">Above180DaysBalance</option>
+                            <option value="LiabilityBalance">LiabilityBalance</option>
+
+                        </select>
+                    </div>
+                </div>
+                <table id="AgeingTable" class="table table-bordered table-striped data-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>MyriadID</th>
+                            <th>FullName</th>
+                            <th>Gender</th>
+                            <th>Bed Space</th>
+                            <th>Room</th>
+                            <th>Room Type</th>
+                            <th>Commitment</th>
+                            <th>MoveIn</th>
+                            <th>MoveOut</th>
+                            <th>CheckIn</th>
+                            <th>CheckOut</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            @*<th>BSPCreatedDate</th>*@
+                            <th>University</th>
+                            <th>Status</th>
+                            <th>OutstandingAmount</th>
+                            <th>0-7</th>
+                            <th>8-30</th>
+                            <th>31-60</th>
+                            <th>61-120</th>
+                            <th>121-180</th>
+                            <th>above 180</th>
+                            <th>LiabilityBalance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+    <script type="text/javascript">
+
+        var startDate = new Date();
+        var FromEndDate = new Date();
+        var ToEndDate = new Date();
+        ToEndDate.setDate(ToEndDate.getDate() + 365);
+
+        $('.from_date').datepicker({
+            weekStart: 1,
+            startDate: '',
+            format: "dd/M/yyyy",
+            autoclose: true
+        })
+            .on('changeDate', function (selected) {
+                startDate = new Date(selected.date.valueOf());
+                $('.to_date').datepicker('setStartDate', startDate);
+            });
+
+        $('.to_date')
+            .datepicker({
+                weekStart: 1,
+                startDate: new Date($('.from_date').val()),
+                endDate: ToEndDate,
+                format: "dd/M/yyyy",
+                autoclose: true,
+
+            })
+            .on('changeDate', function (selected) {
+                FromEndDate = new Date(selected.date.valueOf());
+                FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                $('.from_date').datepicker('setEndDate', FromEndDate);
+            });
+
+        function GetExcel() {
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+            var StudentId = $('#StudentId').val();
+
+            var url = "/Reporting/ExportAgeingReport?FromDate=" + SD + "&ToDate=" + ED + "&StudentId=" + StudentId;
+
+            window.location.href = url;
+
+        }
+
+    </script>
+
+    <script>
+        var table;
+        var tot;
+        var dataTable;
+        $(document).ready(function () {
+            $('#columnvisibilty-filter').multiselect({
+
+                nonSelectedText: 'Select columns to hide',
+                maxHeight: 100,
+                onChange: function (element, checked) {
+
+                    GetAgeingDetail();
+                },
+            });
+            GetAgeingDetail();
+        });
+
+        function GetAgeingDetail() {
+
+            initializeDataTable();
+        };
+
+        function initializeDataTable(SD, ED, CheckOut, StudentId, query) {
+
+            ShowLoader();
+            if (dataTable) {
+                dataTable.destroy();
+            }
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+            var StudentId = $('#StudentId').val();
+            var urlParams = new URLSearchParams(window.location.search);
+            var query = urlParams.get('queryby');
+            var selectedColumns = $('#columnvisibilty-filter').val();
+            var columns = [];
+            if (selectedColumns) {
+                selectedColumns.forEach(function (columnName) {
+                    var columnDef = {
+                        "data": columnName
+                    };
+                    columns.push(columnDef);
+                });
+            }
+            dataTable = $('#AgeingTable').DataTable({
+                processing: false,
+                serverSide: true,
+                filter: true,
+                paging: true,
+                searching: true,
+                lengthChange: true,
+                scrollCollapse: true,
+                scrollY: '70vh',
+                scrollX: true,
+                scroller: true,
+                ordering: true,
+                info: true,
+                iDisplayLength: 100,
+                autoWidth: true,
+                responsive: true,
+                columns: columns,
+                language: {
+                    emptyTable: "No record found."
+                },
+
+
+                "ajax": {
+                    "url": "/Reporting/loadAgeingReportbyAjax",
+                    "type": "POST",
+                    "data": function (d) {
+                        d.FromDate = SD;
+                        d.ToDate = ED;
+                        d.StudentId = StudentId;
+                        d.query = query;
+                        d.SelectedColumns = selectedColumns;
+                        var selectedColumn = $('#column-filter').val();
+                        if (selectedColumn) {
+                            d.search = {
+                                value: $('#AgeingTable_filter input').val(),
+                                column: selectedColumn
+                            };
+                        }
+                        else {
+                            d.search
+                        }
+                        var columnIndex = d.order[0].column;
+
+                        if (columnIndex === 0) {
+                            d.orderBy = d.order[0].column;
+                            d.orderDir = d.order[0].dir;
+                        }
+                        else {
+                            var columnName = d.columns[columnIndex].data;
+                            d.orderBy = columnName;
+                            d.orderDir = d.order[0].dir;
+                        }
+                    },
+
+                    "datatype": "json",
+                    beforeSend: function () {
+                        ShowLoader(); // Show loader before AJAX request
+                    },
+                    complete: function () {
+                        HideLoader(); // Hide loader after AJAX request
+                    },
+                    error: function (xhr, error, thrown) {
+                        console.error('AJAX error:', error, thrown);
+                        HideLoader();
+                    }
+                },
+                columns: [
+
+                    { "data": "Title", visible: !selectedColumns.includes("Title") },
+                    {
+                        "data": "MyriadID",
+                        "render": function (data, type, full, meta) {
+                            var link = '/payments/PartnerLedger?personId=' + full.PersonID;
+                            return '<a target="_blank" href="' + link + '">' + full.MyriadID + '</a>';
+                        },
+                        "visible": !selectedColumns.includes("MyriadID")
+                    },
+                    { "data": "FullName", visible: !selectedColumns.includes("FullName") },
+                    { "data": "Gender", visible: !selectedColumns.includes("Gender") },
+                    { "data": "BedSpace", visible: !selectedColumns.includes("BedSpace") },
+                    { "data": "Room", visible: !selectedColumns.includes("Room") },
+                    { "data": "RoomType", visible: !selectedColumns.includes("RoomType") },
+                    { "data": "Commitment", visible: !selectedColumns.includes("Commitment") },
+                    {
+                        "data": "MoveIn",
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.MoveIn) + '</span>'
+                        },
+                        visible: !selectedColumns.includes("MoveIn")
+                    },
+                    {
+                        "data": "MoveOut",
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.MoveOut) + '</span>'
+                        },
+                        visible: !selectedColumns.includes("MoveOut")
+                    },
+                    {
+                        "data": "CheckIn",
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.CheckIn) + '</span>'
+                        },
+                        visible: !selectedColumns.includes("CheckIn")
+                    },
+                    {
+                        "data": "CheckOut",
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.CheckOut) + '</span>'
+                        },
+                        visible: !selectedColumns.includes("CheckOut")
+                    },
+                    { "data": "Email", visible: !selectedColumns.includes("Email") },
+                    { "data": "Phone", visible: !selectedColumns.includes("Phone") },
+                    //{
+                    //    "data": "BSPCreatedDate",
+                    //    render: function (data, type, full, meta) {
+                    //        return '<span>' + dateformateWithTime(full.BSPCreatedDate) + '</span>'
+                    //    },
+                    //    visible: !selectedColumns.includes("BSPCreatedDate")
+                    //},
+                    { "data": "University", visible: !selectedColumns.includes("University") },
+
+                    {
+                        "data": "Status",
+                        render: function (data, type, full, meta) {
+                            if (full.Status == "CheckedIn") {
+                                return `<span class="text-success label label-success">CheckedIn</span>`
+                            }
+                            else if (full.Status == "CheckedOut") {
+                                return `<span class="label label-primary">CheckedOut</span>`;
+                            }
+                            else if (full.Status == "Not CheckedIn") {
+                                return `<span class="label label-danger">Not CheckedIn</span>`;
+                            }
+
+                            else {
+                                return `<span class="label label-danger"></span>`
+                            }
+                        },
+
+                        visible: !selectedColumns.includes("Status")
+                    },
+
+                    {
+                        "data": "OutstandingAmount",
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.OutstandingAmount == null) {
+                                return ``;
+                            } else {
+                                let amount = parseFloat(full.OutstandingAmount).toFixed(2);
+                                if (amount < 0) {
+                                    return '<span>(' + Math.abs(amount) + ')</span>';
+                                } else {
+                                    return '<span>' + amount + '</span>';
+                                }
+                            }
+                        },
+                        visible: !selectedColumns.includes("OutstandingAmount")
+                    },
+
+                    {
+                        "data": "Last0To7DaysBalance",
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.Last0To7DaysBalance == null) {
+                                return ``;
+                            } else {
+                                let amount = parseFloat(full.Last0To7DaysBalance).toFixed(2);
+                                if (amount < 0) {
+                                    return '<span>(' + Math.abs(amount) + ')</span>';
+                                } else {
+                                    return '<span>' + amount + '</span>';
+                                }
+                            }
+                        },
+                        visible: !selectedColumns.includes("Last0To7DaysBalance")
+                    },
+
+                    {
+                        "data": "Last8To30DaysBalance",
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.Last8To30DaysBalance == null) {
+                                return ``;
+                            } else {
+                                let amount = parseFloat(full.Last8To30DaysBalance).toFixed(2);
+                                if (amount < 0) {
+                                    return '<span>(' + Math.abs(amount) + ')</span>';
+                                } else {
+                                    return '<span>' + amount + '</span>';
+                                }
+                            }
+                        },
+                        visible: !selectedColumns.includes("Last8To30DaysBalance")
+                    },
+
+                    {
+                        "data": "Last31To60DaysBalance",
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.Last31To60DaysBalance == null) {
+                                return ``;
+                            } else {
+                                let amount = parseFloat(full.Last31To60DaysBalance).toFixed(2);
+                                if (amount < 0) {
+                                    return '<span>(' + Math.abs(amount) + ')</span>';
+                                } else {
+                                    return '<span>' + amount + '</span>';
+                                }
+                            }
+                        },
+                        visible: !selectedColumns.includes("Last31To60DaysBalance")
+                    },
+
+                    {
+                        "data": "Last61To120DaysBalance",
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.Last61To120DaysBalance == null) {
+                                return ``;
+                            } else {
+                                let amount = parseFloat(full.Last61To120DaysBalance).toFixed(2);
+                                if (amount < 0) {
+                                    return '<span>(' + Math.abs(amount) + ')</span>';
+                                } else {
+                                    return '<span>' + amount + '</span>';
+                                }
+                            }
+                        },
+                        visible: !selectedColumns.includes("Last61To120DaysBalance")
+                    },
+
+                    {
+                        "data": "Last121To180DaysBalance",
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.Last121To180DaysBalance == null) {
+                                return ``;
+                            } else {
+                                let amount = parseFloat(full.Last121To180DaysBalance).toFixed(2);
+                                if (amount < 0) {
+                                    return '<span>(' + Math.abs(amount) + ')</span>';
+                                } else {
+                                    return '<span>' + amount + '</span>';
+                                }
+                            }
+                        },
+                        visible: !selectedColumns.includes("Last121To180DaysBalance")
+                    },
+
+                    {
+                        "data": "Above180DaysBalance",
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.Above180DaysBalance == null) {
+                                return ``;
+                            } else {
+                                let amount = parseFloat(full.Above180DaysBalance).toFixed(2);
+                                if (amount < 0) {
+                                    return '<span>(' + Math.abs(amount) + ')</span>';
+                                } else {
+                                    return '<span>' + amount + '</span>';
+                                }
+                            }
+                        },
+                        visible: !selectedColumns.includes("Above180DaysBalance")
+                    },
+
+                    {
+                        "data": "LiabilityBalance",
+                        "className": "text-right",
+                        render: function (data, type, full, meta) {
+                            if (full.LiabilityBalance == null) {
+                                return ``;
+                            } else {
+                                let amount = parseFloat(full.LiabilityBalance).toFixed(2);
+                                if (amount < 0) {
+                                    return '<span>(' + Math.abs(amount) + ')</span>';
+                                } else {
+                                    return '<span>' + amount + '</span>';
+                                }
+                            }
+                        },
+                        visible: !selectedColumns.includes("LiabilityBalance")
+                    },
+
+                ],
+
+
+            });
+        };
+
+        function dateformate(date) {
+            if (date == '' || date == null) {
+                return '';
+            } else {
+                let d = new Date(parseInt(date.substr(6)));
+                let _month = (d.getMonth() + 1).toString().padStart(2, "0");
+                let _date = d.getDate() + "/" + _month + "/" + d.getFullYear();
+
+                return _date;
+            }
+        }
+        function dateformateWithTime(date) {
+            if (date == '' || date == null) {
+                return '';
+            } else {
+                let d = new Date(parseInt(date.substr(6)));
+                let _month = (d.getMonth() + 1).toString().padStart(2, "0");
+                let _date = d.getDate().toString().padStart(2, "0");
+                let _year = d.getFullYear();
+                let _hours = d.getHours().toString().padStart(2, "0");
+                let _minutes = d.getMinutes().toString().padStart(2, "0");
+                let _seconds = d.getSeconds().toString().padStart(2, "0");
+
+                let formattedDate = `${_date}/${_month}/${_year} ${_hours}:${_minutes}:${_seconds}`;
+
+                return formattedDate;
+            }
+        }
+
+    </script>
+}

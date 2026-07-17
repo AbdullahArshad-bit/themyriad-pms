@@ -1,0 +1,233 @@
+﻿@model PMS.DTO.ViewModels.CorrespondenceViewModels.AddEmailMessageVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Correspondence";
+    ViewBag.HeaderDescription = "Add/Edit Email Messages";
+    ViewBag.Title = "Add/Edit Email Messages | Correspondence | PMS";
+}
+
+
+@section styles{
+    <!-- bootstrap datepicker -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Bootstrap time Picker -->
+    <link rel="stylesheet" href="~/Assets/plugins/timepicker/bootstrap-timepicker.css">
+}
+
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("EmailMessages", "Correspondence")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Email Messages</a>
+        </div>
+    </div>
+
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddEmailMessages", "Correspondence", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_email_message_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.EmailMessageID)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.IsActive)
+
+                    <div>
+                        <label class="switch">
+                            <input type="checkbox" name="IsActive" id="IsActive" value="@Model.IsActive" @(@Model.IsActive ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    @Html.ValidationMessageFor(x => x.IsActive)
+
+                </div>
+            </div>
+            <div class="row col-md-12">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocationId, "Location")
+                        @Html.DropDownList("LocationId", null, "--- Select Location ---", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.LocationId)
+
+                    </div>
+                </div>
+            </div>
+            <div class="row col-md-12">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.EmailMessageName)</label>
+
+                        @Html.TextBoxFor(x => x.EmailMessageName, new { @class = "form-control", placeholder = "Enter Name" })
+
+                        @Html.ValidationMessageFor(x => x.EmailMessageName)
+
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.EmailMessageDescription)</label>
+                        @Html.TextAreaFor(x => x.EmailMessageDescription, new
+                        {
+                            @class = "form-control",
+                            placeholder = "Enter Description"@*, style = "min-height:75px"*@})
+                        @Html.ValidationMessageFor(x => x.EmailMessageDescription)
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row col-md-12">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.EmailMessageSubject)</label>
+
+                        @Html.TextBoxFor(x => x.EmailMessageSubject, new { @class = "form-control", placeholder = "Enter Subject" })
+
+                        @Html.ValidationMessageFor(x => x.EmailMessageSubject)
+
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.EmailSenderID)</label>
+
+                        @Html.DropDownListFor(model => model.EmailSenderID,
+             new SelectList(Model.EmailMessageSendersList, "Value", "Text"),
+             "-- Sender --",
+             new { @Class = "form-control" })
+
+                        @Html.ValidationMessageFor(x => x.EmailSenderID)
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.ActionId)</label>
+
+                        @Html.DropDownList("ActionId", null, "-- Select Action --", htmlAttributes: new { @Class = "form-control", @required = "required" })
+
+                        @Html.ValidationMessageFor(x => x.ActionId)
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row col-md-12">
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EmailMessageBody)
+                        @Html.TextAreaFor(x => x.EmailMessageBody, new { @class = "form-control", id = "MessageBody", name = "MessageBody", placeholder = "Enter Message", style = "min-height:125px;" })
+                        @Html.ValidationMessageFor(x => x.EmailMessageBody)
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- bootstrap time picker -->
+    <script src="~/Assets/plugins/timepicker/bootstrap-timepicker.min.js"></script>
+
+    <script src="https://cdn.ckeditor.com/4.15.0/full/ckeditor.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            
+        });
+
+        CKEDITOR.replace('MessageBody', {
+            uiColor: '#CCEAEE',
+            removePlugins: 'elementspath',
+            allowedContent: true,
+            extraAllowedContent: 'style[type]{*}(*)'
+            
+        });
+
+        $(function () {
+            //Date picker
+            $('.term_date').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy"
+            });
+
+            //$('#show_time').timepicker({
+            //    showInputs: false
+            //})
+        })
+        function setInitialLocation() {
+
+            var initialLocation = localStorage.getItem("selectedLocation");
+
+            if (initialLocation) {
+
+                $('#LocationId').val(initialLocation);
+                $("#LocationId").prop('disabled', true);
+
+
+            }
+        }
+        $('form').submit(function () {
+
+
+            var locationId = $('#LocationId').val();
+
+
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'LocationId',
+                value: locationId
+            }).appendTo('form');
+
+            return true;
+        });
+
+        setInitialLocation();
+
+    </script>
+}
+

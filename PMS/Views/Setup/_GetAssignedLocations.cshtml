@@ -1,0 +1,5 @@
+﻿@if(ViewBag.LocationId != null)
+{ 
+
+        @Html.DropDownList("LocationId", null, "-- Location --", htmlAttributes: new { @class = "form-control Locationid", @required = "required" })
+}

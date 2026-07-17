@@ -1,0 +1,371 @@
+﻿@model PMS.DTO.ViewModels.TransportationViewModels.AddRouteVM
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Header = "Routes";
+    ViewBag.HeaderDescription = "Add Routes";
+    var i =1;
+}
+<style>
+    .highlight{
+        border-color:red;
+    }
+</style>
+<div class="box box-danger">
+    <div class="box-header with-border">
+        
+            <div class="input-group-btn">
+                <a href="@Url.Action("GetAll", "VehicleRoutes")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Routes</a>
+            </div>
+        
+    </div>
+
+    <!-- form start -->
+   
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x=>x.RouteID,new {@id="routeID" })
+
+<div class="box-body">
+
+    <div class="col-md-6">
+        <div class="form-group">
+            @Html.LabelFor(x => x.LocationId, "Location")
+            @Html.DropDownList("LocationId", null, "--- Select Location ---", htmlAttributes: new { @class = "form-control", @required = "required" })
+            @Html.ValidationMessageFor(x => x.LocationId)
+
+        </div>
+    </div>
+
+    <div class="col-md-6">
+
+        <div class="form-group">
+            <label for="Title">Route Name</label>
+
+            @Html.TextBoxFor(x => x.Routename, new { @class = "form-control routename", placeholder = "Enter Route Name" })
+
+            @Html.ValidationMessageFor(x => x.Routename)
+        </div>
+    </div>
+
+
+    <div class="col-md-6">
+
+        <div class="form-group">
+            <label for="Title">Travel Time (Min)</label>
+
+            @Html.TextBoxFor(x => x.TravelTime, new { @class = "traveltime form-control", placeholder = "Enter Travel Time In Minutes" })
+
+            @Html.ValidationMessageFor(x => x.TravelTime)
+        </div>
+
+    </div>
+
+    <div class="row" id="settingDiv">
+        <table id="show">
+            <tr>
+                <th class="col-md-3">Stops</th>
+                <th class="col-md-3">Order Number</th>
+                <th class="col-md-3">Stop Travel Time (Min)</th>
+                <th class="col-md-3">Is Active</th>
+            </tr>
+        </table>
+        @if (Model != null && Model.RouteStop != null)
+        {
+            @*<table id="show">
+                    <tr>
+                        <th class="col-md-3">Departure Stop</th>
+                        <th class="col-md-3">Order Number</th>
+                        <th class="col-md-3">Stop Travel Time</th>
+                        <th class="col-md-3">Is Active</th>
+                    </tr>
+                </table>*@
+            foreach (var item in Model.RouteStop)
+            {
+                <div class="row parentDiv">
+
+
+                    <div class="col-md-3">
+                        <div class="form-group stop">
+
+                            @Html.DropDownListFor(x => item.DepartureStopId, new SelectList(ViewBag.DepartureStopEdit, "Id", "Name", item.DepartureStopId), "-- Stops --", htmlAttributes: new { @id = "Stop[" + i + "]", @class = "StopId form-control select2", @required = "required" })
+
+
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-3">
+
+                        <div class="form-group">
+
+
+                            @Html.TextBox("Order Number", item.OrderNumber, htmlAttributes: new { @id = "Order-" + i, @data_Index = "OrderNumber[@i]", @class = "OrderNumber form-control", placeholder = "Enter Order Number" })
+
+
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+
+                        <div class="form-group">
+
+
+                            @Html.TextBox("Total Stop Time", item.StopTravelTime, new { @Id = "StopTravelTime[" + i + "]", @class = "StopTime form-control", placeholder = "Enter Stop Time" })
+
+
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+
+                        <div class="form-group">
+
+                            <div>
+                                <label class="switch">
+                                    <input type="checkbox" name="IsActive[@i]" id="IsActive" value="@item.IsActive" @(item.IsActive ? "checked" : "")>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <div>
+                            <a style="cursor:pointer;font-size: 17px;" class="fa fa-trash Addnewrow remove" id="remove"></a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+
+    <div class="col-md-12">
+        <a href="#Line" class="fa fa-plus-circle Addnewrow" onclick="AddNewRow()">Add Stop</a>
+        <button class="btn btn-themyriad savebtn " style="float:right;" type="button" onclick="Save()">Save</button>
+    </div>
+
+
+</div>
+    <!-- /.box-body -->
+
+
+
+
+</div>
+
+@section scripts
+        {
+    <script>
+
+        var counter = 0;
+            var i = 1;
+        $(document).ready(function () {
+                var id = $("#routeID").val();
+                if (id == "0" || id == "") {
+                    AddNewRow();
+                } else {
+                    var html = $('.parentDiv');
+                    if (html.length > 0) {
+                        counter = html.length;
+                        i = html.length+1;
+                    }
+                }
+            $('.select2').select2();
+
+            });
+        
+        $(document).on('focusout', '.OrderNumber', function () {
+                ValidateOrder();
+
+            });
+        $(document).on('click', '.remove', function () {
+            $(this).closest('.parentDiv').remove();
+                counter--;
+            });
+
+            function AddNewRow() {
+            $("#show").append("&nbsp;");
+                //$("#show").show();
+                counter++;
+                var deletebtn = '';
+                if (counter > 1) {
+                    deletebtn = `<div> <a style="cursor:pointer;font-size: 17px;" class="fa fa-trash Addnewrow remove" id="remove"></a></div>`;
+            }
+            var html = `<div class="row parentDiv">
+
+
+
+        <div class="col-md-3">
+            <div class="form-group stop">
+
+                @Html.DropDownList("DepartureStopId",null, "-- Stops --", htmlAttributes: new {@id= "Stop[${counter}]", @class = "StopId form-control select2", @required = "required" })
+            </div>
+
+        </div>
+    <div class="col-md-3">
+
+        <div class="form-group">
+
+
+            @Html.TextBox("Order Number","0",htmlAttributes:  new {@id="Order-${counter}", @data_Index="OrderNumber[${i}]" , @class = "OrderNumber form-control", placeholder = "Enter Order Number" })
+
+
+        </div>
+    </div>
+    <div class="col-md-3">
+
+        <div class="form-group">
+
+
+            @Html.TextBox("Total Stop Time","0", new { @Id= "StopTravelTime[${counter}]", @class = "StopTime form-control", placeholder = "Enter Stop Time" })
+
+
+        </div>
+    </div>
+    <div class="col-md-2">
+
+        <div class="form-group">
+
+
+                  <div>
+                      <label class="switch">
+                          <input type="checkbox" name="IsActive[${counter}]" id="IsActive"  ) checked>
+                          <span class="slider round"></span>
+                      </label>
+                  </div>
+    </div>
+    </div>
+    <div class="col-md-1">
+    ${deletebtn}
+    </div>
+    </div>`
+            
+            $('#settingDiv').append(html);
+            $(`#Order-${counter}`).val(i);
+            $('.select2').select2();
+            i++;
+        }
+        function ValidateOrder() {
+            var OrderHtml = $('#settingDiv').find('.OrderNumber');
+
+            var reportRecipients = [];
+            $.each(OrderHtml, function (i, e) {
+                reportRecipients.push($(e).val());
+            })
+
+            var recipientsArray = reportRecipients.sort();
+
+            var reportRecipientsDuplicate = [];
+            for (var i = 0; i < recipientsArray.length - 1; i++) {
+                var html = OrderHtml[i];
+                $(html).removeClass('highlight');
+                if (recipientsArray[i + 1] == recipientsArray[i]) {
+                    reportRecipientsDuplicate.push(recipientsArray[i]);
+
+                    $(html).addClass('highlight');
+                    //var ClassToApply = $(html).attr("data-index");
+                    //$('#settingDiv').find('[data-index=' + ClassToApply +']').addClass('.highlight');
+
+                }
+            }
+            if (reportRecipientsDuplicate.length > 0) {
+                showMessage('Order Numbr Already Exist')
+                return false;
+            }
+            return true;
+        }
+        function Save() {
+            if (validate() && ValidateOrder()) {
+                var RouteStopList = [];
+                var routeid = $("#routeID").val();
+                var routename = $(".routename").val();
+                var traveltime = $(".traveltime").val();
+                var locationId = $("#LocationId").val();
+
+                $("div.parentDiv").each(function (index, element) {
+
+                    
+                    var stopid = $(element).find(".StopId option:selected").val();
+                    var ordernumber = $(element).find(".OrderNumber").val();
+                    var stoptime = $(element).find(".StopTime").val();
+                    //var isdeparture = $(element).find(".IsDeparture").is(':checked');
+                    var isactive = $(element).find("#IsActive").is(':checked');
+                    var RouteStop = {
+
+                        DepartureStopId: stopid,
+                        OrderNumber: ordernumber,
+                        StopTravelTime: stoptime,
+                        //IsDepartureStop: isdeparture
+                        IsActive:isactive
+                    };
+                    RouteStopList.push(RouteStop);
+                });
+                var Route = {
+                    RouteID: routeid,
+                    Routename: routename,
+                    TravelTime: traveltime,
+                    LocationId: locationId,
+                    RouteStop: RouteStopList
+                };
+                $.ajax({
+                    url: "/Transportation/VehicleRoutes/Add",
+                    method: "Post",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(Route),
+                    success: function (result) {
+                        if (result.status) {
+                            window.location.href = "/Transportation/VehicleRoutes/GetAll";
+                        }
+                    }
+
+                });
+            }
+        }
+        function validate() {
+            
+            var Isvalid = true;
+            var LocationId = $("#LocationId").val();
+            var Routename = $("#Routename").val();
+            var TravelTime = $("#TravelTime").val();
+
+            if (LocationId == "" || LocationId == '' || LocationId == undefined) {
+                showMessage('Please select location');
+                Isvalid = false;
+                return Isvalid;
+            }
+
+
+            if (Routename == "" || Routename == '' || Routename == undefined) {
+                showMessage('Please enter route name');
+                Isvalid = false;
+                return Isvalid;
+            }
+            if (TravelTime == null || TravelTime == '' || TravelTime == undefined || TravelTime==0) {
+                showMessage('Please enter travel time')
+                Isvalid = false;
+                return Isvalid;
+            }
+            $('#settingDiv .parentDiv').each(function (index, value) {
+                
+                var stop = $(value).find(".StopId");
+                if (stop.val() == null || stop.val() == '' || stop.val() == undefined) {
+                    showMessage('Please Enter Stop')
+                    $(stop).addClass('highlight');
+                    Isvalid = false;
+                    return ;
+                }
+                var order = $(value).find(".OrderNumber");
+                if (order.val() == null || order.val() == '' || order.val() == undefined || order.val()==0) {
+                    showMessage('Please enter order number')
+                    $(order).addClass('highlight');
+                    Isvalid = false;
+                    return;
+                }
+            });
+
+            return Isvalid;
+        }
+        function SetDropDown(ctx,value) {
+            $(`#Stop[${ctx}]`).val(value);        }
+
+    </script>
+}
+
+

@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="ccb3e102555148788ffd7edefb1b9e5a" Name="Diagram1" ZoomLevel="40" >
+        <EntityTypeShape EntityType="PMSModel.AccountType" Width="1.5" PointX="3.75" PointY="75.875" />
+        <EntityTypeShape EntityType="PMSModel.AllRoomFeature" Width="1.5" PointX="3" PointY="131.5" />
+        <EntityTypeShape EntityType="PMSModel.AuditLogDetail" Width="1.5" PointX="17.25" PointY="6.75" />
+        <EntityTypeShape EntityType="PMSModel.AuditLog" Width="1.5" PointX="15" PointY="6" />
+        <EntityTypeShape EntityType="PMSModel.BedSpace" Width="1.5" PointX="12" PointY="141.375" />
+        <EntityTypeShape EntityType="PMSModel.BedSpacePlacement" Width="1.5" PointX="14.25" PointY="148.25" />
+        <EntityTypeShape EntityType="PMSModel.BedSpacePlacementMigration" Width="1.5" PointX="14.75" PointY="0.75" />
+        <EntityTypeShape EntityType="PMSModel.BedSpaceStatusLookUp" Width="1.5" PointX="9.75" PointY="138.75" />
+        <EntityTypeShape EntityType="PMSModel.BillingAddress" Width="1.5" PointX="5.25" PointY="1.125" />
+        <EntityTypeShape EntityType="PMSModel.Booking" Width="1.5" PointX="3" PointY="85.5" />
+        <EntityTypeShape EntityType="PMSModel.BookingMart" Width="1.5" PointX="5.25" PointY="4.375" />
+        <EntityTypeShape EntityType="PMSModel.Bus" Width="1.5" PointX="6" PointY="91.875" />
+        <EntityTypeShape EntityType="PMSModel.ChartOfAccount" Width="1.5" PointX="6" PointY="86.75" />
+        <EntityTypeShape EntityType="PMSModel.ClientIntegration" Width="1.5" PointX="5.75" PointY="15.75" />
+        <EntityTypeShape EntityType="PMSModel.ContractAssertion" Width="1.5" PointX="5.25" PointY="108.5" />
+        <EntityTypeShape EntityType="PMSModel.ContractContent" Width="1.5" PointX="5.25" PointY="100" />
+        <EntityTypeShape EntityType="PMSModel.ContractEmail" Width="1.5" PointX="14.25" PointY="88.875" />
+        <EntityTypeShape EntityType="PMSModel.Contract" Width="1.5" PointX="3" PointY="93" />
+        <EntityTypeShape EntityType="PMSModel.ContractSignature" Width="1.5" PointX="5.25" PointY="96.75" />
+        <EntityTypeShape EntityType="PMSModel.ContractType" Width="1.5" PointX="0.75" PointY="94.375" />
+        <EntityTypeShape EntityType="PMSModel.CorespondencePlaceHolder" Width="1.5" PointX="16.75" PointY="0.75" />
+        <EntityTypeShape EntityType="PMSModel.CorrespondenceAction" Width="1.5" PointX="12.75" PointY="6.625" />
+        <EntityTypeShape EntityType="PMSModel.CreditNoteTypeLookup" Width="1.5" PointX="13.5" PointY="125" />
+        <EntityTypeShape EntityType="PMSModel.Currency" Width="1.5" PointX="3" PointY="125.375" />
+        <EntityTypeShape EntityType="PMSModel.EmailMessage" Width="1.5" PointX="6" PointY="81.625" />
+        <EntityTypeShape EntityType="PMSModel.EmailScheduler" Width="1.5" PointX="3" PointY="78.875" />
+        <EntityTypeShape EntityType="PMSModel.EmailSender" Width="1.5" PointX="0.75" PointY="79.5" />
+        <EntityTypeShape EntityType="PMSModel.EmailSetting" Width="1.5" PointX="0.75" PointY="16.75" />
+        <EntityTypeShape EntityType="PMSModel.EmailVerification" Width="1.5" PointX="2.75" PointY="16.75" />
+        <EntityTypeShape EntityType="PMSModel.EmergencyContact" Width="1.5" PointX="10.5" PointY="147" />
+        <EntityTypeShape EntityType="PMSModel.Feedback" Width="1.5" PointX="19.5" PointY="137.25" />
+        <EntityTypeShape EntityType="PMSModel.Floor" Width="1.5" PointX="7.5" PointY="145.5" />
+        <EntityTypeShape EntityType="PMSModel.GenerateInspection" Width="1.5" PointX="18.25" PointY="129.625" />
+        <EntityTypeShape EntityType="PMSModel.GroupLookup" Width="1.5" PointX="10.5" PointY="100.5" />
+        <EntityTypeShape EntityType="PMSModel.GroupRoleLookup" Width="1.5" PointX="10.5" PointY="124.875" />
+        <EntityTypeShape EntityType="PMSModel.InpectionFieldsSelected" Width="1.5" PointX="18.25" PointY="163.875" />
+        <EntityTypeShape EntityType="PMSModel.InspectionField" Width="1.5" PointX="18.25" PointY="101.25" />
+        <EntityTypeShape EntityType="PMSModel.InspectionRatingData" Width="1.5" PointX="20.5" PointY="131.125" />
+        <EntityTypeShape EntityType="PMSModel.InspectionRatingList" Width="1.5" PointX="16" PointY="101.875" />
+        <EntityTypeShape EntityType="PMSModel.InspectionRatingListItem" Width="1.5" PointX="18.25" PointY="126.125" />
+        <EntityTypeShape EntityType="PMSModel.Inspection" Width="1.5" PointX="16" PointY="162.75" />
+        <EntityTypeShape EntityType="PMSModel.InspectionToCompareAgainst" Width="1.5" PointX="13.75" PointY="162.875" />
+        <EntityTypeShape EntityType="PMSModel.InspectionType" Width="1.5" PointX="13.75" PointY="165.25" />
+        <EntityTypeShape EntityType="PMSModel.InvoiceTaxDetail" Width="1.5" PointX="11.25" PointY="87.625" />
+        <EntityTypeShape EntityType="PMSModel.InvoiceTypeLookup" Width="1.5" PointX="6.75" PointY="78.75" />
+        <EntityTypeShape EntityType="PMSModel.Invoicing" Width="1.5" PointX="9" PointY="85" />
+        <EntityTypeShape EntityType="PMSModel.InvoicingDetail" Width="1.5" PointX="13.5" PointY="82.875" />
+        <EntityTypeShape EntityType="PMSModel.InvoicingRevenueDetail" Width="1.5" PointX="15.75" PointY="83.875" />
+        <EntityTypeShape EntityType="PMSModel.JobActionLookup" Width="1.5" PointX="7.75" PointY="12.75" />
+        <EntityTypeShape EntityType="PMSModel.JobConfiguration" Width="1.5" PointX="10" PointY="12" />
+        <EntityTypeShape EntityType="PMSModel.Location" Width="1.5" PointX="0.75" PointY="85" />
+        <EntityTypeShape EntityType="PMSModel.LocationSetting" Width="1.5" PointX="7.75" PointY="16.75" />
+        <EntityTypeShape EntityType="PMSModel.MainMenu" Width="1.5" PointX="7.75" PointY="7.625" />
+        <EntityTypeShape EntityType="PMSModel.Movie" Width="1.5" PointX="0.75" PointY="9.625" />
+        <EntityTypeShape EntityType="PMSModel.MovieShow" Width="1.5" PointX="3" PointY="13.125" />
+        <EntityTypeShape EntityType="PMSModel.MovieVoteCampaign" Width="1.5" PointX="0.75" PointY="5.625" />
+        <EntityTypeShape EntityType="PMSModel.MovieVoteCampaignDetail" Width="1.5" PointX="3" PointY="8.875" />
+        <EntityTypeShape EntityType="PMSModel.MovieVote" Width="1.5" PointX="5.25" PointY="9" />
+        <EntityTypeShape EntityType="PMSModel.News" Width="1.5" PointX="10" PointY="1" />
+        <EntityTypeShape EntityType="PMSModel.NewsCategory" Width="1.5" PointX="7.75" PointY="2.25" />
+        <EntityTypeShape EntityType="PMSModel.NewsDetail" Width="1.5" PointX="12.25" PointY="2.125" />
+        <EntityTypeShape EntityType="PMSModel.Notification" Width="1.5" PointX="9.75" PointY="16.75" />
+        <EntityTypeShape EntityType="PMSModel.Payment" Width="1.5" PointX="3" PointY="2.125" />
+        <EntityTypeShape EntityType="PMSModel.PaymentGateway" Width="1.5" PointX="11.75" PointY="16.75" />
+        <EntityTypeShape EntityType="PMSModel.PaymentMethod" Width="1.5" PointX="0.75" PointY="3.125" />
+        <EntityTypeShape EntityType="PMSModel.PaymentType" Width="1.5" PointX="13.5" PointY="127.5" />
+        <EntityTypeShape EntityType="PMSModel.Person" Width="1.5" PointX="8.25" PointY="117.75" />
+        <EntityTypeShape EntityType="PMSModel.PersonDocument" Width="1.5" PointX="13.75" PointY="16.75" />
+        <EntityTypeShape EntityType="PMSModel.PersonGuest" Width="1.5" PointX="16.5" PointY="158.25" />
+        <EntityTypeShape EntityType="PMSModel.PreCheckInDocumentation" Width="1.5" PointX="16.5" PointY="137.125" />
+        <EntityTypeShape EntityType="PMSModel.PriceConfig" Width="1.5" PointX="7.5" PointY="112.5" />
+        <EntityTypeShape EntityType="PMSModel.Project" Width="1.5" PointX="3" PointY="145.125" />
+        <EntityTypeShape EntityType="PMSModel.Question" Width="1.5" PointX="17.25" PointY="143.75" />
+        <EntityTypeShape EntityType="PMSModel.RefundRequest" Width="1.5" PointX="10.5" PointY="153.75" />
+        <EntityTypeShape EntityType="PMSModel.RegisterSync" Width="1.5" PointX="12.75" PointY="11.875" />
+        <EntityTypeShape EntityType="PMSModel.RoleRight" Width="1.5" PointX="15.75" PointY="71.125" />
+        <EntityTypeShape EntityType="PMSModel.Role" Width="1.5" PointX="13.5" PointY="135.25" />
+        <EntityTypeShape EntityType="PMSModel.Room" Width="1.5" PointX="9.75" PointY="141.75" />
+        <EntityTypeShape EntityType="PMSModel.RoomType" Width="1.5" PointX="3" PointY="138.75" />
+        <EntityTypeShape EntityType="PMSModel.RoomTypeDetail" Width="1.5" PointX="15.75" PointY="16.75" />
+        <EntityTypeShape EntityType="PMSModel.RoomTypeFeature" Width="1.5" PointX="5.25" PointY="140.375" />
+        <EntityTypeShape EntityType="PMSModel.Route" Width="1.5" PointX="3" PointY="120.875" />
+        <EntityTypeShape EntityType="PMSModel.RouteStope" Width="1.5" PointX="5.25" PointY="128.125" />
+        <EntityTypeShape EntityType="PMSModel.Schedule" Width="1.5" PointX="8.25" PointY="102.625" />
+        <EntityTypeShape EntityType="PMSModel.SeatsLookUp" Width="1.5" PointX="6" PointY="75.875" />
+        <EntityTypeShape EntityType="PMSModel.Service" Width="1.5" PointX="11.25" PointY="81.5" />
+        <EntityTypeShape EntityType="PMSModel.ServiceTypeLookup" Width="1.5" PointX="9" PointY="81.875" />
+        <EntityTypeShape EntityType="PMSModel.SpecialRequest" Width="1.5" PointX="10.5" PointY="150.25" />
+        <EntityTypeShape EntityType="PMSModel.Status" Width="1.5" PointX="13.5" PointY="97.625" />
+        <EntityTypeShape EntityType="PMSModel.Stop" Width="1.5" PointX="3" PointY="134.75" />
+        <EntityTypeShape EntityType="PMSModel.StudentContract" Width="1.5" PointX="12.75" PointY="114" />
+        <EntityTypeShape EntityType="PMSModel.StudentCreditNote" Width="1.5" PointX="15.75" PointY="113" />
+        <EntityTypeShape EntityType="PMSModel.StudentCreditNoteDetail" Width="1.5" PointX="12.75" PointY="109.75" />
+        <EntityTypeShape EntityType="PMSModel.StudentLedger" Width="1.5" PointX="15.75" PointY="106.375" />
+        <EntityTypeShape EntityType="PMSModel.SubMenu" Width="1.5" PointX="10" PointY="7" />
+        <EntityTypeShape EntityType="PMSModel.SubscriptionStatusLookup" Width="1.5" PointX="8.25" PointY="108.5" />
+        <EntityTypeShape EntityType="PMSModel.Sync" Width="1.5" PointX="15" PointY="11" />
+        <EntityTypeShape EntityType="PMSModel.SystemConfiguration" Width="1.5" PointX="17.75" PointY="9.75" />
+        <EntityTypeShape EntityType="PMSModel.Tax" Width="1.5" PointX="11.25" PointY="91.5" />
+        <EntityTypeShape EntityType="PMSModel.Temp" Width="1.5" PointX="17.75" PointY="3.75" />
+        <EntityTypeShape EntityType="PMSModel.Term" Width="1.5" PointX="5.25" PointY="116.75" />
+        <EntityTypeShape EntityType="PMSModel.Ticket" Width="1.5" PointX="12.75" PointY="101.5" />
+        <EntityTypeShape EntityType="PMSModel.TicketDetail" Width="1.5" PointX="18" PointY="118" />
+        <EntityTypeShape EntityType="PMSModel.TicketDetailAttachement" Width="1.5" PointX="20.25" PointY="118.25" />
+        <EntityTypeShape EntityType="PMSModel.TicketHistory" Width="1.5" PointX="15" PointY="120.875" />
+        <EntityTypeShape EntityType="PMSModel.TicketingGroupUser" Width="1.5" PointX="12.75" PointY="131.625" />
+        <EntityTypeShape EntityType="PMSModel.TicketPeriorityLookup" Width="1.5" PointX="10.5" PointY="97.25" />
+        <EntityTypeShape EntityType="PMSModel.TicketStatusLookup" Width="1.5" PointX="10.5" PointY="113.75" />
+        <EntityTypeShape EntityType="PMSModel.TimeSlotLookUp" Width="1.5" PointX="6" PointY="123.875" />
+        <EntityTypeShape EntityType="PMSModel.University" Width="1.5" PointX="3" PointY="149.75" />
+        <EntityTypeShape EntityType="PMSModel.UserMaster" Width="1.5" PointX="10.5" PointY="128.25" />
+        <EntityTypeShape EntityType="PMSModel.UserPreference" Width="1.5" PointX="8.25" PointY="129" />
+        <EntityTypeShape EntityType="PMSModel.UserRole" Width="1.5" PointX="15.75" PointY="131.25" />
+        <EntityTypeShape EntityType="PMSModel.VehicleBooking" Width="1.5" PointX="10.5" PointY="109.5" />
+        <EntityTypeShape EntityType="PMSModel.VehiclePrice" Width="1.5" PointX="5.25" PointY="102.75" />
+        <EntityTypeShape EntityType="PMSModel.VehiclePriceLookUp" Width="1.5" PointX="3" PointY="117.625" />
+        <EntityTypeShape EntityType="PMSModel.VehicleSeat" Width="1.5" PointX="8.25" PointY="94" />
+        <EntityTypeShape EntityType="PMSModel.VehicleSubscription" Width="1.5" PointX="10.5" PointY="104" />
+        <EntityTypeShape EntityType="PMSModel.VehicleTypeLookup" Width="1.5" PointX="3.75" PointY="72.875" />
+        <EntityTypeShape EntityType="PMSModel.PreferenceDetail" Width="1.5" PointX="10.5" PointY="121.625" />
+        <EntityTypeShape EntityType="PMSModel.StudentContracts_20221121" Width="1.5" PointX="17.75" PointY="13.75" />
+        <EntityTypeShape EntityType="PMSModel.V_GetPersonsforDeposit" Width="1.5" PointX="2.75" PointY="19.75" />
+        <EntityTypeShape EntityType="PMSModel.v_RommTypeDetail" Width="1.5" PointX="19.75" PointY="7.75" />
+        <EntityTypeShape EntityType="PMSModel.V_RoomTypePriceDetail" Width="1.5" PointX="19.75" PointY="18.75" />
+        <AssociationConnector Association="PMSModel.FK_ChartOfAccounts_AccountTypes" />
+        <AssociationConnector Association="PMSModel.FK_RoomTypeFeatures_AllRoomFeatures" />
+        <AssociationConnector Association="PMSModel.FK_AuditLogDetails_AuditLogs" />
+        <AssociationConnector Association="PMSModel.FK_AuditLogs_CorrespondenceActions" />
+        <AssociationConnector Association="PMSModel.FK_BedSpace_BedSpace" />
+        <AssociationConnector Association="PMSModel.FK_BedSpace_InspectionActions" />
+        <AssociationConnector Association="PMSModel.FK_BedSpace_Rooms" />
+        <AssociationConnector Association="PMSModel.FK_BedSpacePlacement_BedSpace" />
+        <AssociationConnector Association="PMSModel.FK_GenerateInspections_BedSpacePlacement" />
+        <AssociationConnector Association="PMSModel.FK_Feedback_BedSpacePlacement" />
+        <AssociationConnector Association="PMSModel.FK_PersonGuest_BedSpacePlacement" />
+        <AssociationConnector Association="PMSModel.FK_PreCheckInDocumentation_BedSpacePlacement" />
+        <AssociationConnector Association="PMSModel.FK_StudentContracts_BedSpacePlacement" />
+        <AssociationConnector Association="PMSModel.FK_BillingAddress_Payment" />
+        <AssociationConnector Association="PMSModel.FK_Booking_Location" />
+        <AssociationConnector Association="PMSModel.FK_Booking_Person" />
+        <AssociationConnector Association="PMSModel.FK_Booking_PriceConfig" />
+        <AssociationConnector Association="PMSModel.FK_BookingMart_Payment" />
+        <AssociationConnector Association="PMSModel.FK_Buses_VehicleTypeLookup" />
+        <AssociationConnector Association="PMSModel.FK_Location_Buses" />
+        <AssociationConnector Association="PMSModel.FK_Schedule_Buses" />
+        <AssociationConnector Association="PMSModel.FK_VehicleSeats_Buses" />
+        <AssociationConnector Association="PMSModel.FK_Location_ChartOfAccounts" />
+        <AssociationConnector Association="PMSModel.FK_Services_ChartOfAccounts" />
+        <AssociationConnector Association="PMSModel.FK_Taxes_ChartOfAccounts" />
+        <AssociationConnector Association="PMSModel.FK_ContractAssertion_Contracts" />
+        <AssociationConnector Association="PMSModel.FK_ContractContent_Contracts" />
+        <AssociationConnector Association="PMSModel.FK_ContractEmail_Contracts" />
+        <AssociationConnector Association="PMSModel.FK_ContractEmail_EmailMessages" />
+        <AssociationConnector Association="PMSModel.FK_Contracts_ContractType" />
+        <AssociationConnector Association="PMSModel.FK_ContractSignature_Contracts" />
+        <AssociationConnector Association="PMSModel.FK_Location_Contracts" />
+        <AssociationConnector Association="PMSModel.FK_StudentContracts_Contracts" />
+        <AssociationConnector Association="PMSModel.FK_StudentCreditNote_CreditNoteTypeLookup" />
+        <AssociationConnector Association="PMSModel.FK_Location_Currebcy" />
+        <AssociationConnector Association="PMSModel.FK_EmailMessages_EmailSenders" />
+        <AssociationConnector Association="PMSModel.FK_Location_EmailMessages" />
+        <AssociationConnector Association="PMSModel.FK_EmailScheduler_EmailSenders" />
+        <AssociationConnector Association="PMSModel.FK_EmailScheduler_Location" />
+        <AssociationConnector Association="PMSModel.FK_EmergencyContact_Person" />
+        <AssociationConnector Association="PMSModel.FK_Feedback_Persons" />
+        <AssociationConnector Association="PMSModel.FK_Feedback_Questions" />
+        <AssociationConnector Association="PMSModel.FK_Rooms_Floor" />
+        <AssociationConnector Association="PMSModel.FK_GenerateInspections_Inspections" />
+        <AssociationConnector Association="PMSModel.FK_GenerateInspections_Status" />
+        <AssociationConnector Association="PMSModel.FK_GenerateInspections_Status1" />
+        <AssociationConnector Association="PMSModel.FK_GenerateInspections_Status2" />
+        <AssociationConnector Association="PMSModel.FK_GenerateInspections_Status3" />
+        <AssociationConnector Association="PMSModel.FK_GenerateInspections_Status4" />
+        <AssociationConnector Association="PMSModel.FK_InspectionRatingData_GenerateInspections" />
+        <AssociationConnector Association="PMSModel.FK_Person_GenerateInspections" />
+        <AssociationConnector Association="PMSModel.FK_GroupLookup" />
+        <AssociationConnector Association="PMSModel.FK_TicketingGroupUser_GroupLookup" />
+        <AssociationConnector Association="PMSModel.FK_TicketingGroupUser_GroupRoleLookup" />
+        <AssociationConnector Association="PMSModel.FK_InpectionFieldsSelected_Inspections" />
+        <AssociationConnector Association="PMSModel.FK_InpectionFieldsSelected_Inspections1" />
+        <AssociationConnector Association="PMSModel.FK_InspectionFields_InspectionRatingList" />
+        <AssociationConnector Association="PMSModel.FK_InspectionRatingData_InspectionFields" />
+        <AssociationConnector Association="PMSModel.FK_InspectionRatingData_InspectionRatingList" />
+        <AssociationConnector Association="PMSModel.FK_InspectionRatingData_InspectionRatingListItems" />
+        <AssociationConnector Association="PMSModel.FK_InspectionRatingListItems_InspectionRatingList" />
+        <AssociationConnector Association="PMSModel.FK_Inspections_InspectionToCompareAgainst" />
+        <AssociationConnector Association="PMSModel.FK_Inspections_InspectionTypes" />
+        <AssociationConnector Association="PMSModel.FK_InvoiceTaxDetails_Invoicing" />
+        <AssociationConnector Association="PMSModel.FK_Invoicing_InvoiceTypeLookup" />
+        <AssociationConnector Association="PMSModel.FK_Invoicing_Location" />
+        <AssociationConnector Association="PMSModel.FK_Invoicing_ParentInvoiceId" />
+        <AssociationConnector Association="PMSModel.FK_Invoicing_Person" />
+        <AssociationConnector Association="PMSModel.FK_Invoicing_UserMaster" />
+        <AssociationConnector Association="PMSModel.FK_Invoicing_UserMaster1" />
+        <AssociationConnector Association="PMSModel.FK_InvoicingDetail_Invoicing" />
+        <AssociationConnector Association="PMSModel.FK_Studenledger_Invoicing" />
+        <AssociationConnector Association="PMSModel.FK_StudentCreditNoteDetail_Invoicing" />
+        <AssociationConnector Association="PMSModel.FK_InvoicingDetail_Services" />
+        <AssociationConnector Association="PMSModel.FK_InvoicingRevenueDetail_InvoicingDetail" />
+        <AssociationConnector Association="PMSModel.FK_JobConfiguration_JobActionLookup" />
+        <AssociationConnector Association="PMSModel.FK_JobConfiguration_JobActionLookup1" />
+        <AssociationConnector Association="PMSModel.FK_Building_Location" />
+        <AssociationConnector Association="PMSModel.FK_Location_RoomType" />
+        <AssociationConnector Association="PMSModel.FK_Location_Routes" />
+        <AssociationConnector Association="PMSModel.FK_Location_Services" />
+        <AssociationConnector Association="PMSModel.FK_Location_Stops" />
+        <AssociationConnector Association="PMSModel.FK_Location_Taxes" />
+        <AssociationConnector Association="PMSModel.FK_Location_Term" />
+        <AssociationConnector Association="PMSModel.FK_Location_Universities" />
+        <AssociationConnector Association="PMSModel.FK_Person_Location" />
+        <AssociationConnector Association="PMSModel.FK_PriceConfig_Location" />
+        <AssociationConnector Association="PMSModel.FK_Schedule_Location" />
+        <AssociationConnector Association="PMSModel.FK_StudentCreditNote_Location" />
+        <AssociationConnector Association="PMSModel.FK_StudentLedger_Location" />
+        <AssociationConnector Association="PMSModel.FK_Ticket_Location" />
+        <AssociationConnector Association="PMSModel.FK_VehiclePrice_Location" />
+        <AssociationConnector Association="PMSModel.FK_VehicleSubscription_Location" />
+        <AssociationConnector Association="PMSModel.FK_SubMenu_MainMenu" />
+        <AssociationConnector Association="PMSModel.FK_MovieShows_Movies" />
+        <AssociationConnector Association="PMSModel.FK_MovieVoteCampaignDetail_Movie" />
+        <AssociationConnector Association="PMSModel.FK_MovieVoteCampaignDetail_MovieVoteCampaign" />
+        <AssociationConnector Association="PMSModel.FK_MovieVotes_MovieVoteCampaignDetail" />
+        <AssociationConnector Association="PMSModel.FK_News_NewsCategory" />
+        <AssociationConnector Association="PMSModel.FK_NewsDetail_News" />
+        <AssociationConnector Association="PMSModel.FK_NewsCategory_NewsCategory" />
+        <AssociationConnector Association="PMSModel.FK_Payment_PaymentMethod" />
+        <AssociationConnector Association="PMSModel.FK_PaymentTypes_StudentCreditNote" />
+        <AssociationConnector Association="PMSModel.FK_Person_Universities" />
+        <AssociationConnector Association="PMSModel.FK_PreCheckInDocumentation_Person" />
+        <AssociationConnector Association="PMSModel.FK_PreferenceDetails_Person" />
+        <AssociationConnector Association="PMSModel.FK_RefundRequests_Person" />
+        <AssociationConnector Association="PMSModel.FK_SpecialRequest_Person" />
+        <AssociationConnector Association="PMSModel.FK_StudentContracts_Person" />
+        <AssociationConnector Association="PMSModel.FK_StudentCreditNote_Person" />
+        <AssociationConnector Association="PMSModel.FK_StudentLedger_Person" />
+        <AssociationConnector Association="PMSModel.FK_Ticket_Person" />
+        <AssociationConnector Association="PMSModel.FK_UserMaster_Person" />
+        <AssociationConnector Association="PMSModel.FK_VehicleBooking_Person" />
+        <AssociationConnector Association="PMSModel.FK_VehicleSubscription_Persons" />
+        <AssociationConnector Association="PMSModel.FK_PreCheckInDocumentation_UserMaster" />
+        <AssociationConnector Association="PMSModel.FK_PriceConfig_RoomType" />
+        <AssociationConnector Association="PMSModel.FK_PriceConfig_Term" />
+        <AssociationConnector Association="PMSModel.FK_Sync_RegisterSync" />
+        <AssociationConnector Association="PMSModel.FK_RoleRights_Roles" />
+        <AssociationConnector Association="PMSModel.FK_RoleRights_SubMenu" />
+        <AssociationConnector Association="PMSModel.FK_UserRoles_Roles" />
+        <AssociationConnector Association="PMSModel.FK_Rooms_RoomType" />
+        <AssociationConnector Association="PMSModel.FK_RoomTypeFeatures_RoomType" />
+        <AssociationConnector Association="PMSModel.FK_Routes_Routes" />
+        <AssociationConnector Association="PMSModel.FK_RouteStopes_Routes" />
+        <AssociationConnector Association="PMSModel.FK_Schedule_Routes" />
+        <AssociationConnector Association="PMSModel.FK_VehiclePrice_Routes" />
+        <AssociationConnector Association="PMSModel.FK_RouteStopes_Stops" />
+        <AssociationConnector Association="PMSModel.FK_Schedule_TimeSlotLookUp" />
+        <AssociationConnector Association="PMSModel.FK_VehicleBooking_Schedules" />
+        <AssociationConnector Association="PMSModel.FK_VehicleSeats_SeatsLookUp" />
+        <AssociationConnector Association="PMSModel.FK_Services_ServiceTypeLookup" />
+        <AssociationConnector Association="PMSModel.FK_StudentCreditNote_Status" />
+        <AssociationConnector Association="PMSModel.FK_StudentContracts_UserMaster" />
+        <AssociationConnector Association="PMSModel.FK_StudentCreditNote_UserMaster" />
+        <AssociationConnector Association="PMSModel.FK_StudentCreditNote_UserMaster1" />
+        <AssociationConnector Association="PMSModel.FK_StudentCreditNoteDetail_StudentCreditNote" />
+        <AssociationConnector Association="PMSModel.FK_StudentLedger_StudentCreditNote" />
+        <AssociationConnector Association="PMSModel.FK_StudentCreditNoteDetail_UserMaster" />
+        <AssociationConnector Association="PMSModel.FK_StudentLedger_UserMaster" />
+        <AssociationConnector Association="PMSModel.FK_StudentLedger_UserMaster1" />
+        <AssociationConnector Association="PMSModel.FK_VehicleSubscription_SubscriptionStatusLookup" />
+        <AssociationConnector Association="PMSModel.FK_Taxes_Taxes" />
+        <AssociationConnector Association="PMSModel.FK_Universities_Term" />
+        <AssociationConnector Association="PMSModel.FK_VehiclePriceLookup_Term" />
+        <AssociationConnector Association="PMSModel.FK_Ticket_TicketPeriorityLookup" />
+        <AssociationConnector Association="PMSModel.FK_Ticket_TicketStatusLookup" />
+        <AssociationConnector Association="PMSModel.FK_Ticket_UserMaster" />
+        <AssociationConnector Association="PMSModel.FK_Ticket_UserMaster1" />
+        <AssociationConnector Association="PMSModel.FK_Ticket_UserMaster2" />
+        <AssociationConnector Association="PMSModel.FK_Ticket_UserMaster3" />
+        <AssociationConnector Association="PMSModel.FK_TicketDetail_Ticket" />
+        <AssociationConnector Association="PMSModel.FK_TicketHistory_Ticket" />
+        <AssociationConnector Association="PMSModel.FK_TicketDetail_UserMaster" />
+        <AssociationConnector Association="PMSModel.FK_TicketDetailAttachement_TicketDetail" />
+        <AssociationConnector Association="PMSModel.FK_TicketHistory_TicketStatusLookup" />
+        <AssociationConnector Association="PMSModel.FK_TicketHistory_UserMaster" />
+        <AssociationConnector Association="PMSModel.FK_TicketHistory_UserMaster1" />
+        <AssociationConnector Association="PMSModel.FK_TicketingGroupUser_UserMaster" />
+        <AssociationConnector Association="PMSModel.FK_UserRoles_UserMaster" />
+        <AssociationConnector Association="PMSModel.FK_PreferenceDetails_Preferences" />
+        <AssociationConnector Association="PMSModel.FK_VehicleBooking_VehicleSeats" />
+        <AssociationConnector Association="PMSModel.FK_VehiclePrice_VehiclePriceLookUp" />
+        <AssociationConnector Association="PMSModel.FK_VehicleSubscription_VehiclePrice" />
+        <AssociationConnector Association="PMSModel.FK_VehicleSubscription_VehicleSubscription" />
+        <AssociationConnector Association="PMSModel.FK_PaymentTypes_ChartOfAccounts" />
+        <AssociationConnector Association="PMSModel.FK_PaymentTypes_Location" />
+        <AssociationConnector Association="PMSModel.FK_LocationSettings_ChartOfAccounts_Pay" />
+        <AssociationConnector Association="PMSModel.FK_LocationSettings_ChartOfAccounts_Rec" />
+        <EntityTypeShape EntityType="PMSModel.Voucher" Width="1.5" PointX="18.5" PointY="106.625" />
+        <EntityTypeShape EntityType="PMSModel.VoucherDetail" Width="1.5" PointX="14.25" PointY="92.875" />
+        <AssociationConnector Association="PMSModel.FK__VoucherDe__Accou__0F6D37F0" />
+        <AssociationConnector Association="PMSModel.FK__Voucher__Locatio__0B9CA70C" />
+        <AssociationConnector Association="PMSModel.FK__Voucher__Student__0AA882D3" />
+        <AssociationConnector Association="PMSModel.FK__VoucherDe__Vouch__0E7913B7" />
+        <EntityTypeShape EntityType="PMSModel.V_PlacementList" Width="1.5" PointX="12.375" PointY="20.75" />
+        <AssociationConnector Association="PMSModel.FK_LocationSettings_ChartOfAccounts_Adv_Pay" />
+        <AssociationConnector Association="PMSModel.FK_LocationSettings_ChartOfAccounts_Discount" />
+        <EntityTypeShape EntityType="PMSModel.V_GetInvoiceList" Width="1.5" PointX="20.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PMSModel.V_GetPersonsforMiscellaneous" Width="1.5" PointX="16.375" PointY="21.75" />
+        <AssociationConnector Association="PMSModel.FK_EmailSettings_Location" />
+        <AssociationConnector Association="PMSModel.FK_Roles_Location" />
+        <EntityTypeShape EntityType="PMSModel.Building" Width="1.5" PointX="5.25" PointY="145.5" />
+        <AssociationConnector Association="PMSModel.FK_Block_Building" />
+        <AssociationConnector Association="PMSModel.FK_Floor_Block" />
+        <EntityTypeShape EntityType="PMSModel.PushNotificationLog" Width="1.5" PointX="12.75" PointY="154.375" />
+        <AssociationConnector Association="PMSModel.FK_PushNotificationLog_UserMaster" />
+        <EntityTypeShape EntityType="PMSModel.V_GetPaymentList" Width="1.5" PointX="22.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PMSModel.StudentDeviceToken" Width="1.5" PointX="12.75" PointY="158.375" />
+        <AssociationConnector Association="PMSModel.FK_StudentDeviceToken_UserMaster" />
+        <EntityTypeShape EntityType="PMSModel.IntegrationWebhookDispatchLog" Width="1.5" PointX="0.75" PointY="22.75" />
+        <EntityTypeShape EntityType="PMSModel.IntegrationWebhookSubscription" Width="1.5" PointX="2.75" PointY="22.75" />
+      </Diagram>
+      
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

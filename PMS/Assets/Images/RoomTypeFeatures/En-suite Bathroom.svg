@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <g id="En-suite_Bathroom" data-name="En-suite Bathroom" transform="translate(-368 -96)">
+    <rect id="Rectangle_479" data-name="Rectangle 479" width="40" height="40" transform="translate(368 96)" fill="none"/>
+    <g id="En-suite_Bathroom-2" data-name="En-suite Bathroom" transform="translate(276 -184)">
+      <path id="Path_95" data-name="Path 95" d="M2639.123,525.228V510.661l4.471,4.219" transform="translate(-2538 -221.661)" fill="none" stroke="#000" stroke-width="1"/>
+      <g id="Rectangle_67" data-name="Rectangle 67" transform="translate(98 309)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="28" height="8" stroke="none"/>
+        <rect x="0.5" y="0.5" width="27" height="7" fill="none"/>
+      </g>
+      <g id="Rectangle_68" data-name="Rectangle 68" transform="translate(96 303)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="32" height="7" stroke="none"/>
+        <rect x="0.5" y="0.5" width="31" height="6" fill="none"/>
+      </g>
+      <g id="Rectangle_69" data-name="Rectangle 69" transform="translate(102.243 316)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="4" height="4" stroke="none"/>
+        <rect x="0.5" y="0.5" width="3" height="3" fill="none"/>
+      </g>
+      <g id="Rectangle_70" data-name="Rectangle 70" transform="translate(118.703 316)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="4" height="4" stroke="none"/>
+        <rect x="0.5" y="0.5" width="3" height="3" fill="none"/>
+      </g>
+      <g id="Rectangle_71" data-name="Rectangle 71" transform="matrix(0.719, 0.695, -0.695, 0.719, 107.957, 289.932)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="4" height="8" stroke="none"/>
+        <rect x="0.5" y="0.5" width="3" height="7" fill="none"/>
+      </g>
+      <path id="Path_96" data-name="Path 96" d="M2649.023,516.365l4.719,2.469" transform="translate(-2539.273 -221.584)" fill="none" stroke="#c20e1a" stroke-width="1" stroke-dasharray="1"/>
+      <path id="Path_97" data-name="Path 97" d="M2649.023,516.365l4.12,4.249" transform="translate(-2540.675 -220.646)" fill="none" stroke="#c20e1a" stroke-width="1" stroke-dasharray="1"/>
+      <path id="Path_98" data-name="Path 98" d="M2649.023,516.365l1.721,4.562" transform="translate(-2541.494 -219.365)" fill="none" stroke="#c20e1a" stroke-width="1" stroke-dasharray="1"/>
+    </g>
+  </g>
+</svg>

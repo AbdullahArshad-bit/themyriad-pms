@@ -1,0 +1,52 @@
+﻿@using PMS.Common.Classes
+@{
+    string controller = HttpContext.Current.Request.RequestContext.RouteData.Values["controller"].ToString(),
+                    action = HttpContext.Current.Request.RequestContext.RouteData.Values["action"].ToString();
+
+}
+<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel">
+            <div class="pull-left image">
+                <img src="/Assets/dist/img/profile.png" class="img-circle profileImage" alt="User Image">
+            </div>
+            <div class="pull-left info">
+                <p>@PMS.Common.Globals.User.Name</p>
+                <!-- Status -->
+                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
+        </div>
+        <!-- Sidebar Menu -->
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header">MENU</li>
+            <!-- Optionally, you can add icons to the links -->
+
+            <li class="@((controller == "Home" && (action == "Index")) ? "active" : "")"><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i><span>Dashboard</span></a></li>
+            <li class="@((controller == "User" && (action == "Profile")) ? "active" : "")"><a href="@Url.Action("Profile", "User")"><i class="fa fa-user-o"></i><span>Profile</span></a></li>
+            <li class="@((controller == "Booking" && (action == "BookingList")) ? "active" : "")"><a href="@Url.Action("BookingList", "Booking")"><i class="fa fa-book"></i><span>My Bookings</span></a></li>
+            <li class="@((controller == "Invoicings" && (action == "InvoicingList")) ? "active" : "")"><a href="@Url.Action("InvoicingList", "Invoicings")"><i class="fa fa-book"></i><span>My Invoices</span></a></li>
+            <li class="@((controller == "Payment" && (action == "PaymentList")) ? "active" : "")"><a href="@Url.Action("PaymentList", "Payment")"><i class="fa fa-money"></i><span>My Payments</span></a></li>
+            <li class="@((controller == "ContractsManage" && (action == "StudentContracts")) ? "active" : "")"><a href="@Url.Action("StudentContracts", "ContractsManage")"><i class="fa fa-pencil"></i><span>My Contracts</span></a></li>
+            @*<li class="@((controller == "Ticket" && (action == "Index")) ? "active" : "")"><a href="@Url.Action("Index", "Ticket")"><i class="fa fa-ticket"></i><span>My Complaints</span></a></li>*@
+
+            @*<li class="treeview @((controller == "Transport") ? "active" : "")">
+                <a href="#">
+                    <i class="fa fa fa-subway"></i> <span>Transport</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li class="@((controller == "Transport" && action == "Routes") ? "active" : "")"><a href="@Url.Action("Routes", "Transport",new {area="Student" })"><i class="fa fa-circle-o"></i>Routes and seat booking</a></li>
+                    <li class="@((controller == "Transport" && action == "GetStudentBookingReport") ? "active" : "")"><a href="@Url.Action("GetStudentBookingReport", "Transport",new {area="Student" })"><i class="fa fa-circle-o"></i>My Transport Bookings</a></li>
+                </ul>
+            </li>*@
+
+        </ul>
+
+        <!-- /.sidebar-menu -->
+    </section>
+    <!-- /.sidebar -->
+</aside>

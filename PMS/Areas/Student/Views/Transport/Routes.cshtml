@@ -1,0 +1,314 @@
+﻿@using PMS.Common.Classes
+@{
+    Layout = "~/Areas/Student/Views/Shared/_Layout.cshtml";
+    ViewBag.Header = "Routes";
+    ViewBag.HeaderDescription = "All Routes";
+    var routes = ViewBag.routes as List<PMS.DTO.ViewModels.TransportationViewModels.AddScheduleVM>;
+    var data = ViewBag.data as List<PMS.DTO.ViewModels.TransportationViewModels.VehicleSubscriptionVM>;
+}
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+}
+<style>
+    th, td {
+        white-space: nowrap;
+    }
+
+    .wraper {
+/*        padding: 50px;
+*/        text-align: center;
+        font-family: sans-serif;
+        width: 100px;
+        margin: 10px auto;
+    }
+
+    .container {
+        border-top: 2px solid #000;
+        display: flex;
+        list-style: none;
+        /*padding: 0;*/
+        width: 400px;
+        justify-content: space-between;
+        align-items: stretch;
+        align-content: stretch;
+    }
+
+    .link {
+        position: relative;
+        margin-top: 10px;
+        width: 100%;
+    }
+
+        .link a {
+            font-weight: bold;
+            text-decoration: none;
+            color: black;
+            text-transform: uppercase;
+            font-size: 15px;
+        }
+
+        .link:first-child {
+            margin-left: -55px;
+        }
+
+        .link:last-child {
+            margin-right: -55px;
+        }
+
+        .link::after {
+            content: "";
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            position: absolute;
+            border-radius: 10px;
+            top: -18px;
+            left: 50%;
+            transform: translatex(-50%);
+            border: 2px solid black;
+        }
+
+        .active::after,
+        .link:hover::after {
+            background: black;
+        }
+
+    p.lead {
+        font-weight: 600;
+        margin: 50px auto;
+        line-height: 1.5;
+    }
+</style>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+    
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }@if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+
+                    @ViewBag.success
+                </div>
+            }
+            <div class="row">
+                <div class="col-md-2">
+                    <label>Date</label>
+                    <input name="daterange" id="ToDate" autocomplete="off" class="form-control to_date" value="@ViewBag.date" placeholder="To Date" />
+                </div>
+                <div class="col-md-1">
+                    <label> &nbsp; </label>
+                    <br />
+                    <button type="button" onclick="GetRoutes()" class="btn btn-themyriad btn-bordered waves-effect w-md"><i class="fa fa-search"></i> <span>Search</span></button>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <hr />
+            </div>
+            <div style="overflow: auto; width:100%;white-space:nowrap;">
+                <table id="routes" class="table table-bordered table-striped data-table">
+                    <thead>
+                        <tr>
+                            <th>Vehicle</th>
+                            <th>Route</th>
+                            <th>From Date</th>
+                            <th>Departure Time</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var schedule in routes)
+                        {
+                            <tr>
+                                <td>@schedule.VehicleName</td>
+                                <td>
+                                    <a title="View Stops" onclick="OpenStopModal(@schedule.RouteId)" href="#">@(schedule.RouteName)</a>
+                                </td>
+                                <td>@schedule.FromDate.ToString("dd/MM/yyyy")</td>
+                                <td>@schedule.DepartureTypeName</td>
+
+                                <td>
+                                    @foreach (var item in data)
+                                    {
+                                        if (schedule.FromDate == DateTime.Today && DateTime.Now.TimeOfDay.CompareTo(schedule.Time) < 0)
+                                        {
+                                            if (item.SubscriptionStatus == (int)Enumeration.SubscriptionsStatusLookup.Active)
+                                            {
+                                                using (Html.BeginForm("GetSeats", "Transport", new { busid = "_VehicleId", scheduleid = "_ScheduleId", }, FormMethod.Post, new { id = "BokingForm" }))
+                                                {
+                                                @Html.AntiForgeryToken()
+                                                <a title="Book a seat" @("onclick=OpenConfirmBookingModal(" + @schedule.VehicleId + "," + schedule.Id +  ")") href="#"><i class="fa fa-bus"></i></a>
+
+
+                                                }
+
+                                            @*<a title="Check Seat" href="@Url.Action("GetSeats", "Transport", new { busid = schedule.VehicleId, scheduleid = schedule.Id, Area = "Student" })"><i class="fa fa-bus"></i></a>*@
+                                            }
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <!-- /.box -->
+    <div class="modal fade" id="StopModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel" style="font-weight: bold">Stops</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <div id="Stops" class="form-group stop">
+                                    <div class="wraper">
+                                        <ul class="container" id="container">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal" id="BookingSeat">
+        <form method="post" id="BookingSeatForm" action="@Url.Action("GetSeats", "Transport")">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">Confirm Booking</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <p>You are about to book a seat. This process is irreversible.</p>
+                        <p> Are you sure?</p>
+                        <p class="debug-url"></p>
+                    </div>
+                    @*<input type="hidden" name="busid" id="BusId" />
+                    <input type="hidden" name="scheduleid" id="ScheduleId" />*@
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-themyriad btn-ok">Confirm</button>
+                        @*<a class="btn btn-themyriad btn-ok" href="javascript:document.getElementById('BokingForm').submit()">Yes</a>*@
+
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+<!-- /.card -->
+
+@section scripts{
+
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#routes').DataTable({
+                "scrollY": "70vh",
+                "scrollCollapse": true,
+                "scrollX": "auto",
+                "pageLength": -1,
+                buttons: [
+                    ''
+                ],
+                dom: 'Blfrtip',
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]]
+            });
+            $('.dataTables_length').addClass('bs-select');
+
+        });
+
+
+        $('.to_date').datepicker({
+            format: "dd/M/yyyy",
+
+            autoclose: true,
+
+        })
+        function GetRoutes() {
+            var Date = $('.to_date').val();
+            window.location.href = GetFormatedUrl("/Student/Transport/Routes?date=" + Date);
+        }
+        function OpenStopModal(Id) {
+            $.ajax({
+                url: "/Transport/GetStops?RouteId=" + Id,
+                method: "Get",
+                success: function (data) {
+                    if (data.success) {
+                        var stop = data.res;
+                        $("#StopModal .container").html("");
+                        $.each(stop, function (index, value) {
+                            //$("#Stops").append('<b>'+value.StopName+'</b>' + '<br>');
+                            $("#container").append('<li class=link><a href="">' + value.StopName + '</a></li>');
+                        });
+
+                        $("#StopModal").modal();
+                    }
+                }
+            });
+        }
+     
+        function OpenConfirmBookingModal(busid,scheduleid,fromdate) {
+            var action = document.getElementById('BokingForm').action;
+            action = action.replace("_VehicleId", busid);
+            action = action.replace("_ScheduleId", scheduleid);
+            $('#BusId').val(busid);
+            $('#ScheduleId').val(scheduleid);
+            $('body #BookingSeatForm').attr('action', action);
+            $('#BookingSeat').modal('show');
+        }
+    </script>
+}
+
+
+

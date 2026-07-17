@@ -1,0 +1,301 @@
+﻿@model List<PMS.DTO.ViewModels.DropDownViewModel>
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Job Configuration";
+    ViewBag.HeaderDescription = "Add New Job";
+    ViewBag.Title = "Add New Job | PMS";
+}
+
+<link rel="stylesheet" href="~/Assets/plugins/Autocomplete/styles.css">
+<style>
+    .radio-inline{
+        margin:0 !important;
+    }
+</style>
+<div class="box box-danger">
+    <div class=" box-body">
+        @if (ViewBag.error != null)
+        {
+            
+            <div class="alert alert-danger alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
+                <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                @ViewBag.error
+            </div>
+        }
+        @if (ViewBag.success != null)
+        {
+            <div class="alert alert-danger alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
+                <h4><i class="icon fa fa-ban"></i>Alert!</h4>
+                @ViewBag.success
+            </div>
+        }
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select class="select form-control" name="SLAJobs" id="Category">
+                            <option value="">Select</option>
+                            <option value="1">Complaint SLA</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <hr />
+        </div>
+        <div id="show" hidden>
+          <div id="settingDiv">
+
+
+          </div>
+          <div class="col-md-12">
+              <a href="#Line" class="fa fa-plus-circle Addnewrow" onclick="AddNewRow()">Add More</a>
+              <button class="btn btn-themyriad savebtn " style="float:right;" type="button" onclick="Save()">Save</button>
+          </div>
+        </div>
+        
+
+    </div>
+</div>
+
+
+
+
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script src="~/Assets/plugins/Autocomplete/jquery.autocomplete.js"></script>
+<script src="~/Assets/plugins/Autocomplete/jquery.mockjax.js"></script>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/datepicker/Js")
+<script>
+        var counter = 0;
+        $(function () {
+            $("#Category").change(function () {
+                if ($(this).val() != "" && $(this).val() != "0") {
+                    $('#settingDiv').html('');
+                    counter = 0;
+                    GetById($(this).val());
+                } else {
+                    $("#show").hide();
+                }
+            });
+            
+        });
+    $(document).on('click', '.remove' ,function () {
+        $(this).closest('.parentDiv').remove();
+        counter--;
+    });
+    function GetStatus(id) {
+        var url = GetFormatedUrl("/JobsConfiguration/GetActiveStatus")
+        $.ajax({
+            type: "Get",
+            url: url,
+            async: false,
+            success: function (data) {
+                var data = data.data;
+                $("[name='" + id + "']").html('');
+                var html = "<option value=''>---Select Status---</option>";
+                $.each(data, function (key, value) {
+                    html = html + "<option Value='" + value.Id + "'>" + value.Name + "</option>"
+                })
+                $(`[name='${id}']`).html(html);
+
+            }
+        });
+    }
+    function GetActionRadio(id) {
+        var url = GetFormatedUrl("/JobsConfiguration/GetActiveJobAction")
+        $.ajax({
+            type: "Get",
+            url: url,
+            async: false,
+            success: function (data) {
+                var data = data.data;
+                $(`${id}`).html('');
+                var html = "";
+                $.each(data, function (key, value) {
+                    html = html + `
+                        <input type="radio" name="${id}" class="radio-inline" value="${value.Id}" data-id="${value.Id}"> ${value.Name}
+                       `
+                })
+                $(`#${id}`).html(html);
+
+            }
+        });
+    }
+   
+    function AddNewRow() {
+        counter++;
+        var deletebtn = '';
+        if (counter > 1) {
+            deletebtn = `<div class="col-md-12" style="text-align:end;"> <a style="cursor:pointer;font-size: 17px;" class="fa fa-trash Addnewrow remove" id="remove"></a></div>`;
+        }
+        var html = ` <div class="row parentDiv" >
+  <div class="col-md-12">
+   ${deletebtn}
+      <div class="row">
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label>Status</label>
+                  <select name="Status[${counter}]"  class="form-control Status" id="Status[${counter}]"></select>
+              </div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label>First Execution (Hours)</label>
+                  <input type="text" value="" name="FirstExecution[${counter}]" placeholder="Enter Interval" class="form-control" id="FirstJobInterval" autocomplete="off" />
+              </div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-md-6">
+              <label>Job Action:</label>
+              <div class="form-group firstactionRadio" id="radioDiv${counter}">
+                  
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="col-md-12">
+      <div class="row">
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label>Second Execution (Hours)</label>
+                  <input type="text" value="" name="SecondExecution[${counter}]" placeholder="Enter Interval" id="SecondJobInterval" class="form-control" autocomplete="off" />
+              </div>
+          </div>
+           </div>
+           <div class="row">
+            <div class="col-md-6">
+                <label>Job Action:</label>
+                <div class="form-group secondactionRadio" id="radioDivSecond${counter}">
+                    
+                    
+                </div>
+            </div>
+        </div>
+  </div>
+  <div class="col-md-12">
+      <div class="row">
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label>Is Notificaltion</label>
+                  <div>
+                      <label class="switch">
+                          <input type="checkbox" name="IsNotify[${counter}]" id="IsNotify"  ) checked>
+                          <span class="slider round"></span>
+                      </label>
+                  </div>
+              </div>
+          </div>
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label>Is Email</label>
+                  <div>
+                      <label class="switch">
+                          <input type="checkbox" name="IsEmail[${counter}]" id="IsEmail"  )>
+                          <span class="slider round"></span>
+                      </label>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+    <hr>
+    </div>`;
+        $('#settingDiv').append(html);
+        GetStatus(`Status[${counter}]`);
+        GetActionRadio(`radioDiv${counter}`);
+        GetActionRadio(`radioDivSecond${counter}`);
+        
+    }
+
+
+    function Save() {
+        var jobList = [];
+        $("div.parentDiv").each(function (index, element) {
+            var CategoryId = $("#Category option:selected").val();
+            var status = $(element).find(".Status option:selected").val();
+            var statusName = $(element).find(".Status option:selected").text();
+            var firstaction = $(element).find(".firstactionRadio").find(".radio-inline:checked").val();
+            var firstInterval = $(element).find("#FirstJobInterval").val();
+            var secondaction = $(element).find(".secondactionRadio").find(".radio-inline:checked").val();
+            var secondInterval = $(element).find("#SecondJobInterval").val();
+            var IsNotify = $(element).find("#IsNotify").is(':checked');
+            var IsEmail = $(element).find("#IsEmail").is(':checked');
+            var job = {
+                CategoryId: CategoryId,
+                PropertyValue: status,
+                FirstExecutuonOn: firstInterval,
+                FirstExecutionActionId: firstaction,
+                SecondExecutionOn: secondInterval,
+                SecondExecutionACtionId: secondaction,
+                IsEmail: IsEmail,
+                IsNotify: IsNotify,
+                PropertyName: statusName
+            };
+            jobList.push(job);
+        });
+        $.ajax({
+            url: "/JobsConfiguration/Add",
+            method: "Post",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(jobList),
+            success: function (result) {
+                if (result.data) {
+                    Toast.show("Added Successfully","success");
+                }
+            }
+
+        });
+    }
+    function GetById(Id) {
+        if (Id > 0 && Id != '') {
+            $.ajax({
+                url: "/JobsConfiguration/GetById",
+                method: "Get",
+                data:{
+                CategoryId:Id
+                },
+                success: function (result) {
+                    if (result.data.length>0) {
+
+                        $.each(result.data, function (index, value) {
+                            AddNewRow();
+                            $(`select[name='Status[${counter}]']`).val(value.PropertyValue);
+                            $(`input[name="FirstExecution[${counter}]"]`).val(value.FirstExecutuonOn);
+                           
+                            $(`input:radio[name="radioDiv${counter}"]`).filter(`[value="${value.FirstExecutionActionId}"]`).attr('checked', true);
+                            $(`input:radio[name="radioDivSecond${counter}"]`).filter(`[value="${value.SecondExecutionACtionId}"]`).attr('checked', true);
+                            $(`input[name="SecondExecution[${counter}]"]`).val(value.SecondExecutionOn);
+                            $(`input[name="IsEmail[${counter}]"]`).prop("checked",value.IsEmail);
+                            $(`input[name="IsNotify[${counter}]"]`).prop("checked",value.IsNotify);
+                            
+                           
+                        });
+                        $("#show").show();
+                    } else {
+                        $("#show").show();
+                        $('#settingDiv').html('');
+                        AddNewRow();
+                    }
+                }
+
+            });
+        }
+    }
+</script>
+
+
+}

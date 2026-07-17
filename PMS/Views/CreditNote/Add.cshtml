@@ -1,0 +1,324 @@
+﻿@model PMS.DTO.ViewModels.StudentCreditNoteVm
+@using PMS.Common.Classes
+@using PMS.DTO.ViewModels
+
+@{
+    ViewBag.Header = "Credit Note";
+    ViewBag.HeaderDescription = "Add New Credit Note";
+    ViewBag.Title = "Create Credit Note | PMS";
+}
+<style>
+
+    .highlight {
+        border-color: red;
+    }
+</style>
+
+<link rel="stylesheet" href="~/Assets/plugins/Autocomplete/styles.css">
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Index", "CreditNote")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i>Back to Credit Notes</a>
+        </div>
+    </div>
+    <form id="credit-form">
+        @Html.HiddenFor(x => x.Id)
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group defaultDropdown">
+                    @Html.LabelFor(x => x.LocationId, "Location")
+                    @Html.DropDownList("LocationId", null, "--- Select Location ---", htmlAttributes: new { @class = "form-control", @required = "required" })
+                    @Html.ValidationMessageFor(x => x.LocationId)
+
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.TypeId, "Type")
+                    @Html.DropDownList("TypeId", null, "--- Select Credit Type ---", htmlAttributes: new { @class = "form-control select ", @required = "required" })
+                    @Html.ValidationMessageFor(x => x.TypeId)
+
+                </div>
+            </div>
+            <div class="col-md-2" id="paymentTypeDiv" style="display: none;">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.PaymentTypeId, "Payment Method")
+                    @Html.DropDownList("PaymentTypeId", null, "--- Select Payment Method ---", htmlAttributes: new { @class = "form-control select2" })
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.StudentId, "Resident ID")
+                    @Html.DropDownList("StudentId", null, "Select...", htmlAttributes: new { @class = "form-control select2", @required = "required", })
+                    @Html.ValidationMessageFor(x => x.StudentId)
+
+                </div>
+            </div>
+
+
+
+            <div class="col-md-2">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Code, "Code")
+                    @Html.TextBoxFor(x => x.Code, htmlAttributes: new { @class = "form-control pull-right", autocomplete = "off", @readonly = "" })
+                    @Html.ValidationMessageFor(x => x.Code)
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4" style="display:none;">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Percentage, "Percentage")
+                    @Html.TextBoxFor(x => x.Percentage, htmlAttributes: new { @class = "form-control pull-right", autocomplete = "off" })
+                    @Html.ValidationMessageFor(x => x.Percentage)
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Amount, "Amount")
+                    @Html.TextBoxFor(x => x.Amount, htmlAttributes: new { @class = "form-control pull-right", autocomplete = "off", @required = "required" })
+                    @Html.ValidationMessageFor(x => x.Amount)
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Reason)
+
+                    @Html.TextAreaFor(x => x.Reason, new { @class = "form-control", placeholder = "Reason" })
+
+                    @Html.ValidationMessageFor(x => x.Reason)
+
+                </div>
+            </div>
+        </div>
+
+        <div class="box-footer">
+            <button class="btn btn-themyriad savebtn" type="button" onclick="Add('1')">Save</button>
+            @if (User.IsInRole(AppUserRoles.Approve_acc_Invoice))
+            {
+                <button class="btn btn-themyriad saveandapprovebtn" type="button" onclick="Add('3')">Save & Approve</button>
+            }
+        </div>
+    </form>
+</div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script src="~/Assets/plugins/Autocomplete/jquery.autocomplete.js"></script>
+<script src="~/Assets/plugins/Autocomplete/jquery.mockjax.js"></script>
+
+<script>
+
+   $(document).ready(function () {
+    const isEditMode = $("#Id").val() != 0;
+    const status = @Model.Status;
+
+    const $typeId = $('#TypeId');
+    const $studentId = $('#StudentId');
+    const $amount = $('#Amount');
+    const $paymentTypeDiv = $('#paymentTypeDiv');
+    const $paymentTypeId = $('#PaymentTypeId');
+
+    // Function to enable/disable form fields
+    function setFieldState(disabled) {
+        $typeId.prop('disabled', disabled);
+        $studentId.prop('disabled', disabled);
+        $amount.prop('disabled', disabled);
+    }
+
+    if (isEditMode) {
+        if (status === 3) {
+            setFieldState(true);
+        } else if (status === 1) {
+            setFieldState(false);
+        } else {
+            $typeId.prop('disabled', false); // Only TypeId editable
+        }
+    } else {
+        $typeId.prop('disabled', false);
+    }
+
+    // Show/hide paymentTypeDiv based on selected type
+    function togglePaymentTypeDiv(typeVal) {
+        if (typeVal == 4) {
+            $paymentTypeDiv.show();
+        } else {
+            $paymentTypeDiv.hide();
+            $paymentTypeId.val('');
+        }
+    }
+
+    // Initial call
+    togglePaymentTypeDiv($typeId.val());
+
+    // On change
+    $typeId.change(function () {
+        togglePaymentTypeDiv($(this).val());
+    });
+});
+
+
+
+    $('#LocationId, #TypeId').on('change', function () {
+        var LocationId = $('#LocationId').val();
+        var TypeId = $('#TypeId').val();
+
+        if (LocationId && TypeId) {
+            var url = GetFormatedUrl("/CreditNote/GetCode");
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                data: { LocationId: LocationId, TypeId: TypeId },
+                success: function (data) {
+                    $('#StudentId').html('');
+                    var html = "<option value=''>--- Select Resident Id ---</option>";
+                    $.each(data.students, function (key, value) {
+                        html += "<option value='" + value.StudentId + "'>" + value.FullName + "</option>";
+                    });
+                    $('#StudentId').html(html);
+                    $('#Code').val(data.code); // Update the Code field
+                }
+            });
+        }
+    });
+
+
+
+    function Add(Status) {
+        Loaderbtn(true);
+        if (validate()) {
+            $('.savebtn, .saveandapprovebtn')
+                .prop("disabled", true)
+                .html('<i class="fa fa-2x fa-sync-alt fa-spin  fa-refresh loading "></i>')
+                .css('background', '#016891 !important');
+            var data = {
+                Id: $("#Id").val(),
+                LocationId: $('#LocationId').val(),
+                Code: $('#Code').val(),
+                TypeId: $('#TypeId').val(),
+                PaymentTypeId: $('#PaymentTypeId').val(),
+                StudentId: $('#StudentId').val(),
+                Percentage: $('#Percentage').val(),
+                Amount: $('#Amount').val(),
+                Reason: $('#Reason').val(),
+                Status: Status
+
+            };
+            $.ajax({
+                url: "/CreditNote/Add",
+                method: "Post",
+                data: data,
+                success: function (response) {
+                    Loaderbtn(false);
+                    if (response.status) {
+                        window.location.replace(GetFormatedUrl('/CreditNote/Index'))
+
+                    } else {
+                        Toast.show("shome error occoured!", 'danger');
+                    }
+                }
+            });
+        } else {
+            Loaderbtn(false);
+        }
+    }
+
+    function validate() {
+        var LocationId = $('#LocationId').val();
+        var TypeId = $('#TypeId').val();
+        var PaymentTypeId = $('#PaymentTypeId').val();
+        var StudentId = $('#StudentId').val();
+        var Percentage = $('#Percentage').val();
+        var Amount = $('#Amount').val();
+        if (LocationId == null || LocationId == '' || LocationId == undefined) {
+            showMessage('Please select Location!');
+            return false;
+        }
+        if (TypeId == null || TypeId == '' || TypeId == undefined) {
+            showMessage('Please select Type!');
+            return false;
+        }
+        if (TypeId == 4 && (PaymentTypeId == null || PaymentTypeId == '' || PaymentTypeId == undefined)) {
+            showMessage('Please select a Payment Method!');
+            return false;
+        }
+        if (StudentId == null || StudentId == '' || StudentId == undefined) {
+            showMessage('Please select Resident!');
+            return false;
+        }
+
+        if (Amount == null || Amount == '' || Amount == undefined) {
+            showMessage('Please Enter Amount!');
+            return false;
+        }
+        if (Amount <= 0) {
+            showMessage('Please Enter Amount Grater then 0!');
+            return false;
+        }
+
+
+        return true;
+    }
+
+    function Loaderbtn(show) {
+        if (!show) {
+            $('.savebtn')
+                .prop("disabled", false)
+                .html('')
+                .text('Save');
+
+            $('.saveandapprovebtn')
+                .prop("disabled", false)
+                .html('')
+                .text('Save & Approve')
+        }
+        else {
+            $('.savebtn, .saveandapprovebtn')
+                .prop("disabled", true)
+                .html('<i class="fa fa-2x fa-sync-alt fa-spin  fa-refresh loading "></i>')
+                .css('background', '#016891 !important');
+        }
+    }
+
+    function setInitialLocation() {
+
+        var initialLocation = localStorage.getItem("selectedLocation");
+
+        if (initialLocation) {
+
+            $('#LocationId').val(initialLocation);
+            $("#LocationId").prop('disabled', true);
+
+
+        }
+    }
+    $('form').submit(function () {
+
+
+        var locationId = $('#LocationId').val();
+
+
+        $('<input>').attr({
+            type: 'hidden',
+            name: 'LocationId',
+            value: locationId
+        }).appendTo('form');
+
+        return true;
+    });
+
+    setInitialLocation();
+
+</script>
+

@@ -1,0 +1,103 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34408.163
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMS", "PMS\PMS.csproj", "{EC07A45F-02D7-4534-B3FA-E10ABEBCA7BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMS.EF", "PMS.EF\PMS.EF.csproj", "{7F146160-7235-475B-9FF1-3ADE00060E93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMS.Repository", "PMS.Repository\PMS.Repository.csproj", "{B99FA6F2-53ED-46BB-B04D-827F1ED2D8E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMS.Services", "PMS.Services\PMS.Services.csproj", "{A12966C7-1B6E-4282-AB72-DB9479A6A438}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMS.Common", "PMS.Common\PMS.Common.csproj", "{D31ED2F7-914B-4D7C-89E9-0F56B2AF46A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMS.DTO", "PMS.DTO\PMS.DTO.csproj", "{1DC10E26-F43A-4C7A-AE3B-AC82247FA49B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMS.StudentApi", "PMS.StudentApi\PMS.StudentApi.csproj", "{04DFDF02-FE95-4C2B-A209-133B330536FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMS.QuartzJob", "PMS.QuartzJob\PMS.QuartzJob.csproj", "{43E38482-8CB2-406C-A858-01F220136F70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PMSAPI", "PMSAPI\PMSAPI.csproj", "{65F896E3-2596-4834-9244-CA6E96E97B6D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EC07A45F-02D7-4534-B3FA-E10ABEBCA7BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC07A45F-02D7-4534-B3FA-E10ABEBCA7BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC07A45F-02D7-4534-B3FA-E10ABEBCA7BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC07A45F-02D7-4534-B3FA-E10ABEBCA7BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F146160-7235-475B-9FF1-3ADE00060E93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F146160-7235-475B-9FF1-3ADE00060E93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F146160-7235-475B-9FF1-3ADE00060E93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F146160-7235-475B-9FF1-3ADE00060E93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B99FA6F2-53ED-46BB-B04D-827F1ED2D8E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B99FA6F2-53ED-46BB-B04D-827F1ED2D8E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B99FA6F2-53ED-46BB-B04D-827F1ED2D8E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B99FA6F2-53ED-46BB-B04D-827F1ED2D8E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A12966C7-1B6E-4282-AB72-DB9479A6A438}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A12966C7-1B6E-4282-AB72-DB9479A6A438}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A12966C7-1B6E-4282-AB72-DB9479A6A438}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A12966C7-1B6E-4282-AB72-DB9479A6A438}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D31ED2F7-914B-4D7C-89E9-0F56B2AF46A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D31ED2F7-914B-4D7C-89E9-0F56B2AF46A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D31ED2F7-914B-4D7C-89E9-0F56B2AF46A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D31ED2F7-914B-4D7C-89E9-0F56B2AF46A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DC10E26-F43A-4C7A-AE3B-AC82247FA49B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DC10E26-F43A-4C7A-AE3B-AC82247FA49B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DC10E26-F43A-4C7A-AE3B-AC82247FA49B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DC10E26-F43A-4C7A-AE3B-AC82247FA49B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04DFDF02-FE95-4C2B-A209-133B330536FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04DFDF02-FE95-4C2B-A209-133B330536FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04DFDF02-FE95-4C2B-A209-133B330536FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04DFDF02-FE95-4C2B-A209-133B330536FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43E38482-8CB2-406C-A858-01F220136F70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43E38482-8CB2-406C-A858-01F220136F70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43E38482-8CB2-406C-A858-01F220136F70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43E38482-8CB2-406C-A858-01F220136F70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65F896E3-2596-4834-9244-CA6E96E97B6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65F896E3-2596-4834-9244-CA6E96E97B6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65F896E3-2596-4834-9244-CA6E96E97B6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65F896E3-2596-4834-9244-CA6E96E97B6D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {15603161-1091-4267-8A49-4E8AD1D29D85}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 9
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://2bvision.visualstudio.com/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = PMS.Common\\PMS.Common.csproj
+		SccProjectName1 = PMS.Common
+		SccLocalPath1 = PMS.Common
+		SccProjectUniqueName2 = PMS.DTO\\PMS.DTO.csproj
+		SccProjectName2 = PMS.DTO
+		SccLocalPath2 = PMS.DTO
+		SccProjectUniqueName3 = PMS.EF\\PMS.EF.csproj
+		SccProjectName3 = PMS.EF
+		SccLocalPath3 = PMS.EF
+		SccProjectUniqueName4 = PMS.Repository\\PMS.Repository.csproj
+		SccProjectName4 = PMS.Repository
+		SccLocalPath4 = PMS.Repository
+		SccProjectUniqueName5 = PMS.Services\\PMS.Services.csproj
+		SccProjectName5 = PMS.Services
+		SccLocalPath5 = PMS.Services
+		SccProjectUniqueName6 = PMS\\PMS.csproj
+		SccProjectName6 = PMS
+		SccLocalPath6 = PMS
+		SccProjectUniqueName7 = PMS.StudentApi\\PMS.StudentApi.csproj
+		SccProjectName7 = PMS.StudentApi
+		SccLocalPath7 = PMS.StudentApi
+		SccProjectUniqueName8 = PMS.QuartzJob\\PMS.QuartzJob.csproj
+		SccProjectName8 = PMS.QuartzJob
+		SccLocalPath8 = PMS.QuartzJob
+	EndGlobalSection
+EndGlobal

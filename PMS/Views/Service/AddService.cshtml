@@ -1,0 +1,263 @@
+﻿@model PMS.DTO.ViewModels.ServiceViewModels.AddServiceVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Service";
+    ViewBag.HeaderDescription = "Add/Edit Service";
+    ViewBag.Title = "Add/Edit Service | PMS";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+
+
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("ServicesList", "Service")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Services</a>
+        </div>
+    </div>
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddService", "Service", FormMethod.Post, new { enctype = "multipart/form-data", id = "inspection_fields_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.serviceId)
+
+
+
+<div class="box-body">
+    @if (ViewBag.error != null)
+    {
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+            @ViewBag.error
+        </div>
+    }
+    @if (ViewBag.success != null)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-check"></i> Alert!</h4>
+            @ViewBag.success
+        </div>
+    }
+
+    <div class="row col-md-12">
+        <div class="col-md-12">
+            <div class="form-group">
+
+                <label>Active</label>
+
+                <div>
+                    <label class="switch">
+                        <input type="checkbox" name="IsActive" id="IsActive" value="@Model.IsActive" @(Model.IsActive ? "checked" : "")>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                @Html.ValidationMessageFor(x => x.IsActive)
+            </div>
+        </div>
+        @*<div class="col-md-6">
+                <div class="form-group">
+
+                    <label>Is Deposit Service</label>
+
+                    <div>
+                        <label class="switch">
+                            <input type="checkbox" name="IsPrePlacementService" id="IsPrePlacementService" value="@Model.IsPrePlacementService" @(Model.IsPrePlacementService ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    @Html.ValidationMessageFor(x => x.IsPrePlacementService)
+                </div>
+            </div>*@
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.LocationId, "Location")
+                    @Html.DropDownList("LocationId", null, "Select...", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                    @Html.ValidationMessageFor(x => x.LocationId)
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-group">
+                @Html.LabelFor(x => x.ServiceName)
+                @Html.TextBoxFor(x => x.ServiceName, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter name" })
+            </div>
+            @Html.ValidationMessageFor(x => x.ServiceName)
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-group">
+                @Html.LabelFor(x => x.ServiceAmount)
+                @Html.TextBoxFor(x => x.ServiceAmount, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter Amount" })
+            </div>
+            @Html.ValidationMessageFor(x => x.ServiceAmount)
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                @Html.LabelFor(x => x.TaxId, "Tax")
+                @Html.DropDownList("TaxId", null, "--- Select Tax ---", htmlAttributes: new { @class = "form-control select2" })
+            </div>
+            @*@Html.ValidationMessageFor(x => x.DefaultPercentage)*@
+        </div>
+        @*<div class="col-md-4">
+            <div class="form-group">
+                @Html.LabelFor(x => x.AccountId, "Account")
+                @Html.DropDownList("AccountId", null, "Select...", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                @Html.ValidationMessageFor(x => x.AccountId)
+
+            </div>
+        </div>*@
+    </div>
+    <div class="col-md-12">
+
+        <label>Service Type</label>
+    </div>
+    <div class="col-md-12">
+        <div class="form-group">
+            @{
+                foreach (var item in ViewBag.ServiceType)
+                {
+                    <div class="col-md-12">
+                        <input type="radio" id="ServiceType_@item.Id" value="@item.Id" name="ServiceTypeId" @(item.Id == Model.ServiceTypeId ? "checked" : "") />
+                        <label for="ServiceType_@item.Id">@item.Name</label>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            @Html.LabelFor(x => x.AccountId, "Account")
+            @Html.DropDownList("AccountId", null, "Select...", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+            @Html.ValidationMessageFor(x => x.AccountId)
+
+        </div>
+    </div>
+</div>
+
+
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad btnSave" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+    <script>
+        $(function () {
+            //Date picker
+            $('.datepicker').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy",
+                startDate: new Date()
+            })
+
+            $('.select2').select2()
+        })
+
+        $(document).ready(function () {
+            var IsAlreadyCheck = $("input:radio[name=ServiceTypeId]").is(':checked');
+            if (!IsAlreadyCheck)
+                $("input:radio[name=ServiceTypeId]:first").attr('checked', true);
+
+            $('input[name="ServiceTypeId"]').change(function () {
+                var serviceTypeId = $(this).val();
+                var selectedAccountId = $('#AccountId').val(); 
+                filterAccountsByServiceType(serviceTypeId, selectedAccountId);
+            });
+
+            var selectedServiceType = $('input[name="ServiceTypeId"]:checked').val();
+            if (selectedServiceType) {
+                var selectedAccountId = $('#AccountId').val(); 
+                filterAccountsByServiceType(selectedServiceType, selectedAccountId);
+            }
+        });
+
+           function filterAccountsByServiceType(serviceTypeId, selectedAccountId) {
+        if (!serviceTypeId) return;
+
+        $.ajax({
+            url: '@Url.Action("GetAccountsByServiceType", "Service")', 
+            type: 'POST',
+            data: {
+                serviceTypeId: serviceTypeId,
+                selectedAccountId: selectedAccountId
+            },
+            success: function(data) {
+                $('#AccountId').empty();
+                $('#AccountId').append('<option value="">Select...</option>');
+
+                $.each(data, function(index, item) {
+                    var option = '<option value="' + item.Id + '"';
+                    if (item.Selected || (selectedAccountId && item.Id == selectedAccountId)) {
+                        option += ' selected';
+                    }
+                    option += '>' + item.Name + '</option>';
+                    $('#AccountId').append(option);
+                });
+
+                $('#AccountId').trigger('change');
+            },
+            error: function() {
+                console.log('Error loading accounts');
+            }
+        });
+    }
+
+
+        function setInitialLocation() {
+
+            var initialLocation = localStorage.getItem("selectedLocation");
+
+            if (initialLocation) {
+
+                $('#LocationId').val(initialLocation);
+                $("#LocationId").prop('disabled', true);
+
+
+            }
+        }
+        $('form').submit(function () {
+
+
+            var locationId = $('#LocationId').val();
+
+
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'LocationId',
+                value: locationId
+            }).appendTo('form');
+
+            return true;
+        });
+
+        setInitialLocation();
+    </script>
+
+
+}

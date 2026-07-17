@@ -1,0 +1,167 @@
+﻿@model PMS.DTO.ViewModels.PersonManageViewModels.PersonDocumentsVM
+@using PMS.EF
+@{
+    var filePath = System.Configuration.ConfigurationManager.AppSettings["UploadedImages"];
+    var Images = ViewBag.ImagesDetail as ICollection<PersonDocument>;
+}
+
+@using PMS.Common.Classes
+@section styles{
+    <!-- Jquery filer css -->
+    <link href="~/Assets/plugins/jquery.filer/fancy-file-uploader/fancy_fileupload.css" media="all" rel="stylesheet">
+
+}
+@{
+    ViewBag.Header = "Person Documents";
+    ViewBag.HeaderDescription = "Add New Person Document";
+    ViewBag.Title = "Add Person Documents | PMS";
+}
+
+<div class="box box-danger">
+    @if (User.IsInRole(AppUserRoles.View_PersonDocument))
+    {
+        <div class="box-header with-border">
+            <div class="input-group-btn">
+                <a href="@Url.Action("Persons", "PersonManage")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"> All Persons</i></a>
+            </div>
+        </div>
+    }
+
+
+    @using (Html.BeginForm("UploadPersonDocumentImages", "PersonManage", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.HiddenFor(x => x.PersonID)
+
+        <div class="row col-md-12">
+            <input id="ImageSource" type="file" name="ImageSource" class="hide" multiple>
+        </div>
+        <div class="row col-md-12">
+            <table class="table table-sm table-responsive-sm">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width:30%"> Image</th>
+                        <th scope="col"> File Name</th>
+                        <th scope="col"> Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Images.ToList())
+                    {
+                        <tr>
+                            <td>
+                                <a href="@filePath@item.ImageUrl" target="_blank">
+                                    <div class="pull-left image">
+                                        @if (item.ImageUrl.ToLower().EndsWith(".png") ||
+                                            item.ImageUrl.ToLower().EndsWith(".jpg") ||
+                                            item.ImageUrl.ToLower().EndsWith(".jpeg") ||
+                                            item.ImageUrl.ToLower().EndsWith(".svg"))
+                                        {
+                                            <img src="@filePath@item.ImageUrl" class="img-circle" alt="User Image" style="width: 65px; height:65px">
+
+                                        }
+                                        else if (item.ImageUrl.ToLower().EndsWith(".pdf"))
+                                        {
+                                            <img src="~/Assets/Images/pdf-icon.png" class="img-circle" alt="PDF File" style="width: 65px; height:65px">
+                                        }
+                                        else
+                                        {
+                                            <img src="~/Assets/Images/pngtree-file-icon-image_1128287.jpg" class="img-circle" alt="User Image" style="width: 65px; height:65px">
+
+                                        }
+                                    </div>
+                                </a>
+                            </td>
+                            @Html.ValidationMessageFor(m => m.ImageSource, "", new { @class = "text-danger" })
+
+                            <td>
+                                <a href="@Url.Content(filePath + item.ImageUrl)" target="_blank">@item.Description</a>
+                            </td>
+                            <td><a href="#del" onclick="DeleteImage(@item.PersonDocumentID)"><i class="fa fa-remove" style="color:red"></i></a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad hide" value="Save">
+        </div>
+    }
+</div>
+<div class="modal" id="DeleteImageConformation">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Are you sure you want to Delete?</h4>
+            </div>
+            <div class="modal-body">
+                <p>You are about to delete this record. This process is irreversible.</p>
+                <p> Are you sure?</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                <button type="submit" onclick="ApproveInvoice();" class="btn btn-themyriad btn-ok">Delete</button>
+            </div>
+
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@section scripts
+{
+
+    <script src="~/Assets/plugins/jquery.filer/fancy-file-uploader/jquery.ui.widget.js"></script>
+    <script src="~/Assets/plugins/jquery.filer/fancy-file-uploader/jquery.fileupload.js"></script>
+    <script src="~/Assets/plugins/jquery.filer/fancy-file-uploader/jquery.iframe-transport.js"></script>
+    <script src="~/Assets/plugins/jquery.filer/fancy-file-uploader/jquery.fancy-fileupload.js"></script>
+    <script>
+
+        $('#ImageSource').FancyFileUpload({
+            params: {
+                action: 'fileuploader',
+                PersonID: $('#PersonID').val()
+            },
+            maxfilesize: 3 * 1024 * 1024, // 3MB
+            accept: ['image/png', 'image/jpg', 'image/jpeg', 'image/svg+xml', 'application/pdf'],
+            'uploadcompleted': function (e, data) {
+                var response = data.result;
+                alert('File Uploaded Successfully!');
+            },
+            'retries': 1
+        });
+
+        $(function () {
+        })
+        var Id = 0;
+        function DeleteImage(Code) {
+            Id = Code;
+            $('#DeleteImageConformation').modal('show');
+        }
+
+        function ApproveInvoice() {
+            $('#DeleteImageConformation').modal('hide');
+            $.ajax({
+                type: "Post",
+                url: GetFormatedUrl('/PersonManage/DeletePersonDocumentImagesbyId/') + Id,
+                async: true,
+                success: function (data) {
+                    var data = data.status;
+                    if (data == true) {
+                        window.location.reload();
+                        $('#Approve').addClass('hide');
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        };
+
+
+    </script>
+
+}

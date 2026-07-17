@@ -1,0 +1,40 @@
+﻿@{ 
+    var locations = ViewBag.Locations as List<PMS.EF.Location>;
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Action</th>
+            <th>Location</th>
+            <th>Prefix</th>
+            <th>Description</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @for (int i = 0; i < locations.Count; i++)
+        {
+            <tr>
+                <td class="menu-icons" style="text-align:inherit">
+                    <a title="Edit" href="#" class="form_modal" data-id="@locations[i].LocationID" data-view="location"><i class="fa fa-edit"></i></a>
+                    <a title="Setings" href="@Url.Action("LocationSettings" ,"Setup", new { LocationId = locations[i].LocationID })"><i class="fa fa-cog"></i></a>
+                    <a title="Delete" href="#" data-view="location" data-href="@Url.Action("DeleteLocation" ,"Setup", new { id = locations[i].LocationID })" data-toggle="modal" data-target="#confirm-delete-async"><i class="fa fa-remove"></i></a>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="location" value="@locations[i].LocationID" @(i == 0 ? "checked" : "")>
+                                @locations[i].LocationName
+                            </label>
+                        </div>
+                    </div>
+                </td>
+                <td>@locations[i].Prefix</td>
+                <td>@locations[i].LocationDescription</td>
+
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,81 @@
+﻿@model PMS.DTO.ViewModels.SetupViewModels.AddBedSpaceVM
+
+@using (Ajax.BeginForm("AddBed", "Setup", new AjaxOptions
+{
+    HttpMethod = "POST",
+    OnSuccess = "modalFormSuccess",
+    OnFailure = "modalFormFailure",
+    OnBegin = "$('#loader').show();",
+    OnComplete = "$('#loader').fadeOut('slow');"
+}))
+{
+    @Html.AntiForgeryToken();
+    @Html.HiddenFor(x => x.BedSpaceID)
+    @Html.HiddenFor(x => x.RoomID)
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Add/Update Bed Space</h4>
+            </div>
+
+            <div class="modal-body">
+                @*<div class="form-group">
+                    <label>Status</label>
+
+                    <div>
+                        <label class="switch">
+                            @Html.HiddenFor(x => x.Status, new { id = "Statuscheck" })
+                            <input type="checkbox" id="StatusCheckbox" value="@Model.Status" @(Model.Status ? "checked" : "") />
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    @Html.ValidationMessageFor(x => x.Status)
+                </div>*@
+
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Status)
+                        <div>
+                            <label class="switch">
+                                <input type="checkbox" name="Status" id="Status" value="@Model.Status" @(@Model.Status ? "checked" : "")>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        @Html.ValidationMessageFor(x => x.Status)
+                    </div>
+                <div class="form-group">
+                    <label>Name</label>
+
+                    @Html.TextBoxFor(x => x.BedSpaceName, new { @class = "form-control", placeholder = "Enter Name" })
+
+                    @Html.ValidationMessageFor(x => x.BedSpaceName)
+
+                </div>
+                <div class="form-group hide">
+                    <label>Bed Address</label>
+
+                    @Html.TextBoxFor(x => x.BedSpaceAddress, new { @class = "form-control", placeholder = "Enter Address" })
+
+                    @Html.ValidationMessageFor(x => x.BedSpaceAddress)
+
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+
+                    @Html.TextAreaFor(x => x.BedSpaceDescription, new { @class = "form-control", placeholder = "Enter Description", style = "min-height:125px" })
+
+                    @Html.ValidationMessageFor(x => x.BedSpaceDescription)
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-themyriad">Save</button>
+            </div>
+        </div>
+    </div>
+}

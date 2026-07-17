@@ -1,0 +1,878 @@
+﻿@model PMS.DTO.ViewModels.ContractViewModels.AddContractVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Contract";
+    ViewBag.HeaderDescription = "Add/Edit Contract";
+    ViewBag.Title = "Add/Edit Contract | PMS";
+
+    var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+}
+
+
+@section styles{
+    <!-- bootstrap datepicker -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Bootstrap time Picker -->
+    <link rel="stylesheet" href="~/Assets/plugins/timepicker/bootstrap-timepicker.css">
+
+    <style>
+        .nav-tabs-custom > .nav-tabs > li.active {
+            border-top-color: #c20e1a !important;
+        }
+
+        form .error {
+            color: #c20e1a;
+            margin-bottom: auto;
+            font-weight: 500;
+        }
+    </style>
+}
+
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Contracts", "ContractsManage")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Contracts</a>
+        </div>
+    </div>
+
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddContracts", "ContractsManage", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_contracts_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.ContractID)
+        @Html.HiddenFor(x => x.OriginalContractID)
+
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- Custom Tabs -->
+                    <div class="nav-tabs-custom">
+                        <ul class="nav nav-tabs">
+                            <li class="tab_1 active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">Properties</a></li>
+                            <li class="tab_2"><a href="#tab_2" data-toggle="tab" aria-expanded="false">Content</a></li>
+                            <li class="tab_3"><a href="#tab_3" data-toggle="tab" aria-expanded="false">Assertions</a></li>
+                            <li class="tab_4"><a href="#tab_4" data-toggle="tab" aria-expanded="false">Signature</a></li>
+                            <li class="tab_5"><a href="#tab_5" data-toggle="tab" aria-expanded="false">Email</a></li>
+                            <li class="tab_6"><a href="#tab_6" data-toggle="tab" aria-expanded="false">Notes</a></li>
+                            <li class="tab_7"><a href="#tab_7" data-toggle="tab" aria-expanded="false">Publish</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_1">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>Is Active</label>
+
+                                            <div>
+                                                <label class="switch">
+                                                    <input type="checkbox" name="IsActive" id="IsActive" value="@Model.Properties.IsActive" @(Model.Properties.IsActive ? "checked" : "")>
+                                                    <span class="slider round"></span>
+                                                </label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            @Html.LabelFor(x => x.LocationId, "Location")
+                                            @Html.DropDownList("LocationId", null, "Select...", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                                            @Html.ValidationMessageFor(x => x.LocationId)
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(x => x.Properties.ContractNumber)
+
+                                            @{
+                                                if (Model.ContractID > 0 || !string.IsNullOrEmpty(Model.Properties.ContractNumber))
+                                                {
+                                                    @Html.HiddenFor(Model => Model.Properties.ContractNumber)
+                                                    @Html.TextBoxFor(x => x.Properties.ContractNumber, new { @class = "form-control", @disabled = "disabled" })
+                                                }
+                                                else
+                                                {
+                                                    <input disabled class="form-control" value="will be created when contract saved..." />
+                                                }
+                                            }
+
+                                            @Html.ValidationMessageFor(x => x.Properties.ContractNumber)
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(x => x.Properties.ContractName)
+
+                                            @Html.TextBoxFor(x => x.Properties.ContractName, new { @class = "form-control", placeholder = "Enter name" })
+
+                                            @Html.ValidationMessageFor(x => x.Properties.ContractName)
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(x => x.Properties.ContractVersion)
+
+                                            @Html.TextBoxFor(x => x.Properties.ContractVersion, new { @class = "form-control", placeholder = "Enter version", min = "1", type = "number" })
+
+                                            @Html.ValidationMessageFor(x => x.Properties.ContractVersion)
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(x => x.Properties.ContractReferenceNumber)
+
+                                            @Html.TextBoxFor(x => x.Properties.ContractReferenceNumber, new { @class = "form-control", placeholder = "Enter reference" })
+
+                                            @Html.ValidationMessageFor(x => x.Properties.ContractReferenceNumber)
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(x => x.Properties.ContractTypeID)
+
+                                            @Html.DropDownListFor(model => model.Properties.ContractTypeID,
+            new SelectList(Model.Properties.ContractTypeList, "Value", "Text"),
+            "-- Contract Type --",
+            new { @Class = "form-control" })
+
+                                            @Html.ValidationMessageFor(x => x.Properties.ContractTypeID)
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(x => x.Properties.Description)
+
+                                            @Html.TextAreaFor(x => x.Properties.Description, new { @class = "form-control", placeholder = "Enter description", style = "min-height:125px" })
+
+                                            @Html.ValidationMessageFor(x => x.Properties.Description)
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                            <!-- /.tab-pane -->
+                            <div class="tab-pane" id="tab_2">
+
+                                <div class="row" style="padding:20px 0px;">
+
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <div class="radio">
+                                                <label>
+                                                    @*<input type="radio" name="rep" value="editor" checked="">*@
+                                                    @Html.RadioButtonFor(Model => Model.Content.ContentType, "editor", new { @checked = "" })
+                                                    Editor
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="radio">
+                                                <label>
+                                                    @*<input type="radio" name="rep" value="file">*@
+                                                    @Html.RadioButtonFor(Model => Model.Content.ContentType, "file", new { })
+                                                    File
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        @Html.ValidationMessageFor(x => x.Content.ContentType)
+                                    </div>
+
+
+                                    @*<div class="form-group">
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <input type="radio" name="rep" class="minimal" value="editor" checked style="margin-bottom:10px;">
+                                                    Editor<br>
+                                                    <input type="radio" name="rep" class="minimal" value="file">
+                                                    File<br>
+                                                </div>
+                                            </div>
+                                        </div>*@
+
+                                </div>
+
+                                <div class="row triggerDiv type_editor" style="display: block;">
+                                    <div class="col-md-10">
+                                        <div class="form-group">
+                                            <label>Editor Content</label>
+                                            @Html.TextAreaFor(x => x.Content.EditorContent, new { @class = "form-control", id = "ContentValue", name = "ContentValue", placeholder = "Enter Value", style = "min-height:125px" })
+                                            @Html.ValidationMessageFor(x => x.Content.EditorContent)
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="row triggerDiv type_file" style="display: none;">
+                                    <div class="col-md-10">
+                                        <div class="form-group">
+                                            <label>File Content</label>
+                                            @Html.HiddenFor(Model => Model.Content.FileContentPath)
+                                            @Html.TextBoxFor(x => x.Content.FileContent, new { @class = "form-control", type = "file" })
+                                            @Html.ValidationMessageFor(x => x.Content.FileContent)
+                                        </div>
+
+                                        @if (!string.IsNullOrEmpty(Model.Content.FileContentPath))
+                                        {
+                                            <table class="table table-bordered table-striped">
+                                                <colgroup>
+                                                    <col style="width:20%" />
+                                                    <col />
+                                                </colgroup>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Attached File</td>
+                                                        <td><a target="_blank" href="@Model.Content.FileContentPath">@Model.Content.FileContentPath.Split('/').LastOrDefault()</a></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        }
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.tab-pane -->
+                            <div class="tab-pane" id="tab_3">
+
+                                <br />
+
+                                <b>Enter any assertions to be displayed above the "I Agree" button.</b>
+
+                                <p></p>
+
+                                <div id="hidden_assertions">
+                                    @for (int i = 0; i < Model.Assertions.Count; i++)
+                                    {
+                                        <div>
+                                            @Html.HiddenFor(x => x.Assertions[i].ContractAssertionID)
+                                            @Html.HiddenFor(x => x.Assertions[i].ShowCheckBox)
+                                            @Html.HiddenFor(x => x.Assertions[i].AssertionRequired)
+                                            @Html.HiddenFor(x => x.Assertions[i].AssertionText)
+                                            @Html.HiddenFor(x => x.Assertions[i].AssertionHyperlinkText)
+                                            @Html.HiddenFor(x => x.Assertions[i].AssertionHyperlinkUrl)
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="box-body no-padding" style="overflow: auto;width:100%;">
+                                    <table id="assertions_table" class="table">
+
+                                        <colgroup>
+                                            <col>
+                                            <col style="width: 15%;">
+                                            <col style="width: 15%;">
+                                            <col style="width: 15%;">
+
+                                        </colgroup>
+
+                                        <thead>
+                                            <tr>
+                                                <th class="menu-icons" style="text-align:inherit;"><a title="Add New" data-toggle="modal" data-target="#add_assertion_modal"><i class="fa fa-plus-circle" style="font-size:25px;"></i></a></th>
+                                                <th>Show Check Box</th>
+                                                <th>Required</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var assertion in Model.Assertions)
+                                            {
+                                                <tr data-assertion="@(serializer.Serialize(assertion))">
+                                                    <td>@assertion.AssertionText</td>
+                                                    <td>@(assertion.ShowCheckBox ? Html.Raw("<span class='label label-success'>Yes</span>") : Html.Raw("<span class='label label-danger'>No</span>"))</td>
+                                                    <td>@(assertion.AssertionRequired ? Html.Raw("<span class='label label-success'>Yes</span>") : Html.Raw("<span class='label label-danger'>No</span>"))</td>
+                                                    <td class="menu-icons" style="text-align:inherit">
+                                                        <a title="Edit" href="#" class="edit_assertion" onclick="editAssertions(this)"><i class="fa fa-edit"></i></a>
+                                                        <a title="Delete" href="#" onclick="deleteAssertion(this)"><i class="fa fa-trash"></i></a>
+                                                    </td>
+                                                </tr>
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+                                </div>
+
+
+                            </div>
+                            <!-- /.tab-pane -->
+                            <div class="tab-pane" id="tab_4">
+                                <div class="checkbox">
+                                    <label>
+                                        @*<input type="checkbox">*@
+                                        @Html.CheckBoxFor(Model => Model.Signature.RequireElectronicSignature)
+                                        Require electronic signature.
+                                    </label>
+                                </div>
+
+                                <div class="form-horizontal">
+                                    <div class="">
+                                        <label>Configure electronic signature:</label>
+
+                                        @*<div class="input-group col-sm-6">
+                                                <input type="text" value="Configured" class="form-control" disabled>
+                                                <span class="input-group-btn">
+                                                    <a class="btn btn-success btn-flat">Configure Signature</a>
+                                                    <a class="btn btn-themyriad btn-flat">Delete Signature</a>
+                                                </span>
+                                            </div>*@
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    @Html.TextBoxFor(Model => Model.Signature.SignatureText, new { @class = "form-control" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <!-- /.tab-pane -->
+                            <div class="tab-pane" id="tab_5">
+
+                                <h3>Acceptance Email</h3>
+
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBoxFor(Model => Model.Email.SendEmailOnContractAcceptance)
+                                        Send email on contract acceptance
+                                    </label>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Email Message</label>
+                                        @Html.DropDownListFor(model => model.Email.EmailMessageID,
+            new SelectList(Model.Email.EmailMessageList, "Value", "Text"),
+            "-- " + Html.DisplayNameFor(Model => Model.Email.EmailMessageID) + " --",
+            new { @Class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.Email.EmailMessageID)
+                                    </div>
+                                </div>
+
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBoxFor(Model => Model.Email.IncludeContractAsPDF)
+                                        Include contract as PDF attachment
+                                    </label>
+                                </div>
+
+                            </div>
+                            <!-- /.tab-pane -->
+                            <div class="tab-pane" id="tab_6">
+                                <p>Enter notes for this contract version:</p>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        @Html.TextAreaFor(Model => Model.Notes.Notes, new { @style = "min-height:125px;height:200px;width:100%;" })
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.tab-pane -->
+                            <div class="tab-pane" id="tab_7">
+                                <div style="text-align:center;padding:30px 0px">
+                                    @{
+                                        if (!Model.IsPublish)
+                                        {
+                                            <p>Save changes and publish this version. This locks the version so that it can never be deleted.</p>
+                                            <input type="submit" @*formaction="/ContractsManage/PublishContract"*@ name="Publish" class="btn btn-themyriad btnSave" value="Publish">
+                                        }
+                                        else
+                                        {
+                                            <p>This version was published. No changes can be made to this version other than active status and notes.</p>
+                                        }
+
+                                    }
+                                </div>
+                            </div>
+                            <!-- /.tab-pane -->
+                        </div>
+                        <!-- /.tab-content -->
+                    </div>
+                    <!-- nav-tabs-custom -->
+                </div>
+            </div>
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="button" class="btn btn-themyriad btnSave" value="Save">
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="confirm_assertion_delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Information</h4>
+            </div>
+
+            <div class="modal-body">
+                <p>You are about to delete this record. This process is irreversible.</p>
+                <p> Are you sure?</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-themyriad btnConfirmAssertionDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="add_assertion_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    @using (Html.BeginForm("", "", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_assertions_form" }))
+    {
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Add Assertion</h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <b>Enter the assertion to be included in the contract.</b>
+
+                    <input type="hidden" class="assertion_id" value="0">
+
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" class="show_checkbox"> Display checkbox with assertion
+                        </label>
+                    </div>
+
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" class="assertion_required"> Assertion is required
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Assertion Text</label>
+                        <textarea class="form-control assertion_text" placeholder="" style="min-height:125px;resize: none;" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hyperlink Text</label>
+                        <input class="form-control hyperlink_text" type="text" />
+
+                    </div>
+                    <div class="form-group">
+                        <label>Hyperlink URL</label>
+                        <input class="form-control hyperlink_url" type="text" />
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-themyriad" id="save_assertion">Add</button>
+                </div>
+            </div>
+        </div>
+
+    }
+</div>
+
+
+@section scripts
+{
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- bootstrap time picker -->
+    <script src="~/Assets/plugins/timepicker/bootstrap-timepicker.min.js"></script>
+
+    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
+    @*<script src="https://cdn.ckeditor.com/4.15.0/full/ckeditor.js"></script>*@
+
+    <script>
+        $('document').ready(function () {
+            $('input[name="Content.ContentType"]').change(function () {
+                SetContentType();
+            });
+
+            //var val_ref = $('input[name="Content.ContentType"]:checked').val();
+            //$('.triggerDiv').hide();
+            //$('.triggerDiv.type_' + val_ref).show();
+
+            SetContentType();
+        });
+
+
+        function SetContentType() {
+            var val = $('input[name="Content.ContentType"]:checked').val();
+            $('.triggerDiv').hide();
+            $('.triggerDiv.type_' + val).show();
+
+            if (val == "editor") {
+                $("#ContentValue").prop("required", "true");
+
+                $("#Content_FileContent").removeAttr('required');
+                $("#Content_FileContent-error").text('');
+            }
+            else {
+                @if (string.IsNullOrEmpty(Model.Content.FileContentPath))
+                {
+                    @:$("#Content_FileContent").prop("required", "true");
+                }
+
+                $("#ContentValue").removeAttr('required');
+                $("#ContentValue-error").text('');
+            }
+        }
+
+    </script>
+
+    <script>
+
+        var _row = null;
+
+        CKEDITOR.replace('ContentValue', {
+            uiColor: '#CCEAEE',
+            removePlugins: 'elementspath'
+        });
+
+        function editAssertions(n) {
+            var myModal = $('#add_assertion_modal');
+
+            _row = $(n).parents("tr");
+
+            var obj = _row.data("assertion");
+
+            $('.assertion_id', myModal).val(obj.ContractAssertionID);
+            $('.show_checkbox').prop('checked', obj.ShowCheckBox);
+            $('.assertion_required').prop('checked', obj.AssertionRequired);
+            $('.assertion_text', myModal).val(obj.AssertionText);
+            $('.hyperlink_text', myModal).val(obj.AssertionHyperlinkText);
+            $('.hyperlink_url', myModal).val(obj.AssertionHyperlinkUrl);
+
+            $("#save_assertion").text("Update");
+
+            myModal.modal({ show: true });
+        }
+
+        function constructAssertionString() {
+            var myModal = $('#add_assertion_modal');
+            
+
+            var assertion_id = $('.assertion_id', myModal).val();
+            var show_checkbox = $(".show_checkbox").is(":checked")
+            var assertion_required = $(".assertion_required").is(":checked")
+            var assertion_text = $('.assertion_text', myModal).val();
+            var hyperlink_text = $('.hyperlink_text', myModal).val();
+            var hyperlink_url = $('.hyperlink_url', myModal).val();
+
+            let obj = {
+                "ContractAssertionID": assertion_id,
+                "ShowCheckBox": show_checkbox,
+                "AssertionRequired": assertion_required,
+                "AssertionText": assertion_text,
+                "AssertionHyperlinkText": hyperlink_text,
+                "AssertionHyperlinkUrl": hyperlink_url
+
+            };
+            
+            var show = "";
+            if (obj.ShowCheckBox == true) {
+                show = "<span class='label label-success'>Yes</span>";
+            }
+            else {
+                show = "<span class='label label-danger'>No</span>";
+            }
+            var required = "";
+            if (obj.AssertionRequired == true) {
+                required = "<span class='label label-success'>Yes</span>";
+            }
+            else {
+                required = "<span class='label label-danger'>No</span>";
+            }
+
+            $tr = $("<tr/>", {
+                data: { "assertion": obj }
+            });
+
+            $tr = $tr.append("<td>" + obj.AssertionText + "</td><td>" + show + "</td><td>" + required + "</td><td class='menu-icons' style='text-align:inherit'><a title='Edit' href='#' class='edit_assertion' onclick='editAssertions(this)'><i class='fa fa-edit'></i></a><a title='Delete' href='#' onclick='deleteAssertion(this)'><i class='fa fa-trash'></i></a></td>");
+            
+            return $tr;
+            
+            //return "<tr data-assertion=" + JSON.stringify(obj) + "><td>" + obj.AssertionText + "</td><td>" + show + "</td><td>" + required + "</td><td class='menu-icons' style='text-align:inherit'><a title='Edit' href='#' class='edit_assertion' onclick='editAssertions(this)'><i class='fa fa-edit'></i></a><a title='Delete' href='#' class='delete'><i class='fa fa-trash'></i></a></td></tr>";
+        }
+
+        function deleteAssertion(n) {
+
+            var deleteModal = $('#confirm_assertion_delete');
+
+            $tr = $(n).closest('tr');
+
+            $('.btnConfirmAssertionDelete').data('row', $tr);
+
+            deleteModal.modal({ show: true });
+        }
+
+        $(document).ready(function () {
+
+            $(".btnSave").click(function () {
+                var currenttab = $("ul.nav-tabs li.active").attr('class').split(' ');
+                var tab = currenttab[0];
+                var tab1Validation = $('#add_contracts_form').valid();
+                var validator = $("#add_assertions_form").validate();
+                var isValid = $("#add_assertions_form").valid();
+               
+                if (tab == 'tab_1' && tab1Validation == true) {
+                    $("ul.nav-tabs li").removeClass("active");
+                    $(".tab-pane").removeClass("active");
+                    $(".tab_2").addClass("active");
+                    $("#tab_2").addClass("active");
+                    return;
+                }
+                if (tab1Validation == false) {
+                    return;
+                }
+                if (!isValid) {
+                    return;
+                }
+                if (tab == 'tab_2') {
+                    if (true) {
+                        $("ul.nav-tabs li").removeClass("active");
+                        $(".tab-pane").removeClass("active");
+                        $(".tab_3").addClass("active");
+                        $("#tab_3").addClass("active");
+                        return;
+                    }
+                }
+                
+                if (tab == 'tab_3') {
+                    $("ul.nav-tabs li").removeClass("active");
+                    $(".tab-pane").removeClass("active");
+                    $(".tab_4").addClass("active");
+                    $("#tab_4").addClass("active");
+                    return;
+                }
+                if (tab == 'tab_4') {
+                    $("ul.nav-tabs li").removeClass("active");
+                    $(".tab-pane").removeClass("active");
+                    $(".tab_5").addClass("active");
+                    $("#tab_5").addClass("active");
+                    return;
+                }
+                if (tab == 'tab_5') {
+                    $("ul.nav-tabs li").removeClass("active");
+                    $(".tab-pane").removeClass("active");
+                    $(".tab_6").addClass("active");
+                    $("#tab_6").addClass("active");
+                    return;
+                }
+                if (tab == 'tab_6') {
+                    $("ul.nav-tabs li").removeClass("active");
+                    $(".tab-pane").removeClass("active");
+                    $(".tab_7").addClass("active");
+                    $("#tab_7").addClass("active");
+                    return;
+                }
+                if (tab == 'tab_7' && tab1Validation == true) {
+                    $(".btnSave").attr('type', 'submit');
+                }
+                $("#add_contracts_form").data("validator").settings.ignore = "";
+                var validator = $("#add_contracts_form").validate();
+                var isValid = $("#add_contracts_form").valid();
+                if (!isValid) {
+                    var tab_id = jQuery(validator.errorList[0].element).closest(".tab-pane").attr("id");
+                    $("ul.nav-tabs li").removeClass("active");
+                    $(".tab-pane").removeClass("active");
+                    $("." + tab_id).addClass("active");
+                    $("#" + tab_id).addClass("active");
+                }
+                else {
+                    
+                    //$("#hidden_assertions").html("<div><input type='hidden' name='Assertions.Index' value='wajhe' /><input name='Assertions[wajhe].AssertionText' type='hidden' value='sample test text13456'></div>");
+
+                    $container = $('<div/>', { 'class': 'hidden_assertions_container' });
+                    var index = 0;
+
+                    $("#assertions_table tbody").find("tr").each(function () {
+                        var data = $(this).data("assertion");
+
+                        $fields = $('<div/>', { 'class': 'hidden_assertions_sub_container' });
+
+                        $assertion_id = $('<input />', { 'class': '', 'name': 'Assertions[' + index + '].ContractAssertionID', 'type': 'hidden', 'value': data.ContractAssertionID });
+                        $show_checkbox = $('<input />', { 'class': '', 'name': 'Assertions[' + index + '].ShowCheckBox', 'type': 'hidden', 'value': data.ShowCheckBox });
+                        $assertion_required = $('<input />', { 'class': '', 'name': 'Assertions[' + index + '].AssertionRequired', 'type': 'hidden', 'value': data.AssertionRequired });
+                        $assertion_text = $('<input />', { 'class': '', 'name': 'Assertions[' + index + '].AssertionText', 'type': 'hidden', 'value': data.AssertionText });
+                        $hyperlink_text = $('<input />', { 'class': '', 'name': 'Assertions[' + index + '].AssertionHyperlinkText', 'type': 'hidden', 'value': data.AssertionHyperlinkText });
+                        $hyperlink_url = $('<input />', { 'class': '', 'name': 'Assertions[' + index + '].AssertionHyperlinkUrl', 'type': 'hidden', 'value': data.AssertionHyperlinkUrl });
+
+                        $fields.append($assertion_id);
+                        $fields.append($show_checkbox);
+                        $fields.append($assertion_required);
+                        $fields.append($assertion_text);
+                        $fields.append($hyperlink_text);
+                        $fields.append($hyperlink_url);
+
+                        $container.append($fields);
+
+                        index = index + 1;
+                    });
+
+                    $("#hidden_assertions").html($container);
+
+                }
+                
+            });
+            
+
+
+            $('#save_assertion').on('click', function () {
+                //$("#add_assertions_form").data("validator").settings.ignore = "";
+                var validator = $("#add_assertions_form").validate();
+                var isValid = $("#add_assertions_form").valid();
+
+                if (isValid) {
+
+                    var myModal = $('#add_assertion_modal');
+
+                    var str = constructAssertionString();
+
+                    if ($(this).text() == "Update") {
+                        
+                        $(_row).after(str);
+
+                        $(_row).remove();
+                    }
+                    else {
+
+                        $("#assertions_table tbody").append(str);
+                    }
+
+                    myModal.modal('hide');
+                    
+                }
+
+                return false;
+            });
+
+            
+            
+            $('#add_assertion_modal').on('hidden.bs.modal', function () {
+                $("#add_assertions_form").trigger("reset");
+                $("#save_assertion").text("Add");
+            });
+            
+
+            $(".btnConfirmAssertionDelete").on('click', function () {
+                $(this).data('row').remove();
+                $('#confirm_assertion_delete').modal('hide');;
+            });
+            
+
+        });
+
+        $(function () {
+            //Date picker
+            $('.term_date').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy"
+            });
+
+            //$('#show_time').timepicker({
+            //    showInputs: false
+            //})
+        })
+
+
+        function setInitialLocation() {
+
+            var initialLocation = localStorage.getItem("selectedLocation");
+
+            if (initialLocation) {
+
+                $('#LocationId').val(initialLocation);
+                $("#LocationId").prop('disabled', true);
+
+
+            }
+        }
+        $('form').submit(function () {
+
+
+            var locationId = $('#LocationId').val();
+
+
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'LocationId',
+                value: locationId
+            }).appendTo('form');
+
+            return true;
+        });
+
+        setInitialLocation();
+
+    </script>
+}
+
+

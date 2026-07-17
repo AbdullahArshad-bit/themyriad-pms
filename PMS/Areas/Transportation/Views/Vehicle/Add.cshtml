@@ -1,0 +1,268 @@
+﻿@model PMS.DTO.ViewModels.VehicleViewModel.VehicleViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Header = "Vehicle";
+    ViewBag.HeaderDescription = "Add Vehicle";
+    ViewBag.Title = "Add Vehicle | PMS";
+}
+
+
+<style>
+    .overlay-image:hover {
+        opacity: 0.5;
+    }
+
+        .overlay-image:hover .profilepic__content {
+            opacity: 1;
+        }
+
+    .overlay-image {
+        overflow: hidden;
+    }
+
+    .profilepic__content {
+        position: absolute;
+        top: 10%;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        opacity: 0;
+        transition: opacity .2s ease-in-out;
+    }
+
+    .profilepic__icon {
+        color: white;
+        padding-bottom: 8px;
+    }
+
+    .profilepic__content .fa {
+        font-size: 20px;
+        color: white;
+    }
+
+    .profilepic__text {
+        text-transform: uppercase;
+        font-size: 12px;
+        width: 50%;
+        text-align: center;
+        color: white;
+    }
+
+    .option1 {
+        display: inline-block; /* show on the same line */
+        padding-right: 5px; /* small gap on the right of each header */
+    }
+</style>
+<div class="box box-danger">
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Index", "Vehicle")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Vehicles</a>
+        </div>
+    </div>
+
+    <!-- form start -->
+    @using (Html.BeginForm("Add", "Vehicle", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_Vehicle_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.BusId)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+        <div class="row">
+            @if (Model.BusId > 0)
+            {
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Active</label>
+                        <div>
+                            <label class="switch">
+                                <input type="checkbox" name="IsActive" id="Is_Active"
+                                       value="@Model.IsActive" @(Model.IsActive ? "checked" : "")>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        @Html.ValidationMessageFor(x => x.IsActive)
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Active</label>
+                        <div>
+                            <label class="switch">
+                                <input type="checkbox" name="IsActive" id="Is_Active" checked
+                                       value="@Model.IsActive" @(Model.IsActive ? "checked" : "")>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        @Html.ValidationMessageFor(x => x.IsActive)
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.LocationId, "Location")
+                    @Html.DropDownList("LocationId", null, "--- Select Location ---", htmlAttributes: new { @class = "form-control", @required = "required" })
+                    @Html.ValidationMessageFor(x => x.LocationId)
+
+                </div>
+            </div>
+            <div class="col-md-4">
+
+                <div class="form-group">
+                    <label for="Title">Vehicle Name</label>
+                    @Html.TextBoxFor(x => x.BusName, new { @class = "form-control", placeholder = "Enter Bus Name" })
+                    @Html.ValidationMessageFor(x => x.BusName)
+                </div>
+            </div>
+            <div class="col-md-4">
+
+                <div class="form-group">
+                    <label for="Title">Registration Number</label>
+                    @Html.TextBoxFor(x => x.RegistrationNumber, new { @class = "form-control", placeholder = "Enter Registration Number" })
+                    @Html.ValidationMessageFor(x => x.RegistrationNumber)
+                </div>
+            </div>
+        </div>
+            @if (Model.BusId > 0)
+            {
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Title">Prefix</label>
+                            @Html.TextBoxFor(x => x.Prefix, new { @class = "form-control", @disabled = "disabled", placeholder = "Enter Prefix" })
+                            @Html.ValidationMessageFor(x => x.Prefix)
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Title">Total Seats</label>
+                            @Html.TextBoxFor(x => x.TotalSeats, new { @autocomplete = "off", @disabled = "disabled", @class = "form-control", placeholder = "Enter Seats" })
+                            @Html.ValidationMessageFor(x => x.TotalSeats)
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Title">Prefix</label>
+                            @Html.TextBoxFor(x => x.Prefix, new { @class = "form-control", placeholder = "Enter Prefix" })
+                            @Html.ValidationMessageFor(x => x.Prefix)
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Title">Total Seats</label>
+                            @*@Html.TextBoxFor(x => x.TotalSeats, new { @class = "form-control", placeholder = "Enter Seats" ,disabled = (Model.BusId > 0 ? "disable" : "") })*@
+                            @Html.TextBoxFor(x => x.TotalSeats, new { @autocomplete = "off", @class = "form-control", placeholder = "Enter Seats" })
+                            @Html.ValidationMessageFor(x => x.TotalSeats)
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="form-group"></div>
+                    <div class="text-left">
+                        <div class="overlay-image">
+                            <a href="#" onclick="ClickFile()" style="cursor:pointer;">
+                                @{
+                                    var path = "/Assets/dist/img/profile.png";
+                                    if (Model.ImageUrl != null)
+                                    {
+                                        path = Model.ImageUrl;
+                                    }
+
+                                    <img src="@path" class="avatar img-thumbnail" style="height: 215px; width: 83%; transition: opacity .2s ease-in-out;" alt="image">
+                                }
+                                <div class="profilepic__content img-circle" style="height: 208px; width: 90%;">
+                                    <span class="profilepic__icon"><i class="fa fa-camera"></i></span>
+                                    <span class="profilepic__text">Edit Image</span>
+                                </div>
+                            </a>
+                        </div>
+
+                        <input type="file" class="text-center center-block file-upload" name="file" id="imgfile" style="display:none;">
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+
+
+            var readURL = function (input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        $('.avatar').attr('src', e.target.result);
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+            $(".file-upload").change(function () {
+                $(".enable").prop("disabled", false);
+                readURL(this);
+            });
+
+
+        });
+        function ClickFile() {
+            $("#imgfile").click();
+        }
+        $('#Is_Active').change('change', function () {
+            if ($(this).is(':checked'))
+                $('#IsActive').val(true);
+            else
+                $('#IsActive').val(false);
+
+        });
+    </script>
+}
+
+

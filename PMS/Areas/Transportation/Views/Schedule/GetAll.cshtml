@@ -1,0 +1,105 @@
+﻿@using PMS.Common.Classes
+@{
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Header = "Schedules";
+    ViewBag.HeaderDescription = "All Schedules";
+    var schedule = ViewBag.Schedule as List<PMS.DTO.ViewModels.TransportationViewModels.AddScheduleVM>;
+}
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+            <div class="col-sm-12 " style="margin-bottom:30px ; padding:0px;">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("Add", "Schedule")" class="btn btn-themyriad"><i class="fa fa-plus" style="padding-right: 5px;"></i> Add New Schedule</a>
+                </div>
+            </div>
+
+            <div style="overflow: auto; width:100%">
+                <table id="Schedules" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>ScheduleName</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in schedule)
+                        {
+                            <tr>
+
+                                <td>@item.ScheduleName</td>
+                                <td class="menu-icons" style="text-align:inherit">
+                                    @*<a title="Details" href="@Url.Action("RootDetails", "Transportation", new { ScheduleID = Schedule.ScheduleID })"><i class="fa fa-newspaper-o"></i></a>*@
+                                    @if (User.IsInRole(AppUserRoles.edit_schedules))
+                                    {
+                                        <a title="Edit" href="@Url.Action("Add", "Schedule", new { ScheduleID = item.Id })"><i class="fa fa-edit"></i></a>
+                                    }
+                                    @if (User.IsInRole(AppUserRoles.delete_schedules))
+                                    {
+                                        <a title="Delete" href="#" data-href="@Url.Action("Delete", "Schedule", new { ScheduleID = item.Id })" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-remove"></i></a>
+                                    }
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>ScheduleName</th>
+                            <th>Action</th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <!-- /.box -->
+</div>
+<!-- /.card -->
+
+@section scripts{
+    <script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.11/sorting/date-eu.js" type="text/javascript"></script>
+
+    <script>
+        $(function () {
+            $('#Schedules').DataTable({});
+        })
+    </script>
+}
+
+

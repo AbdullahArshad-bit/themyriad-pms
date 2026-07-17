@@ -1,0 +1,276 @@
+﻿
+::placeholder {
+    text-transform: capitalize;
+}
+table thead, table tfoot {
+    text-transform: capitalize;
+}
+
+.text-theme-color {
+    color: #c20e1a;
+}
+.select2 {
+    width: 100% !important;
+}
+
+table{
+    width: 100% !important;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+.Customloader {
+    width: 75px;
+    height: 75px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    border: 7px solid #f0ffff;
+    border-bottom-color: #c20e1a;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+
+.modal-overlay, .Customoverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    z-index: 999; /* Place overlay above other elements */
+}
+
+/* ===========================================
+   RESPONSIVE MODAL STYLES - APPLICATION WIDE
+   =========================================== */
+
+/* Mobile Responsive Modal Styles */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 10px auto;
+        width: calc(100% - 20px);
+        max-width: none;
+        position: relative;
+    }
+    
+    .modal-sm {
+        max-width: 100%;
+    }
+    
+    .modal-md {
+        max-width: 100%;
+    }
+    
+    .modal-lg {
+        max-width: 100%;
+    }
+    
+    .modal-body {
+        padding: 15px;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+    
+    .modal-footer {
+        padding: 10px 15px;
+        text-align: center;
+    }
+    
+    .modal-footer .btn {
+        width: 48%;
+        margin: 0 1%;
+        display: inline-block;
+    }
+    
+    .modal-footer .btn + .btn {
+        margin-left: 1%;
+    }
+    
+    .input-group-addon {
+        padding: 6px 12px;
+    }
+    
+    .modal-title {
+        font-size: 16px;
+        line-height: 1.4;
+    }
+    
+    .modal-header {
+        padding: 12px 15px;
+    }
+    
+    .modal-header .close {
+        margin-top: -2px;
+        font-size: 21px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-dialog {
+        margin: 5px auto;
+        width: calc(100% - 10px);
+        position: relative;
+    }
+    
+    .modal-body {
+        padding: 10px;
+        max-height: 75vh;
+    }
+    
+    .modal-footer {
+        padding: 8px 10px;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+        margin: 2px 0;
+        display: block;
+    }
+    
+    .modal-footer .btn + .btn {
+        margin-left: 0;
+    }
+    
+    .modal-title {
+        font-size: 14px;
+    }
+    
+    .modal-header {
+        padding: 10px;
+    }
+    
+    .modal-header .close {
+        font-size: 18px;
+        padding: 0;
+    }
+    
+    /* Form elements in mobile */
+    .form-control {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .input-group .form-control {
+        height: 40px;
+    }
+    
+    .input-group-addon {
+        height: 40px;
+        line-height: 28px;
+        padding: 6px 10px;
+    }
+    
+    /* Textarea adjustments */
+    textarea.form-control {
+        min-height: 60px;
+        resize: vertical;
+    }
+    
+    /* Well/info boxes */
+    .well {
+        padding: 8px;
+        margin-bottom: 10px;
+        font-size: 13px;
+    }
+}
+
+/* Extra small devices (phones in portrait) */
+@media (max-width: 320px) {
+    .modal-dialog {
+        margin: 2px auto;
+        width: calc(100% - 4px);
+        position: relative;
+    }
+    
+    .modal-body {
+        padding: 8px;
+    }
+    
+    .modal-footer {
+        padding: 6px 8px;
+    }
+    
+    .modal-title {
+        font-size: 13px;
+    }
+    
+    .btn {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+    .modal-dialog {
+        margin: 5px auto;
+        position: relative;
+    }
+    
+    .modal-body {
+        max-height: 60vh;
+    }
+}
+
+/* Fix for input focus on mobile */
+.modal .form-control:focus {
+    border-color: #66afe9;
+    outline: 0;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+}
+
+/* Better button spacing in modals */
+.modal-footer .btn-group .btn {
+    margin: 0;
+}
+
+.modal-footer .btn-group .btn + .btn {
+    margin-left: -1px;
+}
+
+/* Fix for long text in modals */
+.modal-body p {
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+/* Better table responsiveness in modals */
+.modal-body .table-responsive {
+    border: none;
+}
+
+.modal-body .table {
+    margin-bottom: 0;
+}
+
+/* Fix for select dropdowns in mobile modals */
+@media (max-width: 480px) {
+    .modal-body select.form-control {
+        font-size: 16px;
+        height: 40px;
+    }
+    
+    .modal-body .select2-container {
+        width: 100% !important;
+    }
+}

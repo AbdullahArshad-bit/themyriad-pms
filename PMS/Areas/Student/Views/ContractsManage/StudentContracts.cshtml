@@ -1,0 +1,208 @@
+﻿@model IEnumerable<PMS.DTO.ViewModels.ContractViewModels.StudentConractsListVM>
+
+@{
+    ViewBag.Header = "Contracts List";
+    ViewBag.HeaderDescription = "All Contracts";
+    ViewBag.Title = "All Contracts | PMS";
+
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+
+            @*<div class="col-sm-12 " style="margin-bottom:30px ; padding:0px;">
+                    <div class="input-group-btn">
+                        <a href="@Url.Action("AddContracts", "ContractsManage")" class="btn btn-themyriad"><i class="fa fa-plus" style="padding-right: 5px;"></i> Add New Contract</a>
+                    </div>
+                </div>*@
+
+            <div style="overflow: auto; width:100%">
+
+                <table class="table table-bordered table-striped data-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>MyriadID</th>
+                            <th>Contract Name</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var contract in Model)
+                        {
+                            <tr>
+                                
+                                <td>@contract.PersonCode</td>
+                                <td>@contract.ContractName</td>
+                                <td>@(contract.IsSigned == true? Html.Raw("<span class='text-success label label-success'>Signed</span>") : Html.Raw("<span class='text-success label label-danger'>UnSigned</span>"))</td>
+                                <td>@contract.CreatedOn.ToString("dd/MM/yyyy")</td>
+                                <td>
+
+                                    @if (!contract.IsSigned)
+                                    {
+                                        <a title="Sign Contract" onclick="contract(@contract.Id,'@contract.ContractUrl')"><i class="fa fa-file-word-o"></i></a>
+                                    }
+                                    else
+                                    {
+                                        using (Html.BeginForm("ContractDownloadPdf", "ContractsManage", new { id = contract.Id, type = "Studentcontract" }, FormMethod.Post, new { id = "revertCancelBookingForm " + contract.Id, style = "display:inline-block" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <a title="Download Contract" href="javascript:document.getElementById('revertCancelBookingForm @contract.Id').submit()"><i class="fa fa-download"></i></a>
+                                        }
+                                    }
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_div" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+</div>
+
+    <div class="modal" id="contractmodal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+@section scripts{
+
+    <script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.11/sorting/date-eu.js" type="text/javascript"></script>
+
+    <script>
+        $(function () {
+            //$('.data-table').DataTable({ "targets": [0], "searchable": false, "orderable": false, "visible": true });
+            $('.data-table').DataTable({
+
+            });
+            $(document).on('change', "#IsSigned", function () {
+                if ($(this).prop("checked") == true) {
+                    $('.btn-submit').attr('disabled', false)
+
+                }
+                else {
+                    $('.btn-submit').attr('disabled', true)
+
+                }
+            });
+        })
+
+        function contract(id,contractUrl)
+        {
+            $("#contractmodal .modal-content").html("");
+            
+            var html = `<div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">Sign Your Contract</h4>
+                </div>
+                <div class="modal-body">
+     @using (Html.BeginForm("Accept_Contract_Details", "ContractsManage", FormMethod.Post))
+     {
+
+            @Html.AntiForgeryToken()
+         <div class="row col-md-12 col-sm-12">
+                <div id="dialog">
+    </div>
+                <br />
+                <br />
+                <br />
+
+            </div>
+            <input type="hidden" id="contractId" name ="id" value="${id}">
+                    <div class="row col-md-12">
+                <div class="form-group has-feedback">
+                    <label>Signature</label>
+                    <input type="text" id="Signature" name="Signature" class="form-control" placeholder="Please enter Signature here!" required maxlength="25" />
+                    <span class="fa fa-pencil form-control-feedback"></span>
+                    @Html.ValidationMessage("Signature")
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-8">
+                    <div class="checkbox">
+                        <label>
+                        <input type="checkbox" name ="IsSigned" id="IsSigned"/>I Agree with <a href="#Terms">Terms & Conditions.</a>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-themyriad btn-block btn-flat btn-submit" disabled>I Accept Agreement</button>
+                </div>
+            </div>
+     }
+                </div>
+
+            <div class="modal-footer">
+                  <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                </div>`
+                $("#contractmodal .modal-content").append(html);
+
+              AppendContract(contractUrl);
+              $("#contractmodal").modal();
+
+        }
+        function AppendContract(contractPath) {
+             var object = "<object data=\"{FileName}\" type=\"application/pdf\" width=\"100%\" height=\"300px\">";
+            object += "If you are unable to view file, you can download from <a href=\"{FileName}\">here</a>";
+            object += " or download <a target = \"_blank\" href = \"http://get.adobe.com/reader/\">Adobe PDF Reader</a> to view the file.";
+             object += "</object>";
+             object = object.replace(/{FileName}/g, ''+contractPath+'');
+            $("#dialog").html(object);
+        }
+    </script>
+    }

@@ -1,0 +1,200 @@
+﻿@model PMS.DTO.ViewModels.PersonManageViewModels.ImportPersonsWithBookingResultVM
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Persons";
+    ViewBag.HeaderDescription = "Import from excel";
+    ViewBag.Title = "Import from excel | PMS";
+
+    var savedPersons = Model?.SavedPersons ?? new List<PMS.DTO.ViewModels.PersonManageViewModels.AddPersonVM>();
+    var notSavedPersons = Model?.NotSavedPersons ?? new List<PMS.DTO.ViewModels.PersonManageViewModels.AddPersonVM>();
+    var errorSummary = Model?.ErrorSummary ?? new List<PMS.DTO.ViewModels.PersonManageViewModels.ImportErrorSummaryItem>();
+    var summaryType = (ViewBag.summaryType as string) ?? "info";
+    var alertClass = summaryType == "success" ? "alert-success" : summaryType == "danger" ? "alert-danger" : summaryType == "warning" ? "alert-warning" : "alert-info";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+
+            @if (ViewBag.summaryMessage != null)
+            {
+                <div class="alert @alertClass alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4>
+                        <i class="icon fa @(summaryType == "success" ? "fa-check" : summaryType == "danger" ? "fa-ban" : "fa-warning")"></i>
+                        Import summary
+                    </h4>
+                    <p>@ViewBag.summaryMessage</p>
+                </div>
+            }
+
+            @if (errorSummary.Any())
+            {
+                <div class="box box-default">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Failure breakdown</h3>
+                    </div>
+                    <div class="box-body">
+                        <table class="table table-condensed table-bordered" style="max-width: 720px;">
+                            <thead>
+                                <tr>
+                                    <th>Reason</th>
+                                    <th style="width: 100px;">Rows</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in errorSummary)
+                                {
+                                    <tr>
+                                        <td>@item.Reason</td>
+                                        <td>@item.Count</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <p class="text-muted" style="margin-bottom: 0;">Fix these issues in your Excel file and re-import. Each failed row below shows the same reason in the <strong>Reason</strong> column.</p>
+                    </div>
+                </div>
+            }
+
+            <div class="col-sm-12" style="margin-bottom: 30px; padding: 0;">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("Persons", "PersonManage")" class="btn btn-themyriad"><i class="fa fa-list" style="padding-right: 5px;"></i> All Person List</a>
+                </div>
+            </div>
+
+            <div style="overflow: auto; width: 100%;">
+                <table id="persons-table" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Reason</th>
+                            <th>Title</th>
+                            <th>Full Name</th>
+                            <th>Gender</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>University</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var person in notSavedPersons)
+                        {
+                            <tr class="import-row-failed">
+                                <td><span class="label label-danger">Failed</span></td>
+                                <td>@(string.IsNullOrWhiteSpace(person.ImportError) ? "Unknown error." : person.ImportError)</td>
+                                <td>@person.Title</td>
+                                <td>@person.FullName</td>
+                                <td>@person.Gender</td>
+                                <td>@person.Email</td>
+                                <td>@person.Phone</td>
+                                <td>@person.UniversityName</td>
+                            </tr>
+                        }
+
+                        @foreach (var person in savedPersons)
+                        {
+                            <tr class="import-row-success">
+                                <td><span class="label label-success">Success</span></td>
+                                <td>-</td>
+                                <td>@person.Title</td>
+                                <td>@person.FullName</td>
+                                <td>@person.Gender</td>
+                                <td>@person.Email</td>
+                                <td>@person.Phone</td>
+                                <td>@person.UniversityName</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Status</th>
+                            <th>Reason</th>
+                            <th>Title</th>
+                            <th>Full Name</th>
+                            <th>Gender</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>University</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+
+    <script>
+        $(function () {
+            var table = $('#persons-table').DataTable({
+                scrollY: '70vh',
+                scrollCollapse: true,
+                scrollX: true,
+                pageLength: 100,
+                order: [[0, 'asc']],
+                dom: 'Blfrtip',
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']],
+                buttons: ['excelHtml5'],
+                columnDefs: [
+                    { targets: 1, width: '280px' }
+                ]
+            });
+
+            var statusFilter = '';
+
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                if (settings.nTable.id !== 'persons-table')
+                    return true;
+                if (!statusFilter)
+                    return true;
+                var row = table.row(dataIndex).node();
+                if (statusFilter === 'Failed')
+                    return $(row).hasClass('import-row-failed');
+                if (statusFilter === 'Success')
+                    return $(row).hasClass('import-row-success');
+                return true;
+            });
+
+            $('<label style="margin-left: 12px;">Show: </label>')
+                .appendTo('.dataTables_length');
+
+            $('<select class="form-control input-sm" style="width: auto; display: inline-block; margin-left: 6px;">' +
+                '<option value="">All rows</option>' +
+                '<option value="Failed">Failed only</option>' +
+                '<option value="Success">Success only</option>' +
+                '</select>')
+                .appendTo('.dataTables_length')
+                .on('change', function () {
+                    statusFilter = $(this).val();
+                    table.draw();
+                });
+        });
+    </script>
+}

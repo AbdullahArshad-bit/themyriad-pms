@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <g id="Telephone" transform="translate(-564 -96)">
+    <rect id="Rectangle_482" data-name="Rectangle 482" width="40" height="40" transform="translate(564 96)" fill="none"/>
+    <g id="Telephone-2" data-name="Telephone" transform="translate(-2059.469 -578.969)">
+      <g id="Group_194" data-name="Group 194" transform="translate(2630.469 686.969)">
+        <g id="Rectangle_80" data-name="Rectangle 80" transform="translate(4.908 2.727) rotate(45)" fill="#fff" stroke="#000" stroke-width="1">
+          <rect width="28.536" height="6.941" stroke="none"/>
+          <rect x="0.5" y="0.5" width="27.536" height="5.941" fill="none"/>
+        </g>
+        <g id="Rectangle_81" data-name="Rectangle 81" transform="translate(7.635 0) rotate(45)" fill="#fff" stroke="#000" stroke-width="1">
+          <rect width="7.712" height="4.627" stroke="none"/>
+          <rect x="0.5" y="0.5" width="6.712" height="3.627" fill="none"/>
+        </g>
+        <g id="Rectangle_82" data-name="Rectangle 82" transform="translate(22.359 14.724) rotate(45)" fill="#fff" stroke="#000" stroke-width="1">
+          <rect width="7.712" height="4.627" stroke="none"/>
+          <rect x="0.5" y="0.5" width="6.712" height="3.627" fill="none"/>
+        </g>
+      </g>
+      <path id="Path_116" data-name="Path 116" d="M2638.82,689.752l4.1,4.038" transform="translate(-1.692 -0.419)" fill="none" stroke="#c20e1a" stroke-width="1"/>
+      <path id="Path_117" data-name="Path 117" d="M2638.82,689.752l4.077,4.058" transform="translate(13.074 14.267)" fill="none" stroke="#c20e1a" stroke-width="1"/>
+    </g>
+  </g>
+</svg>

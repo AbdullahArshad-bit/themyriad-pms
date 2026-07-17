@@ -1,0 +1,591 @@
+
+@using PMS.Common.Classes
+@{
+    string controller = HttpContext.Current.Request.RequestContext.RouteData.Values["controller"].ToString(),
+                    action = HttpContext.Current.Request.RequestContext.RouteData.Values["action"].ToString();
+
+}
+
+<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel">
+            <div class="pull-left image">
+                <img src="~/Assets/dist/img/profile.png" class="img-circle" alt="User Image">
+            </div>
+            <div class="pull-left info">
+                <p>@PMS.Common.Globals.User.Name</p>
+                <!-- Status -->
+                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
+        </div>
+        <!-- search form (Optional) -->
+        @*<form action="#" method="get" class="sidebar-form">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="Search...">
+                    <span class="input-group-btn">
+                        <button type="submit" name="search" id="search-btn" class="btn btn-flat">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </span>
+                </div>
+            </form>*@
+        <!-- /.search form -->
+        <!-- Sidebar Menu -->
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header">MENU</li>
+            <!-- Optionally, you can add icons to the links -->
+            @if (User.IsInRole(AppUserRoles.view_dashboard))
+            {
+                <li class="@((controller == "Home" && action == "Dashboard") ? "active" : "")"><a href="@Url.Action("Dashboard", "Home", new { area=""})"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+            }
+
+            @if (User.IsInRole(AppUserRoles.view_news))
+            {
+                <li class="@((controller == "News") ? "active" : "")"><a href="@Url.Action("All", "News", new { area=""})"><i class="fa fa-file-text-o"></i> <span>News Management</span></a></li>
+            }
+
+            @*<li class="@((controller == "Notification" && action == "SendPush") ? "active" : "")">
+                <a href="@Url.Action("SendPush", "Notification", new { area = "" })">
+                    <i class="fa fa-bell"></i> <span>Send Push Notification</span>
+                </a>
+            </li>*@
+
+            @if (User.IsInRole(AppUserRoles.view_movies) || User.IsInRole(AppUserRoles.view_movie_vote_campaign) || User.IsInRole(AppUserRoles.view_movie_shows))
+            {
+                <li class="treeview @((controller == "MovieNights") ? "active" : "")">
+                    <a href="#">
+                        <i class="fa fa fa-video-camera"></i> <span>Movie Nights</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (User.IsInRole(AppUserRoles.view_movies))
+                        {
+                            <li class="@((controller == "MovieNights" && (action == "Movies" || action == "AddMovie")) ? "active" : "")"><a href="@Url.Action("Movies", "MovieNights", new { area=""})"><i class="fa fa-circle-o"></i>Movies</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_movie_vote_campaign))
+                        {
+                            <li class="@((controller == "MovieNights" && (action == "MovieVoteCampaign" || action == "AddMovieVoteCampaign" || action == "MovieVoteCampaignDetail" || action == "AddMovieVoteCampaignDetail")) ? "active" : "")"><a href="@Url.Action("MovieVoteCampaign", "MovieNights", new { area=""})"><i class="fa fa-circle-o"></i>Movie Vote Campaigns</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_movie_shows))
+                        {
+                            <li class="@((controller == "MovieNights" && (action == "MovieShows" || action == "AddMovieShows")) ? "active" : "")"><a href="@Url.Action("MovieShows", "MovieNights", new { area=""})"><i class="fa fa-circle-o"></i>Movie Shows</a></li>
+                        }
+
+
+                    </ul>
+                </li>
+            }
+
+            @if (User.IsInRole(AppUserRoles.transportation) || User.IsInRole(AppUserRoles.view_vehicles) || User.IsInRole(AppUserRoles.view_stops) || User.IsInRole(AppUserRoles.view_routes) || User.IsInRole(AppUserRoles.view_schedules) || User.IsInRole(AppUserRoles.view_prices) || User.IsInRole(AppUserRoles.view_subscription))
+            {
+                <li class="treeview @((controller == "Vehicle" || controller == "VehicleStop" || controller =="VehicleRoutes" || controller == "Schedule" || controller == "VehiclePrice" || controller == "VehicleSubscription") ? "active" : "")">
+                    <a href="#">
+                        <i class="fa fa fa-subway"></i> <span>Transport</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (User.IsInRole(AppUserRoles.view_vehicles))
+                        {
+                            <li class="@((controller == "Vehicle" && action == "Index") ? "active" : "")"><a href="@Url.Action("Index", "Vehicle", new { area = "Transportation" })"><i class="fa fa-circle-o"></i>Vehicles</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_stops))
+                        {
+                            <li class="@((controller == "VehicleStop" && action == "GetAll") ? "active" : "")"><a href="@Url.Action("GetAll", "VehicleStop", new { area = "Transportation" })"><i class="fa fa-circle-o"></i>Stops</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_routes))
+                        {
+                            <li class="@((controller == "VehicleRoutes" && action == "GetAll") ? "active" : "")"><a href="@Url.Action("GetAll", "VehicleRoutes", new { area = "Transportation" })"><i class="fa fa-circle-o"></i>Routes</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_schedules))
+                        {
+                            <li class="@((controller == "Schedule" && action == "Index") ? "active" : "")"><a href="@Url.Action("Index", "Schedule", new { area = "Transportation" })"><i class="fa fa-circle-o"></i>Schedules</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_prices))
+                        {
+                            <li class="@((controller == "VehiclePrice" && action == "Index") ? "active" : "")"><a href="@Url.Action("Index", "VehiclePrice", new { area = "Transportation" })"><i class="fa fa-circle-o"></i>Prices</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_subscription))
+                        {
+                            <li class="@((controller == "VehicleSubscription" && action == "Index") ? "active" : "")"><a href="@Url.Action("Index", "VehicleSubscription", new { area = "Transportation" })"><i class="fa fa-circle-o"></i>Subscrptions</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if (User.IsInRole(AppUserRoles.View_Profile) || User.IsInRole(AppUserRoles.View_BookingList) || User.IsInRole(AppUserRoles.View_BedSpacePlacement))
+            {
+                <li class="treeview @((controller == "Booking" || controller == "PersonManage" || controller == "BedSpacePlacement") ? "active" : "")">
+                    <a href="#">
+                        <i class="fa fa fa-book"></i> <span>Booking</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (User.IsInRole(AppUserRoles.View_Profile))
+                        {
+                            <li class="@((controller == "PersonManage" && (action == "Persons" || action == "AddPerson" || action == "PersonRelationshipHistory")) ? "active" : "")"><a href="@Url.Action("Persons", "PersonManage", new { area=""})"><i class="fa fa-user-plus"></i>Profile</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_BookingList))
+                        {
+                            <li class="@((controller == "Booking" && (action == "BookingList" || action == "AddBooking")) ? "active" : "")"><a href="@Url.Action("BookingList", "Booking", new { area=""})"><i class="fa fa-book"></i>Bookings</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_BedSpacePlacement))
+                        {
+                            <li class="@((controller == "BedSpacePlacement" && (action == "PlacementsList" || action == "AddPlacements")) ? "active" : "")"><a href="@Url.Action("PlacementsList", "BedSpacePlacement", new { area=""})"><i class="fa fa-bed"></i>Placements</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_BedSpacePlacement))
+                        {
+                            <li class="@((controller == "Booking" && (action == "PersonGuest" || action == "AddPlacements")) ? "active" : "")">
+                                <a href="@Url.Action("PersonGuest", "Booking", new { area=""})">
+                                    <i class="fa fa-users" aria-hidden="true"></i>
+                                    GuestCount
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+
+            }
+            @if (User.IsInRole(AppUserRoles.view_InspectionRatingList) || User.IsInRole(AppUserRoles.view_GeneratedInspectionsList) || User.IsInRole(AppUserRoles.view_InspectionFieldsList) || User.IsInRole(AppUserRoles.view_InspectionList))
+            {
+                <li class="treeview @((controller == "Inspection") ? "active" : "")">
+                    <a href="#">
+                        <i class="fa fa-search"></i> <span>Inspections</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (User.IsInRole(AppUserRoles.view_GeneratedInspectionsList))
+                        {
+                            <li class="@((controller == "Inspection" && (action == "Inspection" || action == "GeneratedInspections")) ? "active" : "")"><a href="@Url.Action("GeneratedInspections", "Inspection", new { area=""})"><i class="fa fa-circle-o"></i>Generated Inspections</a></li>
+                        }  @if (User.IsInRole(AppUserRoles.view_InspectionRatingList))
+                        {
+                            <li class="@((controller == "Inspection" && (action == "RatingList" || action == "AddRatingList")) ? "active" : "")"><a href="@Url.Action("RatingList", "Inspection", new { area=""})"><i class="fa fa-circle-o"></i>Rating List</a></li>
+                        } @if (User.IsInRole(AppUserRoles.view_InspectionFieldsList))
+                        {
+                            <li class="@((controller == "Inspection" && (action == "InspectionField" || action == "AddInspectionField")) ? "active" : "")"><a href="@Url.Action("InspectionField", "Inspection", new { area=""})"><i class="fa fa-circle-o"></i>Inspection Fields</a></li>
+                        } @if (User.IsInRole(AppUserRoles.view_InspectionList))
+                        {
+                            <li class="@((controller == "Inspection" && (action == "Inspection" || action == "AddNewInspection")) ? "active" : "")"><a href="@Url.Action("Inspection", "Inspection", new { area=""})"><i class="fa fa-circle-o"></i>Inspections</a></li>
+                        }
+                    </ul>
+
+                </li>
+
+            }
+
+            @if (User.IsInRole(AppUserRoles.view_room_feaure) || User.IsInRole(AppUserRoles.living_areas) || User.IsInRole(AppUserRoles.view_room_types) || User.IsInRole(AppUserRoles.view_terms) || User.IsInRole(AppUserRoles.view_price_config))
+            {
+                <li class="treeview @((controller == "Setup") ? "active" : "")">
+                    <a href="#">
+                        <i class="fa fa fa-gear"></i> <span>Setup</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (User.IsInRole(AppUserRoles.view_room_feaure))
+                        {
+                            <li class="@((controller == "Setup" && (action == "RoomFeatures" || action == "AddRoomFeature")) ? "active" : "")"><a href="@Url.Action("RoomFeatures", "Setup", new { area=""})"><i class="fa fa-circle-o"></i>Room Features</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.living_areas))
+                        {
+                            <li class="@((controller == "Setup" && action == "LivingAreas") ? "active" : "")"><a href="@Url.Action("LivingAreas", "Setup", new { area=""})"><i class="fa fa-circle-o"></i>Living Areas</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_room_types))
+                        {
+                            <li class="@(((controller == "Setup" && action == "RoomTypes") || action == "AddRoomType") ? "active" : "")"><a href="@Url.Action("RoomTypes", "Setup", new { area=""})"><i class="fa fa-circle-o"></i>Room Types</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_terms))
+                        {
+                            <li class="@(((controller == "Setup" && action == "Terms") || action == "AddTerm") ? "active" : "")"><a href="@Url.Action("Terms", "Setup", new { area=""})"><i class="fa fa-circle-o"></i>Term</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_price_config))
+                        {
+                            <li class="@(((controller == "Setup" && action == "PriceConfig") || action == "AddPriceConfig") ? "active" : "")"><a href="@Url.Action("PriceConfig", "Setup", new { area=""})"><i class="fa fa-circle-o"></i>Price Configuration</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_UniversitesList))
+                        {
+                            <li class="@(((controller == "Setup" && action == "GetUniversitesList") || action == "AddUniversity") ? "active" : "")"><a href="@Url.Action("GetUniversitesList", "Setup", new { area=""})"><i class="fa fa-circle-o"></i>Universities/Organizations</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if (User.IsInRole(AppUserRoles.view_Services) || User.IsInRole(AppUserRoles.view_acc_TaxType)
+               || User.IsInRole(AppUserRoles.view_acc_PaymentMethod) || User.IsInRole(AppUserRoles.view_acc_CreditNote)
+               || User.IsInRole(AppUserRoles.view_Referral_CreditNotes) || User.IsInRole(AppUserRoles.view_acc_COA)
+               || User.IsInRole(AppUserRoles.view_acc_Invoice) || User.IsInRole(AppUserRoles.view_acc_PaymentTransection)
+               || User.IsInRole(AppUserRoles.View_Refund_Payments) || User.IsInRole(AppUserRoles.View_Deposit_Invoices)
+               || (User.IsInRole(AppUserRoles.view_acc_Invoice)))
+            {
+                <li class="treeview @((controller == "Invoicings" || controller == "Payments" || controller == "PaymentTypes" || controller == "Service" || controller == "Tax" || controller == "Accounting") ? "active" : "")">
+                    <a href="#">
+                        <i class="fa fa-user"></i> <span>Accounts</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+
+                        @if (User.IsInRole(AppUserRoles.view_Services))
+                        {
+                            <li class="@((controller == "Service" && action == "ServicesList") ? "active" : "")"><a href="@Url.Action("ServicesList", "Service", new { area=""})"><i class="fa fa-circle-o"></i>Services</a></li>
+                        }
+
+                        @if (User.IsInRole(AppUserRoles.view_acc_TaxType))
+                        {
+                            <li class="@((controller == "Tax" && action == "TaxList") ? "active" : "")"><a href="@Url.Action("TaxList", "Tax", new { area=""})"><i class="fa fa-circle-o"></i>Tax Types</a></li>
+                        }
+
+                        @if (User.IsInRole(AppUserRoles.view_acc_PaymentMethod))
+                        {
+                            <li class="@((controller == "PaymentTypes" && action == "PaymentList") ? "active" : "")"><a href="@Url.Action("PaymentList", "PaymentTypes", new { area=""})"><i class="fa fa-circle-o"></i>Payment Methods</a></li>
+                        }
+
+                        @if (User.IsInRole(AppUserRoles.view_acc_CreditNote))
+                        {
+                            <li class="@((controller == "CreditNote" && (action == "Index"|| action == "Add" || action == "Edit" || action == "Details")) ? "active" : "")"><a href="@Url.Action("Index", "CreditNote", new { area=""})"><i class="fa fa-circle-o"></i>Credit Note</a></li>
+                        }
+
+                        @if (User.IsInRole(AppUserRoles.view_Referral_CreditNotes))
+                        {
+                            <li class="@((controller == "CreditNote" && action == "ReferralCreditNotes") ? "active" : "")"><a href="@Url.Action("ReferralCreditNotes", "CreditNote", new { area = "" })"><i class="fa fa-circle-o"></i>Referrals CreditNote</a></li>
+                        }
+
+                        @if (User.IsInRole(AppUserRoles.view_acc_COA))
+                        {
+                            <li class="@((controller == "Accounting" && (action == "CreateOrUpdateCOA" || action == "Index")) ? "active" : "")"><a href="@Url.Action("Index", "Accounting", new { area=""})"><i class="fa fa-circle-o"></i>Chart of Accounts</a></li>
+                        }
+
+                        @if (User.IsInRole(AppUserRoles.view_acc_Invoice))
+                        {
+                            <li class="@((controller == "Invoicings" && (action == "Create" || action == "Index" || action == "Edit" || action == "Details")) ? "active" : "")"><a href="@Url.Action("Index", "Invoicings", new { area=""})"><i class="fa fa-circle-o"></i>Invoices</a></li>
+                        }
+
+                        @if (User.IsInRole(AppUserRoles.view_acc_PaymentTransection))
+                        {
+                            <li class="@((controller == "Payments" && (action == "Create" || action == "Index" || action == "Edit" || action == "Details")) ? "active" : "")"><a href="@Url.Action("Index", "Payments", new { area=""})"><i class="fa fa-circle-o"></i>Payment Transactions</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_Refund_Payments))
+                        {
+                            <li class="@((controller == "Payments" && action == "Refunds") ? "active" : "")"><a href="@Url.Action("Refunds", "Payments", new { area=""})"><i class="fa fa-circle-o"></i>Refund Payment Transactions</a></li>
+
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_Deposit_Invoices))
+                        {
+                            <li class="@((controller == "Invoicings" && action == "GetDepositInvoices" || action == "CreateRefundInvoice" || action =="RefundedInvoicePayment") ? "active" : "")"><a href="@Url.Action("GetDepositInvoices", "Invoicings", new { area = "" })"><i class="fa fa-circle-o"></i>Deposit Invoices</a></li>
+                        }
+
+                        @if (User.IsInRole(AppUserRoles.view_UpComing_Invoices))
+                        {
+                            <li class="@((controller == "Invoicings" && action == "GetInvoicesTillNextWeek") ? "active" : "")"><a href="@Url.Action("GetInvoicesTillNextWeek", "Invoicings", new { area = "" })"><i class="fa fa-circle-o"></i>Upcoming Invoices</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if (User.IsInRole(AppUserRoles.view_users) || User.IsInRole(AppUserRoles.view_roles))
+            {
+                <li class="treeview @((controller == "UserManage") ? "active" : "")">
+                    <a href="#">
+                        <i class="fa fa-user"></i> <span>User Management</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (User.IsInRole(AppUserRoles.view_users))
+                        {
+                            <li class="@((controller == "UserManage" && (action == "Users" || action == "AddUser")) ? "active" : "")"><a href="@Url.Action("Users", "UserManage", new { area=""})"><i class="fa fa-circle-o"></i>Users</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_roles))
+                        {
+                            <li class="@((controller == "UserManage" && (action == "Roles" || action == "AddRole")) ? "active" : "")"><a href="@Url.Action("Roles", "UserManage", new { area=""})"><i class="fa fa-circle-o"></i>Roles</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+            @if (User.IsInRole(AppUserRoles.view_contracts) || User.IsInRole(AppUserRoles.view_contractTypes) || User.IsInRole(AppUserRoles.view_StudentContracts)
+                || User.IsInRole(AppUserRoles.view_old_contracts))
+            {
+                <li class="treeview @((controller == "ContractsManage") ? "active" : "")">
+                    <a href="#">
+                        <i class="fa fa-pencil"></i> <span>Contract Management</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (User.IsInRole(AppUserRoles.view_contracts))
+                        {
+                            <li class="@((controller == "ContractsManage" && (action == "Contracts" || action == "AddContracts")) ? "active" : "")"><a href="@Url.Action("Contracts", "ContractsManage", new { area=""})"><i class="fa fa-circle-o"></i>Contracts</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_contractTypes))
+                        {
+                            <li class="@((controller == "ContractsManage" && (action == "ContractTypes" || action == "AddContractType" )) ? "active" : "")"><a href="@Url.Action("ContractTypes", "ContractsManage", new { area=""})"><i class="fa fa-circle-o"></i>Contract Types</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_StudentContracts))
+                        {
+                            <li class="@((controller == "ContractsManage" && (action == "StudentContracts")) ? "active" : "")"><a href="@Url.Action("StudentContracts", "ContractsManage", new { area=""})"><i class="fa fa-circle-o"></i>Students Generated Contracts</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_old_contracts))
+                        {
+                            <li class="@((controller == "ContractsManage" && (action == "GetOldContract")) ? "active" : "")"><a href="@Url.Action("GetOldContract", "ContractsManage", new { area=""})"><i class="fa fa-circle-o"></i>Old Contracts</a></li>
+
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if (User.IsInRole(AppUserRoles.view_ticketList))
+            {
+                <li class="treeview @((controller == "Ticket") ? "active" : "" )">
+                    <a href="#">
+                        <i class="fa fa-ticket "></i> <span>Complaints</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (User.IsInRole(AppUserRoles.view_ticketList))
+                        {
+                            <li class="@((controller == "Ticket" && (action == "Index")) ? "active" : "")"><a href="@Url.Action("Index", "Ticket",new {area="" })"><i class="fa fa-circle-o"></i>All Complaints</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_ticketList))
+                        {
+                            <li class="@((controller == "TicketGroup" && (action == "Add")) ? "active" : "")"><a href="@Url.Action("Add", "TicketGroup",new {area="" })"><i class="fa fa-circle-o"></i>Groups</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if (User.IsInRole(AppUserRoles.View_EmailSettings) || User.IsInRole(AppUserRoles.View_EmailSenders) || User.IsInRole(AppUserRoles.View_EmailMessages)
+                || User.IsInRole(AppUserRoles.View_EmailSchedulers) || User.IsInRole(AppUserRoles.Push_Notification))
+            {
+                <li class="treeview @((controller == "Correspondence" || controller == "Notification") ? "active" : "")">
+                    <a href="#">
+                        <i class="fa fa-envelope"></i> <span>Correspondence</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (User.IsInRole(AppUserRoles.View_EmailSettings))
+                        {
+                            <li class="@((controller == "Correspondence" && (action == "EmailSettings" || action == "EmailSettings")) ? "active" : "")">
+                                <a href="@Url.Action("EmailSettings", "Correspondence", new { area=""})">
+                                    <i class="fa fa-cog"></i> Email Settings
+                                </a>
+                            </li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_EmailSenders))
+                        {
+                            <li class="@((controller == "Correspondence" && (action == "EmailSenders" || action == "AddEmailSenders")) ? "active" : "")">
+                                <a href="@Url.Action("EmailSenders", "Correspondence", new { area=""})">
+                                    <i class="fa fa-user"></i> Email Senders
+                                </a>
+                            </li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_EmailMessages))
+                        {
+                            <li class="@((controller == "Correspondence" && (action == "EmailMessages" || action == "AddEmailMessages")) ? "active" : "")">
+                                <a href="@Url.Action("EmailMessages", "Correspondence", new { area=""})">
+                                    <i class="fa fa-envelope-open"></i> Email Messages
+                                </a>
+                            </li>
+                        }
+                        @*@if (User.IsInRole(AppUserRoles.View_EmailSchedulers))
+        {
+            <li class="@((controller == "Correspondence" && (action == "EmailSchedulers" || action == "AddEmailSchedule")) ? "active" : "")"><a href="@Url.Action("EmailSchedulers", "Correspondence", new { area = "" })"><i class="fa fa-circle-o"></i>Email Schedulers</a></li>
+        }*@
+                        @if (User.IsInRole(AppUserRoles.Push_Notification))
+                        {
+                            <li class="@((controller == "PushNotification" && (action == "PushNotification")) ? "active" : "")"><a href="@Url.Action("PushNotification", "PushNotification", new { area = "" })"><i class="fa fa-bell"></i>Push Notification</a></li>
+                        }
+                        </ul>
+                </li>
+            }
+
+            @if (User.IsInRole(AppUserRoles.view_AuditTrialList))
+            {
+                <li class="treeview @((controller == "AuditTrail") ? "active" : "")">
+                    <a href="#">
+                        <i class="fa fa-envelope"></i> <span>Audit Trail</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (User.IsInRole(AppUserRoles.view_AuditTrialList))
+                        {
+                            <li class="@((controller == "AuditTrail" && (action == "index")) ? "active" : "")"><a href="@Url.Action("Index", "AuditTrail", new { area=""})"><i class="fa fa-circle-o"></i>Audit trail Logs</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if (User.IsInRole(AppUserRoles.View_Customize_Detailed_Reports) || User.IsInRole(AppUserRoles.View_ServiceDetail_Report)
+     || User.IsInRole(AppUserRoles.View_PaymentDetail_Report) || User.IsInRole(AppUserRoles.View_Resident_Trail_Balance_Report)
+     || User.IsInRole(AppUserRoles.View_Resident_Detail_Trail_Balance_Report) || User.IsInRole(AppUserRoles.View_RevenueDetail_Report)
+     || User.IsInRole(AppUserRoles.View_ComplaintHistory_Report) || User.IsInRole(AppUserRoles.View_RoomInventory_Report)
+     || User.IsInRole(AppUserRoles.View_Booking_Report) || User.IsInRole(AppUserRoles.View_TransportationBooking_Report)
+     || User.IsInRole(AppUserRoles.View_AccountLiability_Report) || User.IsInRole(AppUserRoles.Liability_Balance_Report)
+     || User.IsInRole(AppUserRoles.view_End_Of_Shift_Report) || User.IsInRole(AppUserRoles.Tax_Detail_Report)
+     || User.IsInRole(AppUserRoles.View_Manager_Daily_Report) || User.IsInRole(AppUserRoles.View_History_Forcast_Report)
+     || User.IsInRole(AppUserRoles.View_Swapped_Report) || User.IsInRole(AppUserRoles.View_Ageing_Report) || User.IsInRole(AppUserRoles.View_Contracts_Report)
+     || User.IsInRole(AppUserRoles.View_Accounting_Vouchers_Report) || User.IsInRole(AppUserRoles.View_InHouseByUniversity_Report)
+     || User.IsInRole(AppUserRoles.View_Voucher_Report) || User.IsInRole(AppUserRoles.View_Occupancy_Forecast_Report))
+            {
+                <li class="treeview @((controller == "Reporting") ? "active" : "" )">
+                    <a href="#">
+                        <i class="fa fa-envelope"></i> <span>Reports</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (User.IsInRole(AppUserRoles.View_Accounting_Vouchers_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "AccountingVouchersReport")) ? "active" : "")"><a href="@Url.Action("AccountingVouchersReport", "Reporting", new { area = "" })"><i class="fa fa-circle-o"></i>Accounting Vouchers Report</a></li>
+                        }
+
+                        @if (User.IsInRole(AppUserRoles.View_Ageing_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "AgeingReport")) ? "active" : "")"><a href="@Url.Action("AgeingReport", "Reporting", new { area = "" })"><i class="fa fa-circle-o"></i>Ageing Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_Booking_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "BookingReport")) ? "active" : "")"><a href="@Url.Action("BookingReport", "Reporting", new { area=""})"><i class="fa fa-circle-o"></i>Booking Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_ComplaintHistory_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "ComplaintHistoryReport")) ? "active" : "")"><a href="@Url.Action("ComplaintHistoryReport", "Reporting", new { area=""})"><i class="fa fa-circle-o"></i>Complaint Escalation Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_Contracts_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "ContractsExpiringIn30Days")) ? "active" : "")"><a href="@Url.Action("ContractsExpiringIn30Days", "Reporting", new { area = "" })"><i class="fa fa-circle-o"></i>Contracts Expiring In 30Days</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.view_End_Of_Shift_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "ShiftEndReport")) ? "active" : "")"><a href="@Url.Action("ShiftEndReport", "Reporting", new { area = "" })"><i class="fa fa-circle-o"></i>End Of Shift Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_AccountLiability_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "AccountLiability")) ? "active" : "")"><a href="@Url.Action("AccountLiability", "Reporting", new { area = "" })"><i class="fa fa-circle-o"></i>General Account Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_Voucher_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "VoucherReport")) ? "active" : "")"><a href="@Url.Action("VoucherReport", "Reporting", new { area = "" })"><i class="fa fa-circle-o"></i>General Ledger Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_History_Forcast_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "HistoryForcastReport")) ? "active" : "")"><a href="@Url.Action("HistoryForcastReport", "Reporting", new { area = "" })"><i class="fa fa-circle-o"></i>History Forcast Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_InHouseByUniversity_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "InHouseByUniversityReport")) ? "active" : "")"><a href="@Url.Action("InHouseByUniversityReport", "Reporting", new { area = "" })"><i class="fa fa-circle-o"></i>In-House By Uni Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.Liability_Balance_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "LiabilityBalanceReport")) ? "active" : "")"><a href="@Url.Action("LiabilityBalanceReport", "Reporting", new { area = "" })"><i class="fa fa-circle-o"></i>Liability Balance Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_Manager_Daily_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "ManagerDailyReport")) ? "active" : "")"><a href="@Url.Action("ManagerDailyReport", "Reporting", new { area = "" })"><i class="fa fa-circle-o"></i>Manager Daily Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_Customize_Detailed_Reports))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "ReportingView")) ? "active" : "")"><a href="@Url.Action("ReportingView", "Reporting", new { area=""})"><i class="fa fa-circle-o"></i>Master (Generic)</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_Occupancy_Forecast_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "OccupancyForecastReport")) ? "active" : "")"><a href="@Url.Action("OccupancyForecastReport", "Reporting", new { area=""})"><i class="fa fa-circle-o"></i>Occupancy Forecast Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_PaymentDetail_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "PaymentsDetailReport")) ? "active" : "")"><a href="@Url.Action("PaymentsDetailReport", "Reporting", new { area=""})"><i class="fa fa-circle-o"></i>Payments Ledger</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_Resident_Trail_Balance_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "ResidentTrialBalanceReport")) ? "active" : "")"><a href="@Url.Action("ResidentTrialBalanceReport", "Reporting", new { area=""})"><i class="fa fa-circle-o"></i>Resident Trial Balance</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_Resident_Detail_Trail_Balance_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "ResidentDetailTrialBalanceReport")) ? "active" : "")"><a href="@Url.Action("ResidentDetailTrialBalanceReport", "Reporting", new { area=""})"><i class="fa fa-circle-o"></i>Resident Detail Trial Balance</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_RevenueDetail_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "RevenueDetailReport")) ? "active" : "")"><a href="@Url.Action("RevenueDetailReport", "Reporting", new { area=""})"><i class="fa fa-circle-o"></i>Revenue Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_RoomInventory_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "RoomInventoryReport")) ? "active" : "")"><a href="@Url.Action("RoomInventoryReport", "Reporting", new { area=""})"><i class="fa fa-circle-o"></i>Room Inventory Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_ServiceDetail_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "ServicesDetailReport")) ? "active" : "")"><a href="@Url.Action("ServicesDetailReport", "Reporting", new { area=""})"><i class="fa fa-circle-o"></i>Services Ledger</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_Swapped_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "SwappBedSpacesReport")) ? "active" : "")"><a href="@Url.Action("SwappBedSpacesReport", "Reporting", new { area = "" })"><i class="fa fa-circle-o"></i>Swapped BedSpace Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.Tax_Detail_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "TaxDetailReport")) ? "active" : "")"><a href="@Url.Action("TaxDetailReport", "Reporting", new { area = "" })"><i class="fa fa-circle-o"></i>Tax Detail Report</a></li>
+                        }
+                        @if (User.IsInRole(AppUserRoles.View_TransportationBooking_Report))
+                        {
+                            <li class="@((controller == "Reporting" && (action == "TransportationBookingReport")) ? "active" : "")"><a href="@Url.Action("TransportationBookingReport", "Reporting", new { area=""})"><i class="fa fa-circle-o"></i>Transport Booking Report</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if (User.IsInRole(AppUserRoles.add_JobConfiguration))
+            {
+                <li class="treeview @((controller == "JobsConfiguration") ? "active" : "")">
+                    <a href="#">
+                        <i class="fa fa-gear"></i> <span>Configuration</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @if (User.IsInRole(AppUserRoles.add_JobConfiguration))
+                        {
+                            <li class="@((controller == "JobsConfiguration" && (action == "Add")) ? "active" : "")"><a href="@Url.Action("Add", "JobsConfiguration", new { area=""})"><i class="fa fa-circle-o"></i>Job Configuration</a></li>
+                        }
+                    </ul>
+                </li>
+
+            }
+
+            @if (User.IsInRole(AppUserRoles.View_Api_Documentation))
+            {
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-file-code-o"></i> <span>API Documentation</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><a href="/swagger/ui/index" target="_blank"><i class="fa fa-circle-o"></i>Swagger UI</a></li>
+                    </ul>
+                </li>
+            }
+        </ul>
+
+        <!-- /.sidebar-menu -->
+    </section>
+    <!-- /.sidebar -->
+</aside>

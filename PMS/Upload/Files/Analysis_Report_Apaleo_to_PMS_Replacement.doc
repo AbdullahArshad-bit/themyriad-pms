@@ -1,0 +1,280 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<title>Technical Integration Analysis Report - Apaleo to PMS Replacement</title>
+<!--[if gte mso 9]>
+<xml>
+ <w:WordDocument>
+  <w:View>Print</w:View>
+  <w:Zoom>100</w:Zoom>
+  <w:DoNotOptimizeForBrowser/>
+ </w:WordDocument>
+</xml>
+<![endif]-->
+<style>
+    @page {
+        size: A4;
+        margin: 1in;
+    }
+    body {
+        font-family: 'Segoe UI', Calibri, Arial, sans-serif;
+        line-height: 1.6;
+        color: #2d3748;
+        font-size: 11pt;
+    }
+    h1 {
+        font-size: 22pt;
+        color: #1a365d;
+        border-bottom: 2px solid #2b6cb0;
+        padding-bottom: 8px;
+        margin-top: 24px;
+        margin-bottom: 12px;
+    }
+    h2 {
+        font-size: 15pt;
+        color: #2b6cb0;
+        margin-top: 28px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 4px;
+    }
+    h3 {
+        font-size: 12pt;
+        color: #2d3748;
+        margin-top: 20px;
+        margin-bottom: 6px;
+    }
+    p {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+    ul, ol {
+        margin-top: 0;
+        margin-bottom: 12px;
+        padding-left: 20px;
+    }
+    li {
+        margin-bottom: 4px;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 16px;
+        margin-bottom: 16px;
+    }
+    th, td {
+        border: 1px solid #cbd5e0;
+        padding: 8px 12px;
+        text-align: left;
+        vertical-align: top;
+        font-size: 9.5pt;
+    }
+    th {
+        background-color: #ebf8ff;
+        color: #2c5282;
+        font-weight: bold;
+        border-bottom: 2px solid #bee3f8;
+    }
+    tr:nth-child(even) td {
+        background-color: #f7fafc;
+    }
+    .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 8.5pt;
+        font-weight: bold;
+        text-align: center;
+        display: inline-block;
+    }
+    .badge-match {
+        background-color: #c6f6d5;
+        color: #22543d;
+        border: 1px solid #9ae6b4;
+    }
+    .badge-partial {
+        background-color: #feebc8;
+        color: #744210;
+        border: 1px solid #fbd38d;
+    }
+    .badge-gap {
+        background-color: #fed7d7;
+        color: #742a2a;
+        border: 1px solid #feb2b2;
+    }
+    .text-center {
+        text-align: center;
+    }
+    .footer {
+        margin-top: 40px;
+        font-size: 9pt;
+        color: #a0aec0;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 10px;
+        text-align: center;
+    }
+    .hero-box {
+        background-color: #f7fafc;
+        border-left: 4px solid #3182ce;
+        padding: 15px;
+        margin-bottom: 20px;
+        margin-top: 15px;
+    }
+</style>
+</head>
+<body>
+
+    <div style="text-align: center; margin-bottom: 40px; margin-top: 20px;">
+        <span style="font-size: 10pt; text-transform: uppercase; letter-spacing: 2px; color: #718096; font-weight: bold;">Technical Evaluation Report</span>
+        <h1 style="border-bottom: none; margin-top: 10px; font-size: 26pt; color: #1a365d;">PMS Replacement Analysis</h1>
+        <p style="font-size: 13pt; color: #4a5568;">Transitioning Crito Smart PMS (Uno Smart) from Apaleo to The Myriad PMS</p>
+        <div style="width: 100px; height: 3px; background-color: #3182ce; margin: 20px auto;"></div>
+    </div>
+
+    <div class="hero-box">
+        <strong>Document Purpose:</strong> This report provides a detailed technical comparison of the integrations between Crito Smart PMS (Uno Smart) and Apaleo, evaluating how they map to the existing architectures of The Myriad PMS (PMS). It highlights direct matches, identifies implementation gaps, and outlines a transition path to replace Apaleo as the system of record.
+    </div>
+
+    <h2>1. Executive Summary</h2>
+    <p>
+        The <strong>Crito Smart PMS</strong> (Uno Smart) operates as an operational, guest-facing, and lock-provisioning layer on top of a core Property Management System. Apaleo is currently connected as Crito's system of record.
+    </p>
+    <p>
+        Our analysis shows that replacing Apaleo with <strong>The Myriad PMS (PMS)</strong> is highly feasible. The PMS codebase already has native implementations for almost all core hotel/student housing objects, guest lifecycles, and payment workflows. In addition, PMS has a native smart lock controller (TTLock/Sciener), meaning some services currently delegated to Crito could potentially be handled directly inside PMS.
+    </p>
+    <ul>
+        <li><strong>Data Model Compatibility (High Alignment):</strong> Direct mapping exists for Properties (Locations), Unit Groups (Room Types), Units (Rooms), and Reservations (Bookings).</li>
+        <li><strong>Guest Experience (High Alignment):</strong> PMS has a native Online Pre-CheckIn Documentation system and card-issuing checkout workflows.</li>
+        <li><strong>Development Requirements:</strong> The primary development gap is the implementation of an outbound webhook subscription and dispatching service to notify Crito of events in real time.</li>
+    </ul>
+
+    <h2>2. Feature-by-Feature Comparison Matrix</h2>
+    <p>The table below breaks down the integration features utilized by Crito Smart PMS, mapping them to PMS equivalents:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 20%;">Apaleo Feature</th>
+                <th style="width: 25%;">Integration Usage Details</th>
+                <th style="width: 25%;">PMS Capability</th>
+                <th style="width: 15%; text-align: center;">Match Status</th>
+                <th style="width: 15%;">Technical Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>OAuth Authentication</strong></td>
+                <td>OAuth2 client credentials grant via <code>POST /connect/token</code> to acquire a bearer token.</td>
+                <td>Database credentials mapping + standard API authentication logic.</td>
+                <td class="text-center"><span class="badge badge-match">MATCH</span></td>
+                <td>PMS manages external integrations via the <code>ClientIntegration</code> model, storing client details, tokens, and expirations.</td>
+            </tr>
+            <tr>
+                <td><strong>Properties</strong></td>
+                <td><code>GET /inventory/v1/properties</code><br>Retrieve property records linked to tenants.</td>
+                <td><code>Location</code> database model and APIs.</td>
+                <td class="text-center"><span class="badge badge-match">MATCH</span></td>
+                <td>Maps directly to <code>PMS.EF.Location</code>. An endpoint (<code>api/GetLocations</code>) is already available.</td>
+            </tr>
+            <tr>
+                <td><strong>Unit Groups (Room Categories)</strong></td>
+                <td><code>GET /inventory/v1/unit-groups</code><br>Retrieve room categories for pricing/offers.</td>
+                <td><code>RoomType</code> database model and APIs.</td>
+                <td class="text-center"><span class="badge badge-match">MATCH</span></td>
+                <td>Maps directly to <code>PMS.EF.RoomType</code>. Endpoint <code>api/GetRoomTypesByLocationId</code> is available.</td>
+            </tr>
+            <tr>
+                <td><strong>Units (Rooms)</strong></td>
+                <td><code>GET /inventory/v1/units</code><br>Bulk sync of room list and status.</td>
+                <td><code>Room</code> database model and management.</td>
+                <td class="text-center"><span class="badge badge-match">MATCH</span></td>
+                <td>Maps directly to <code>PMS.EF.Room</code>. Supports full room details, features, and metadata.</td>
+            </tr>
+            <tr>
+                <td><strong>Availability</strong></td>
+                <td><code>GET /availability/v1/unit-groups</code><br>Retrieve available slots.</td>
+                <td>Room availability checking services.</td>
+                <td class="text-center"><span class="badge badge-match">MATCH</span></td>
+                <td>Calculated natively in <code>SetupService</code> and queried via <code>api/booking/GetAvailableRoomsForLandingPage</code>.</td>
+            </tr>
+            <tr>
+                <td><strong>Bookings & Reservations</strong></td>
+                <td><code>POST/GET /booking/v1/bookings</code><br>Create and sync bookings/guest records.</td>
+                <td><code>Booking</code> and <code>Person</code> models and APIs.</td>
+                <td class="text-center"><span class="badge badge-match">MATCH</span></td>
+                <td>PMS uses <code>Booking</code> and <code>Person</code> entities to store reservation headers, guest profiles, check-in dates, and details.</td>
+            </tr>
+            <tr>
+                <td><strong>Unit Assignment</strong></td>
+                <td><code>PUT .../assign-unit</code><br>Assigns a physical room number.</td>
+                <td>Bed-space placement logic.</td>
+                <td class="text-center"><span class="badge badge-match">MATCH</span></td>
+                <td>PMS handles room assignment via <code>IBedSpacePlacementService.AssignBedSpaceToPerson(...)</code>.</td>
+            </tr>
+            <tr>
+                <td><strong>Check-In / Out Actions</strong></td>
+                <td><code>PUT .../checkin</code><br><code>PUT .../checkout</code><br>Triggers stay start and end.</td>
+                <td>Check-in/out services.</td>
+                <td class="text-center"><span class="badge badge-match">MATCH</span></td>
+                <td>Natively handled in PMS via <code>CheckInPlacement</code> (assigns key cards) and <code>CheckOutGuest</code>.</td>
+            </tr>
+            <tr>
+                <td><strong>Folios & Payments</strong></td>
+                <td>Creates guest folios, terminal payments, and hosted checkout payment links.</td>
+                <td><code>Invoicing</code>, <code>StudentLedger</code>, and local Payment Gateways.</td>
+                <td class="text-center"><span class="badge badge-partial">PARTIAL</span></td>
+                <td>PMS is invoice-centric rather than folio-centric. Outstanding balances are mapped from invoices. Online payments are generated via PMS local payment gateways (Network International / Thawani).</td>
+            </tr>
+            <tr>
+                <td><strong>Webhooks (Inbound)</strong></td>
+                <td>Crito receives webhooks from Apaleo to automate tasks on reservation updates.</td>
+                <td>No Outbound Webhooks.</td>
+                <td class="text-center"><span class="badge badge-gap">GAP</span></td>
+                <td>PMS does not feature outbound webhook publishing. Development is required to send real-time events to Crito.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. Key Development Gaps</h2>
+    <p>To successfully integrate Crito with PMS and replace Apaleo, two primary development initiatives must be undertaken in our codebase:</p>
+
+    <h3>Gap 1: Outbound Webhook Publisher Service (High Priority)</h3>
+    <p>
+        Crito relies on real-time event updates from the PMS (e.g., when a booking is created, when a unit is assigned, or when a payment occurs) to trigger guest email schedules and smart lock provisioning.
+    </p>
+    <ul>
+        <li><strong>Requirement:</strong> Develop a Webhook Dispatcher system in PMS. Whenever a reservation change is committed, the PMS must issue an HTTP POST request to Crito's endpoint (<code>/api/webhooks/reservation</code>) with the matching JSON event payload.</li>
+        <li><strong>Implementation:</strong> Create a background task or service hook in the repository layer (e.g., inside <code>BookingService</code>, <code>BedSpacePlacementService</code>, and <code>PaymentService</code>) that serializes the event data and queues it for dispatching.</li>
+    </ul>
+
+    <h3>Gap 2: API Integration Strategy (Medium Priority)</h3>
+    <p>There are two development strategies available to align the REST API communication:</p>
+    <ul>
+        <li><strong>Option A (Client-Side Adaptation - Recommended):</strong> If Crito's codebase is accessible, customize Crito's data clients to request lists directly from PMS APIs (such as <code>api/GetLocations</code> and <code>Booking/Search</code>) rather than Apaleo. This is cleaner and reduces architectural translation overhead.</li>
+        <li><strong>Option B (Server-Side Compatibility Layer):</strong> If Crito's codebase cannot be modified, build a compatibility controller in PMS (e.g., <code>ApaleoProxyController.cs</code>) that matches Apaleo's REST routes and JSON schema outputs. PMS will act as an Apaleo emulator, intercepting calls from Crito and translating them into native service calls.</li>
+    </ul>
+
+    <h2>4. Special Opportunity: TTLock Smart Lock Integration</h2>
+    <p>
+        The Apaleo integration requires Crito to handle smart lock connections. However, <strong>The Myriad PMS already has a native smart lock service</strong> integrated with <strong>TTLock/Sciener</strong> (see <code>TTLockAuth.cs</code> and <code>ScienerAppController.cs</code>).
+    </p>
+    <p>
+        PMS has direct capabilities to generate guest passcodes, register IC key cards via encoders, and revoke access on check-out/room swap.
+    </p>
+    <ul>
+        <li><strong>Coexistence:</strong> We can send room assignment events to Crito via webhooks and allow Crito to continue managing the locks.</li>
+        <li><strong>Simplification:</strong> Alternatively, we can bypass Crito's lock integration entirely, leveraging PMS's native TTLock controller, which simplifies the overall software stack and reduces third-party dependencies.</li>
+    </ul>
+
+    <h2>5. Implementation Timeline & Recommendation</h2>
+    <ol>
+        <li><strong>Phase 1: API Discovery & Mapping (1 week)</strong> - Exchange sample JSON schemas of Crito's webhook endpoints and map them to PMS objects.</li>
+        <li><strong>Phase 2: Webhook Engine Development (2 weeks)</strong> - Build the background dispatcher and hook events (booking creation, cancellation, room assignment, check-in, checkout, and payment).</li>
+        <li><strong>Phase 3: API Integration Bridge (2 weeks)</strong> - Implement the compatibility endpoints in PMS or modify Crito's connectors.</li>
+        <li><strong>Phase 4: End-to-End Testing (1 week)</strong> - Validate the booking flow from room assignment to passcode generation and check-out.</li>
+    </ol>
+
+    <div class="footer">
+        © 2026 The Myriad Property Management System (PMS) | Confidential Technical Analysis
+    </div>
+
+</body>
+</html>

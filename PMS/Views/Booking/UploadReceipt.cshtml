@@ -1,0 +1,242 @@
+﻿@model PMS.DTO.ViewModels.BookingViewModels.UploadReceiptVM
+
+@using PMS.Common.Classes
+@{
+    ViewBag.Title = "UploadReceipt";
+    Layout = null;
+}
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>@ViewBag.Title</title>
+<!-- Tell the browser to be responsive to screen width -->
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<!-- Bootstrap 3.3.7 -->
+<link rel="stylesheet" href="~/Assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="~/Assets/bower_components/font-awesome/css/font-awesome.min.css">
+<!-- Ionicons -->
+<link rel="stylesheet" href="~/Assets/bower_components/Ionicons/css/ionicons.min.css">
+<!-- Theme style -->
+<link rel="stylesheet" href="~/Assets/dist/css/AdminLTE.min.css">
+<!-- iCheck -->
+<link rel="stylesheet" href="~/Assets/plugins/iCheck/square/_all.css">
+
+<link href="~/Assets/css/custom.css" rel="stylesheet" />
+<link href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.9/themes/blitzer/jquery-ui.css" rel="stylesheet" type="text/css" />
+<link href="~/Assets/css/custom.css?v=1.0.3" rel="stylesheet" />
+<link rel="shortcut icon" type="image/png" href="http://themyriad.com/Assets/images/favicon.png">
+<link href="~/Assets/css/toast.css" rel="stylesheet" />
+<link href="~/Content/Css/Common.css" rel="stylesheet" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-viewport-checker/1.8.8/jquery.viewportchecker.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/additional-methods.min.js"></script>
+</head>
+
+
+<style>
+
+    .highlight {
+        border-color: red;
+    }
+
+    .overlay-image:hover {
+        opacity: 0.5;
+    }
+
+        .overlay-image:hover .profilepic__content {
+            opacity: 1;
+        }
+
+    .overlay-image {
+        overflow: hidden;
+    }
+
+    .profilepic__content {
+        position: absolute;
+        top: 10%;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        opacity: 0;
+        transition: opacity .2s ease-in-out;
+    }
+
+    .profilepic__icon {
+        color: white;
+        padding-bottom: 8px;
+    }
+
+    .profilepic__content .fa {
+        font-size: 20px;
+        color: white;
+    }
+
+    .profilepic__text {
+        text-transform: uppercase;
+        font-size: 12px;
+        width: 50%;
+        text-align: center;
+        color: white;
+    }
+
+    .option1 {
+        display: inline-block; 
+        padding-right: 5px; 
+    }
+    .file-input {
+        width: 427px; 
+    }
+</style>
+
+
+<div class="login-box">
+    <div class="login-logo" style=" margin-bottom: -33px; padding-left: 0;">
+        <a href="#">
+            <img src="https://www.themyriad.com/Assets/images/logo.png" alt="logo">
+        </a>
+    </div>
+    <div style="width:auto !important" class="login-box-danger">
+        <div class="box-body">
+
+            <div class="row col-md-12">
+                <div id="dialog"></div>
+                <br />
+                <br />
+                <br />
+
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-center">
+
+                </div>
+
+            </div>
+            <div class="modal fade" id="message_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel">Information</h4>
+                        </div>
+
+                        <div class="modal-body">
+                            <p class="message_modal_text"></p>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-themyriad" data-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-danger">
+            @using (Html.BeginForm("UploadReceipt", "Booking", FormMethod.Post, new { enctype = "multipart/form-data", id = "Receipt_form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(x => x.PersonId) 
+                @Html.HiddenFor(x => x.BookingId)
+               
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group ">
+                            <br />
+                            <label for="exampleInputFile">Upload Receipt</label>
+                            @{
+                                if (Model.BookingId > 0)
+                                {
+                                    Html.EnableClientValidation(false);
+                                }
+                            }
+                            @Html.TextBoxFor(x => x.ThumbnailImage, new { @class = "form-control file-input", type = "file", style = "width: 345px !important;" })
+
+                            <p class="help-block ">image size should be 2250x508 pixels</p>
+
+                            @Html.ValidationMessageFor(x => x.ThumbnailImage)
+
+                            <img id="thumbUpload" src="@(!string.IsNullOrEmpty(Model.ThumbnailImageUrl) ? Model.ThumbnailImageUrl : "")" class="img-responsive" />
+
+                            @{ Html.EnableClientValidation(true);}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box-footer">
+                    <button class="btn btn-themyriad btn-block btn-flat btn-submit" type="submit">Submit</button>
+                </div>
+            }
+        </div>
+    </div>
+    
+</div>
+
+
+<script src="~/Assets/bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="~/Assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- AdminLTE App -->
+<script src="~/Assets/dist/js/adminlte.min.js"></script>
+
+<!-- PACE -->
+<script src="~/Assets/bower_components/PACE/pace.min.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+<!-- Select2 -->
+<script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+<script src="~/Scripts/Common.js?v=@DateTime.Now.ToString("hhmmsstt")"></script>
+
+<script src="~/Assets/js/toast.js"></script>
+
+<script>
+    $(function () {
+
+        $('.select2').select2()
+    })
+
+</script>
+<script>
+
+    $(function () {
+        function readURL(input) {
+            $('#thumbUpload').attr('src', '');
+            if (input.files && input.files[0]) {
+                var size = input.files[0].size / 1024 / 1024;
+                if (size > 1) {
+                    $('#fileSizeMessage').modal('show');
+                    $("#ThumbnailImage").val(null);
+                    return;
+                }
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#thumbUpload').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        };
+        $("#ThumbnailImage").change(function () {
+            readURL(this);
+        });
+
+        $("#thumbUpload").click(function () {
+            $("input[id='ThumbnailImage']").click();
+        });
+    });
+
+</script>
+
+
+

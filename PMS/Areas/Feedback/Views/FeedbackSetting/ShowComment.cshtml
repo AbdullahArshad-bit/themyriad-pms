@@ -1,0 +1,413 @@
+﻿@model PMS.DTO.ViewModels.FeedbackViewModels.FeedbackViewModels
+@{
+    ViewBag.Title = "Add Feedback | The Myriad";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var rating = ViewBag.Rating as List<PMS.DTO.ViewModels.FeedbackViewModels.FeedbackDetailVM>;
+}
+
+<head>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+      /*  body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }*/
+
+        .feedback-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #46464638 0%, #464646db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .logo {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo img {
+            max-height: 60px;
+            width: auto;
+        }
+
+        .alert {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @@keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-icon {
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .alert-text {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .question-card {
+            background: #754ea72e;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-text {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .rating-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px 0;
+        }
+
+        .star {
+            font-size: 32px;
+            transition: all 0.3s ease;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .star.filled {
+            color: #ffc107;
+            text-shadow: 0 0 15px rgba(255, 193, 7, 0.8);
+            animation: starGlow 0.5s ease-out;
+        }
+
+        .star.empty {
+            color: #ddd;
+        }
+
+        @@keyframes starGlow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .rating-label {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .feedback-text {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+            line-height: 1.5;
+        }
+
+        .feedback-text:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .feedback-text[readonly] {
+            background: #f8f9fa;
+            cursor: default;
+            border-color: #dee2e6;
+        }
+
+        .no-feedback {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .feedback-summary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: black;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .feedback-summary h3 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+        }
+
+        .feedback-summary p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        @@media (max-width: 768px) {
+            .feedback-container {
+                margin: 10px;
+                max-width: 100%;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .star {
+                font-size: 28px;
+            }
+
+            .question-text {
+                font-size: 16px;
+            }
+
+            .alert {
+                margin: 10px;
+                padding: 15px;
+            }
+        }
+
+        /* Animation for when page loads */
+        .question-card {
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .question-card:nth-child(1) { animation-delay: 0.1s; }
+        .question-card:nth-child(2) { animation-delay: 0.2s; }
+        .question-card:nth-child(3) { animation-delay: 0.3s; }
+        .question-card:nth-child(4) { animation-delay: 0.4s; }
+        .question-card:nth-child(5) { animation-delay: 0.5s; }
+        .question-card:nth-child(6) { animation-delay: 0.6s; }
+        .question-card:nth-child(7) { animation-delay: 0.7s; }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<div class="feedback-container">
+    <div class="header">
+        <div class="logo">
+            <img src="https://www.themyriad.com/Assets/images/logo.png" alt="The Myriad Logo">
+        </div>
+    </div>
+
+    @if (ViewBag.error != null)
+    {
+        <div class="alert">
+            <span class="alert-icon">⚠️</span>
+            <span class="alert-text">@ViewBag.error</span>
+        </div>
+    }
+
+    <div class="content">
+        @if (rating != null && rating.Count > 0)
+        {
+            @* Check if any feedback has been submitted *@
+            if (rating.Any(r => r.rating > 0 || !string.IsNullOrEmpty(r.description)))
+            {
+                <div class="feedback-summary">
+                    <h3>📋 Feedback Summary</h3>
+                    <p>Thank you for your valuable feedback. Here's what you've shared with us:</p>
+                </div>
+            }
+
+            foreach (var item in rating)
+            {
+                <div class="question-card">
+                    <div class="question-text">
+                        @item.Question
+                    </div>
+
+                    <div class="rating-container">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= item.rating)
+                            {
+                                <span class="star filled">★</span>
+                            }
+                            else
+                            {
+                                <span class="star empty">★</span>
+                            }
+                        }
+                    </div>
+
+                    @if (item.rating > 0)
+                    {
+                        <div class="rating-label">
+                            @switch (item.rating)
+                            {
+                                case 1:
+                                    <span style="color: #dc3545;">⭐ Poor</span>
+                                    break;
+                                case 2:
+                                    <span style="color: #fd7e14;">⭐⭐ Fair</span>
+                                    break;
+                                case 3:
+                                    <span style="color: #ffc107;">⭐⭐⭐ Good</span>
+                                    break;
+                                case 4:
+                                    <span style="color: #20c997;">⭐⭐⭐⭐ Very Good</span>
+                                    break;
+                                case 5:
+                                    <span style="color: #28a745;">⭐⭐⭐⭐⭐ Excellent</span>
+                                    break;
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="rating-label">
+                            <span style="color: #6c757d;">No rating provided</span>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(item.description))
+                    {
+                        <textarea class="feedback-text" readonly>@item.description</textarea>
+                    }
+                    else
+                    {
+                        <div class="no-feedback">
+                            <em>No detailed feedback provided for this question.</em>
+                        </div>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert">
+                <span class="alert-icon">📝</span>
+                <span class="alert-text">No feedback questions are available at this time.</span>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    // Add some interactive animations
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add hover effects to question cards
+        const cards = document.querySelectorAll('.question-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function () {
+                this.style.transform = 'translateY(-8px)';
+            });
+
+            card.addEventListener('mouseleave', function () {
+                this.style.transform = 'translateY(-5px)';
+            });
+        });
+
+        // Add click animation to filled stars
+        const filledStars = document.querySelectorAll('.star.filled');
+        filledStars.forEach(star => {
+            star.addEventListener('click', function () {
+                this.style.animation = 'starGlow 0.5s ease-out';
+                setTimeout(() => {
+                    this.style.animation = '';
+                }, 500);
+            });
+        });
+    });
+</script>

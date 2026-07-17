@@ -1,0 +1,212 @@
+﻿@model PMS.DTO.ViewModels.TransportationViewModels.UpdateScheduleVM
+@using PMS.Common.Classes
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Header = "Schedule";
+    ViewBag.HeaderDescription = "Update Schedule";
+
+}
+@section styles{
+    <!-- bootstrap datepicker -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Bootstrap time Picker -->
+    <link rel="stylesheet" href="~/Assets/plugins/timepicker/bootstrap-timepicker.css">
+}
+
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Index", "Schedule")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Schedules</a>
+        </div>
+    </div>
+
+    <!-- form start -->
+    <form id="schedule-form">
+
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.Id)
+
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocationId, "Location")
+                        @Html.DropDownList("LocationId", null, "--- Select Location ---", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.LocationId)
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.VehicleId, "Bus")
+                        @Html.DropDownList("VehicleId", null, "--- Select Bus ---", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.VehicleId)
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.RouteId, "Route")
+                        @Html.DropDownList("RouteId", null, "--- Select Route ---", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.RouteId)
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group ">
+                        @Html.LabelFor(x => x.FromDate, "Date", new { style = "padding-left:inherit !important" })
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(x => x.FromDate, new { type = "datetime", @Value = Model.FromDate.ToString("MM/dd/yyyy"), @class = "schedule_date from_date form-control pull-right", autocomplete = "off", @readonly = "", placeholder = "Select Date" })
+                            @Html.ValidationMessageFor(x => x.FromDate)
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.DepartureTimeId, "Departure Time")
+                        @Html.DropDownList("DepartureTimeId", null, "--- Select Departure Time ---", htmlAttributes: new { @class = "form-control select2 ", @required = "required", @autocomplete = "off" })
+                        @Html.ValidationMessageFor(x => x.DepartureTimeId)
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="button" onclick="Submit()" class="btn btn-themyriad" value="Save">
+        </div>
+    </form>
+</div>
+
+@section scripts
+{
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- bootstrap time picker -->
+    <script src="~/Assets/plugins/timepicker/bootstrap-timepicker.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+        });
+        $('.schedule_date').datepicker({
+            autoclose: true
+        });
+
+
+    </script>
+
+    <script>
+        var startDate = new Date();
+        var FromEndDate = new Date();
+        var ToEndDate = new Date();
+
+        $('.from_date').datepicker({
+            format: 'dd/M/yyyy',
+            orientation: 'bottom',
+            autoclose: true
+        })
+            .on('changeDate', function (selected) {
+                startDate = new Date(selected.date.valueOf());
+                startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+                $('.to_date').datepicker('setStartDate', startDate);
+            });
+        $('.to_date').datepicker({
+            format: 'dd/M/yyyy',
+            FromEndDate: new Date(),
+            autoclose: true
+        })
+            .on('changeDate', function (selected) {
+                FromEndDate = new Date(selected.date.valueOf());
+                FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                $('.from_date').datepicker('setEndDate', FromEndDate);
+            });
+
+    </script>
+    <script>
+        function Submit() {
+            var LocationId = $("#LocationId").val();
+            var VehicleId = $("#VehicleId").val();
+            var RouteId = $("#RouteId").val();
+            var FromDate = $("#FromDate").val();
+            var DepartureTimeId = $("#DepartureTimeId").val();
+            var Id = $("#Id").val();
+            var schedule = {
+                Id: Id,
+                LocationId: LocationId,
+                VehicleId: VehicleId,
+                RouteId: RouteId,
+                FromDate: FromDate,
+                DepartureTimeId: DepartureTimeId,
+            };
+            if (LocationId == null || LocationId == '' || LocationId == undefined) {
+                showMessage('Please select Location');
+                return false;
+            }
+            if (VehicleId == null || VehicleId == '' || VehicleId == undefined) {
+                showMessage('Please select Bus');
+                return false;
+            }
+            if (RouteId == null || RouteId == '' || RouteId == undefined) {
+                showMessage('Please select Route');
+                return false;
+            }
+            if (FromDate == null || FromDate == '' || FromDate == undefined) {
+                showMessage('Please select From Date');
+                return false;
+            }
+            if (DepartureTimeId == null || DepartureTimeId == '' || DepartureTimeId == undefined) {
+                showMessage('Please select Departure Time');
+                return false;
+            }
+            $.ajax({
+                url: "/Schedule/Edit",
+                method: "Post",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(schedule),
+                success: function (data) {
+                    if (data.status = true) {
+                        window.location.href = "/Transportation/Schedule/Index";
+                    } 
+                    else {
+                        Toast.show(data.message, "error");
+                    }
+                }
+            });
+            return true;
+        }
+        function Loaderbtn(show) {
+            if (!show) {
+                $('.savebtn')
+                    .prop("disabled", false)
+                    .html('')
+                    .text('Save');
+            }
+            else {
+                $('.savebtn')
+                    .prop("disabled", true)
+                    .html('<i class="fa fa-2x fa-sync-alt fa-spin  fa-refresh loading "></i>')
+                    .css('background', '#016891 !important');
+            }
+        }
+
+
+    </script>
+}
+
+

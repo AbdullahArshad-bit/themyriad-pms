@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40.104" viewBox="0 0 40 40.104">
+  <g id="Single_Bed" data-name="Single Bed" transform="translate(-299 -96)">
+    <rect id="Rectangle_478" data-name="Rectangle 478" width="40" height="40" transform="translate(299 96)" fill="none"/>
+    <g id="Single_Bed-2" data-name="Single Bed" transform="translate(207 -136)">
+      <g id="Single_bed-3" data-name="Single bed" transform="translate(72 -353)">
+        <g id="Rectangle_463" data-name="Rectangle 463" transform="translate(28 602)" fill="#fff" stroke="#000" stroke-width="1">
+          <rect width="24" height="10" stroke="none"/>
+          <rect x="0.5" y="0.5" width="23" height="9" fill="none"/>
+        </g>
+        <g id="Rectangle_462" data-name="Rectangle 462" transform="translate(34 606)" fill="#fff" stroke="#c20e1a" stroke-width="1">
+          <rect width="13" height="6" stroke="none"/>
+          <rect x="0.5" y="0.5" width="12" height="5" fill="none"/>
+        </g>
+        <g id="Rectangle_464" data-name="Rectangle 464" transform="translate(24 611)" fill="#fff" stroke="#000" stroke-width="1">
+          <rect width="32" height="10" stroke="none"/>
+          <rect x="0.5" y="0.5" width="31" height="9" fill="none"/>
+        </g>
+        <path id="Path_740" data-name="Path 740" d="M2265.1,623.557V629.1" transform="translate(-2240.595 -4)" fill="none" stroke="#000" stroke-width="1"/>
+        <path id="Path_743" data-name="Path 743" d="M2265.1,623.557v2.7" transform="translate(-2236.595 -3)" fill="none" stroke="#000" stroke-width="1"/>
+        <path id="Path_741" data-name="Path 741" d="M2265.1,623.557V629.1" transform="translate(-2209.595 -4)" fill="none" stroke="#000" stroke-width="1"/>
+        <path id="Path_742" data-name="Path 742" d="M2265.1,623.557v2.7" transform="translate(-2213.595 -3)" fill="none" stroke="#000" stroke-width="1"/>
+      </g>
+    </g>
+  </g>
+</svg>

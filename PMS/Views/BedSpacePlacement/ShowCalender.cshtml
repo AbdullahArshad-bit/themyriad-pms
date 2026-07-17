@@ -1,0 +1,197 @@
+﻿
+@{
+
+    var data = ViewBag.Placements;
+    ViewBag.Header = "Calender";
+    ViewBag.HeaderDescription = "Calender implementation";
+    ViewBag.Title = "Calender implementation | PMS";
+}
+
+@section styles{
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Calendar implementaion</title>
+    <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+    <!-- CSS -->
+    <link href="~/Assets/dist/css/rescalendar.css" rel="stylesheet" />
+    <style>
+        .w h1 {
+            margin: 150px 0 100px 30px;
+        }
+
+        .w h4 {
+            margin: 60px 0 10px 60px;
+        }
+
+        .wrapperr {
+            width: 100%;
+            text-align: center;
+        }
+
+        .greenClass {
+            background: rgb(16, 67, 113);
+        }
+
+        /*.blueClass {
+            background: blue;
+        }*/
+
+        .day_cell {
+            padding: 5px;
+        }
+
+        .dataRow {
+           border-bottom: 1px solid #ecf0f5;
+        }
+
+        /*.dataRow td{
+            display:block;
+        }*/
+        .firstColumn{
+            display:block;
+        }
+        /*.greenClass:before {
+            content: "zainab:";
+            color: white;
+        }*/
+    </style>
+
+}
+
+<div>
+    <div>
+        <div class="jquery-script-clear"></div>
+    </div>
+</div>
+<div class="wrapperr" style="background-color:white;padding-top:35px; padding-bottom:35px;">
+    <h4 class="w">@*Example 1*@</h4>
+    <div class="rescalendar" id="my_calendar_en"></div>
+
+</div>
+
+
+@section scripts
+{
+    @*<script src="~/Assets/bower_components/jquery/src/jquery.js"></script>*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+    <script src="~/Assets/dist/js/rescalendar.js"></script>
+    <script type="text/javascript">
+<!--
+        google_ad_client = "ca-pub-2783044520727903";
+        /* jQuery_demo */
+        google_ad_slot = "2780937993";
+        google_ad_width = 728;
+        google_ad_height = 90;
+        //-->
+    </script>
+    <script type="text/javascript"
+            src="https://pagead2.googlesyndication.com/pagead/show_ads.js">
+    </script>
+    @*<script>
+        $(document).ready(function () {
+        var statesAvailable = @Html.Raw(Json.Encode(@ViewBag.Placements));
+    //Loop through statesAvailable
+
+        $.each(statesAvailable, function (value) {
+
+            alert(value);
+        })
+
+
+
+            var array = @Html.Raw(Json.Encode(@ViewBag.Placements));
+            for(var i = 0; i < array.length; i++) {
+            jScriptArray[i] = array[i];
+            }
+            alert(array);
+
+        });
+
+
+        
+    </script>*@
+
+    <script>
+        $(document).ready(function () {
+            var serviceURL = '/BedSpacePlacement/getDataYar';
+
+            $.ajax({
+                type: "POST",
+                url: serviceURL,
+                data: param = "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+            function successFunc(data, status) {
+                alert(JSON.stringify(data[0].MoveIn));
+                $(function () {
+                    $('#my_calendar_en').rescalendar({
+                        id: 'my_calendar_en',
+                        format: 'YYYY-MM-DD',
+                        refDate: '2020-03-08',
+                        jumpSize: 15,
+                        disabledDays: ['2020-01-01', '2020-01-07', '2020-04-18', '2020-04-19', '2020-05-01', '2020-05-02', '2020-05-13', '2020-08-15', '2020-10-12', '2020-11-01', '2020-12-06', '2020-12-09', '2020-12-20', '2020-12-24', '2020-12-25', '2020-12-31'],
+                        disabledWeekDays: [5, 6],
+                        data: [
+
+                            {
+                                id: 1,
+                                name: JSON.stringify(data[0].FullName),
+                                startDate: '2020-03-01',
+                                endDate: '2020-03-05',
+                                customClass: 'greenClass'
+                            },
+                            //{
+                            //    id: 2,
+                            //    name: 'student2',
+                            //    startDate: '2020-03-05',
+                            //    endDate: '2020-03-15',
+                            //    customClass: 'greenClass',
+                            //    title: 'Title 2 en'
+                            //},
+                            {
+                                id: 3,
+                                name: JSON.stringify(data[3].FullName),
+                                startDate: '2020-03-05',
+                                endDate: '2020-03-08',
+                                customClass: 'greenClass'
+                            }
+                        ],
+
+                        dataKeyField: 'name',
+                        dataKeyValues: [JSON.stringify(data[0].FullName), JSON.stringify(data[1].FullName), JSON.stringify(data[2].FullName), JSON.stringify(data[3].FullName)]
+
+                    });
+                });
+            }
+
+            function errorFunc() {
+                alert('error');
+            }
+        });
+    </script>
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-36251023-1']);
+        _gaq.push(['_setDomainName', 'jqueryscript.net']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+
+}
+
+
+
+

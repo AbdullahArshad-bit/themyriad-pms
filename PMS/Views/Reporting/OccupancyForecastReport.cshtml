@@ -1,0 +1,350 @@
+﻿@model IEnumerable<PMS.DTO.ViewModels.ReportingViewModels.OccupancyForecastVm>
+
+@{
+    ViewBag.Header = "Occupancy Forecast Report";
+    ViewBag.HeaderDescription = "Occupancy Forecast Report";
+    ViewBag.Title = "Occupancy Forecast Report";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+}
+
+<style>
+    /* Table Styling matching your provided classes */
+    .table-bordered > thead > tr > th {
+        border: 1px solid #000 !important;
+        text-align: center;
+        vertical-align: middle;
+        background-color: #ffffff;
+        color: #333;
+        font-weight: bold;
+        font-size: 11px;
+    }
+
+    table.dataTable td {
+        text-align: center;
+        border: 1px solid #ccc !important;
+        font-size: 11px;
+        padding: 4px !important;
+    }
+
+    .bg-occ-gray {
+        background-color: #f2f2f2 !important;
+        font-weight: bold;
+    }
+
+    .neg-avail {
+        background-color: #f8d7da !important;
+        color: #721c24 !important;
+        font-weight: bold;
+        display: block;
+    }
+
+    .section-header {
+        background-color: #f9f9f9 !important;
+        font-weight: bold;
+        font-size: 14px !important;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        border-bottom: 2px solid #000 !important;
+    }
+
+    .text-bold {
+        font-weight: bold;
+    }
+</style>
+
+
+<div class="box box-danger">
+    <div class="box-body">
+        <div class="row">
+            <div class="col-md-2">
+                <label>From Date</label>
+                <input name="daterange" type="text" autocomplete="off" id="FromDate" class="form-control from_date" value="@ViewBag.FromDate" placeholder="From Date" />
+            </div>
+            <div class="col-md-2">
+                <label>To Date</label>
+                <input name="daterange" type="text" autocomplete="off" id="ToDate" class="form-control to_date" value="@ViewBag.ToDate" placeholder="To Date" />
+            </div>
+            <div class="col-md-1">
+                <label>&nbsp;</label><br />
+                <button type="button" onclick="GetForecastDetail();" class="btn btn-themyriad btn-bordered waves-effect w-md">
+                    <i class="fa fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="table-responsive">
+            <table id="ForecastTable" class="table table-bordered nowrap" style="width:100%">
+                <thead id="tableHeader"></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+
+    <script>
+        var roomTypes = [];
+        var genders = [];
+        var roomCapacities = {};
+
+        $(document).ready(function () {
+            $('.from_date, .to_date').datepicker({
+                format: "dd/M/yyyy",
+                autoclose: true,
+                todayHighlight: true
+            });
+            GetForecastDetail();
+        });
+
+        function GetForecastDetail() {
+            ShowLoader();
+            $.get("/Reporting/OccupancyForecastReportAjax", {
+                FromDate: $('#FromDate').val(),
+                ToDate: $('#ToDate').val()
+            }, function (res) {
+                var raw = res.data || [];
+                var masterGroup = {};
+
+                roomTypes = [];
+                genders = [];
+                roomCapacities = {};
+
+                raw.forEach(r => {
+                    var dateKey = formatDate(r.ForecastDate);
+                    var g = r.Gender || "Unknown";
+                    var rt = r.RoomType || "Standard";
+
+                    if (genders.indexOf(g) === -1) genders.push(g);
+                    if (roomTypes.indexOf(rt) === -1) roomTypes.push(rt);
+
+                    if (!roomCapacities[g]) roomCapacities[g] = {};
+                    roomCapacities[g][rt] = r.TotalCapacity || 0;
+
+                    if (!masterGroup[dateKey]) {
+                        masterGroup[dateKey] = { DisplayDate: dateKey };
+                    }
+
+                    var prefix = g + "_" + rt;
+                    masterGroup[dateKey][prefix + "_OCC"] = r.OccupiedBeds || 0;
+                    masterGroup[dateKey][prefix + "_DO"] = r.ExpectedCheckOuts || 0;
+                    masterGroup[dateKey][prefix + "_FDO"] = r.FutureDayOut || 0;
+                    masterGroup[dateKey][prefix + "_ARR"] = r.ExpectedCheckIns || 0;
+                    masterGroup[dateKey][prefix + "_AVAIL"] = r.VacantBeds || 0;
+
+                    masterGroup[dateKey][g + "_TotalAvail"] =
+                        (masterGroup[dateKey][g + "_TotalAvail"] || 0) + (r.VacantBeds || 0);
+                    masterGroup[dateKey][g + "_TotalDO"] = (masterGroup[dateKey][g + "_TotalDO"] || 0) + (r.ExpectedCheckOuts || 0);
+                    masterGroup[dateKey][g + "_TotalARR"] = (masterGroup[dateKey][g + "_TotalARR"] || 0) + (r.ExpectedCheckIns || 0);
+                });
+
+                buildDynamicHeader();
+                initDynamicTable(Object.values(masterGroup));
+                HideLoader();
+            }).fail(function (xhr, error, thrown) {
+                console.error('AJAX error:', error, thrown);
+                HideLoader();
+            });
+        }
+
+        function buildDynamicHeader() {
+            // roomCount = (RoomTypes * 5) + 3 (OCC, D/O, Future D/O, ARR, AVAIL) + (TOTAL. D/O, TOTAL. ARR, TOTAL. AV)
+            var roomCount = (roomTypes.length * 5) + 3;
+            var h1 = '<tr><th rowspan="3">Date</th>';
+            genders.forEach(g => {
+                h1 += `<th colspan="${roomCount}" class="section-header">${g.toUpperCase()}</th>`;
+            });
+            h1 += '</tr>';
+
+            var h2 = '<tr>';
+            genders.forEach(g => {
+                roomTypes.forEach(rt => {
+                    var cap = (roomCapacities[g] && roomCapacities[g][rt]) ? roomCapacities[g][rt] : 0;
+                    h2 += `<th colspan="5">${rt} (${cap})</th>`;
+                });
+                // Added D/O, Future D/O, ARR, AV headers here
+                h2 += '<th rowspan="2">TOTAL. D/O</th>';
+                h2 += '<th rowspan="2">TOTAL. ARR</th>';
+                h2 += '<th rowspan="2">TOTAL. AV</th>';
+            });
+            h2 += '</tr>';
+
+            var h3 = '<tr>';
+            genders.forEach(g => {
+                roomTypes.forEach(() => {
+                    h3 += '<th>OCC</th><th>D/O</th><th>Future D/O</th><th>ARR</th><th>AVAIL</th>';
+                });
+            });
+            h3 += '</tr>';
+
+            $('#tableHeader').html(h1 + h2 + h3);
+        }
+
+        function initDynamicTable(data) {
+            var columns = [{ data: "DisplayDate" }];
+
+            genders.forEach(g => {
+                roomTypes.forEach(rt => {
+                    var prefix = g + "_" + rt;
+                    columns.push({ data: prefix + "_OCC", defaultContent: 0, className: "bg-occ-gray" });
+                    columns.push({ data: prefix + "_DO", defaultContent: 0 });
+                    columns.push({ data: prefix + "_FDO", defaultContent: 0 });
+                    columns.push({ data: prefix + "_ARR", defaultContent: 0 });
+                    columns.push({
+                        data: prefix + "_AVAIL",
+                        defaultContent: 0,
+                        render: v => v < 0 ? `<span class="neg-avail">${v}</span>` : v
+                    });
+                });
+
+                columns.push({ data: g + "_TotalDO", defaultContent: 0, className: "text-bold" });
+                columns.push({ data: g + "_TotalARR", defaultContent: 0, className: "text-bold" });
+                columns.push({ data: g + "_TotalAvail", defaultContent: 0, className: "text-bold" });
+            });
+
+            if ($.fn.DataTable.isDataTable('#ForecastTable')) {
+                $('#ForecastTable').DataTable().destroy();
+            }
+
+            $('#ForecastTable').DataTable({
+                paging: false,
+                ordering: false,
+                searching: false,
+                info: false,
+                data: data,
+                columns: columns,
+                dom: 'Bfrtip',
+                buttons: [{
+                    extend: 'excelHtml5',
+                    title: 'Occupancy Forecast Report',
+                    customizeData: function (data) {
+                        // Updated sectionWidth: (RoomTypes * 5) + 3 (OCC, D/O, Future D/O, ARR, AV, then D/O, ARR, AV totals)
+                        var sectionWidth = (roomTypes.length * 5) + 3;
+
+                        var row1 = [''];
+                        genders.forEach(g => {
+                            row1.push(g.toUpperCase());
+                            for (var i = 1; i < sectionWidth; i++) row1.push('');
+                        });
+
+                        var row2 = ['Date'];
+                        genders.forEach(g => {
+                            roomTypes.forEach(rt => {
+                                var cap = (roomCapacities[g] && roomCapacities[g][rt]) ? roomCapacities[g][rt] : 0;
+                                row2.push(rt + ' (' + cap + ')', '', '', '', '');
+                            });
+                            // Matching your table header names exactly
+                            row2.push('TOTAL. D/O', 'TOTAL. ARR', 'TOTAL. AV');
+                        });
+
+                        var row3 = [''];
+                        genders.forEach(g => {
+                            roomTypes.forEach(() => {
+                                row3.push('OCC', 'D/O', 'Future D/O', 'ARR', 'AVAIL');
+                            });
+                            // Empty placeholders for the bottom row of the 3 total columns
+                            row3.push('', '', '');
+                        });
+
+                        data.header = [];
+                        data.body.unshift(row3);
+                        data.body.unshift(row2);
+                        data.body.unshift(row1);
+                    },
+                    customize: function (xlsx) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        var sectionWidth = (roomTypes.length * 5) + 3;
+                        var totalColumns = (genders.length * sectionWidth) + 1;
+                        var lastColLetter = getExcelColumnName(totalColumns);
+
+                        var currentSectionEnd = 1;
+
+                        genders.forEach((g) => {
+                            currentSectionEnd += sectionWidth;
+                            var separatorColLetter = getExcelColumnName(currentSectionEnd);
+                            $(`row c[r^="${separatorColLetter}"]`, sheet).attr('s', '5');
+                            $(`col[min="${currentSectionEnd}"][max="${currentSectionEnd}"]`, sheet).attr('width', '15');
+                        });
+
+                        $('row:nth-child(-n+5) c', sheet).attr('s', '2');
+
+                        if ($('mergeCells', sheet).length > 0) {
+                            $('mergeCells', sheet).remove();
+                        }
+
+                        var mergeRefs = [];
+                        mergeRefs.push('A1:' + lastColLetter + '1'); // Main Title
+                        mergeRefs.push('A2:A4'); // Date Column
+
+                        var colIndex = 2;
+                        genders.forEach(() => {
+                            var start = getExcelColumnName(colIndex);
+                            var end = getExcelColumnName(colIndex + sectionWidth - 1);
+                            mergeRefs.push(start + '2:' + end + '2'); // Gender Header
+                            colIndex += sectionWidth;
+                        });
+
+                        colIndex = 2;
+                        genders.forEach(() => {
+                            roomTypes.forEach(() => {
+                                mergeRefs.push(
+                                    getExcelColumnName(colIndex) + '3:' +
+                                    getExcelColumnName(colIndex + 4) + '3'
+                                ); // Room Type Header
+                                colIndex += 5;
+                            });
+                            // Skip the 3 total columns (D/O, ARR, AV) so they don't get room-type merging
+                            colIndex += 3;
+                        });
+
+                        var mergeCellsTag = '<mergeCells count="' + mergeRefs.length + '">';
+                        mergeRefs.forEach(function (ref) {
+                            mergeCellsTag += '<mergeCell ref="' + ref + '"/>';
+                        });
+                        mergeCellsTag += '</mergeCells>';
+
+                        $('sheetData', sheet).after(mergeCellsTag);
+                    }
+                }]
+            });
+        }
+
+        function getExcelColumnName(colNumber) {
+            var dividend = colNumber;
+            var columnName = '';
+            var modulo;
+            while (dividend > 0) {
+                modulo = (dividend - 1) % 26;
+                columnName = String.fromCharCode(65 + modulo) + columnName;
+                dividend = Math.floor((dividend - modulo) / 26);
+            }
+            return columnName;
+        }
+
+        function formatDate(d) {
+            if (!d) return "";
+
+            var dt = new Date(parseInt(d.replace(/\/Date\((\d+)\)\//, '$1')));
+
+            var day = dt.getDate().toString().padStart(2, '0');
+            var month = (dt.getMonth() + 1).toString().padStart(2, '0');
+            var year = dt.getFullYear();
+
+            return day + "/" + month + "/" + year;
+        }
+
+    </script>
+}

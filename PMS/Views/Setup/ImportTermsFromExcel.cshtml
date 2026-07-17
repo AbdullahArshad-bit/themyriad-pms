@@ -1,0 +1,183 @@
+﻿
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Terms";
+    ViewBag.HeaderDescription = "Import from excel";
+    ViewBag.Title = "Import from excel | PMS";
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }@if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+
+            <div class="col-sm-12 " style="margin-bottom:30px ; padding:0px;">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("Terms", "Setup")" class="btn btn-themyriad"><i class="fa fa-plus" style="padding-right: 5px;"></i> All Term List</a>
+                </div>
+            </div>
+
+            <div style="overflow: auto; width:100%">
+
+                <table id="terms-table" class="table table-bordered table-striped">
+
+                    <thead>
+
+                        <tr>
+                            <th>Status</th>
+                            <th>Name</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Frequency</th>
+                            <th>Description</th>
+                            <th>Publish</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var term in ViewBag.NotSavedTerms as List<PMS.DTO.ViewModels.SetupViewModels.AddTermVM>)
+                        {
+                            <tr>
+                                <td><span class='label label-danger'>Failed</span></td>
+                                <td>@term.TermName</td>
+                                <td>@(term.TermStartDate == null ? "" : ((DateTime)term.TermStartDate).ToString("dd/MM/yyy"))</td>
+
+                                <td>@(term.TermEndDate == null ? "" : ((DateTime)term.TermEndDate).ToString("dd/MM/yyy"))</td>
+                                <td>
+                                    @if (term.FrequencyId == 1)
+                                    {
+                                        @:Daily
+                                    }
+                                    else if (term.FrequencyId == 2)
+                                    {
+                                        @:Monthly
+                                    }
+                                    else if (term.FrequencyId == 3)
+                                    {
+                                        @:Weekly
+                                    }
+                                    else
+                                    {
+                                        @:Unknown
+                                    }
+                                </td>
+                                <td>@term.TermDescription</td>
+                                <td>
+                                    @if (term.IsPublished == true)
+                                    {
+                                        <span class="label label-success">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="label label-danger">No</span>
+
+                                    }
+
+                                </td>
+                            </tr>
+                        }
+
+                        @foreach (var term in ViewBag.savedTerms as List<PMS.DTO.ViewModels.SetupViewModels.AddTermVM>)
+                        {
+                            <tr>
+                                <td><span class='label label-success'>Success</span></td>
+                                <td>@term.TermName</td>
+                                <td>@(term.TermStartDate == null ? "" : ((DateTime)term.TermStartDate).ToString("dd/MM/yyy"))</td>
+
+                                <td>@(term.TermEndDate == null ? "" : ((DateTime)term.TermEndDate).ToString("dd/MM/yyy"))</td>
+                                <td>
+                                    @if (term.FrequencyId == 1)
+                                    {
+                                        @:Daily
+                                    }
+                                    else if (term.FrequencyId == 2)
+                                    {
+                                        @:Monthly
+                                    }
+                                    else if (term.FrequencyId == 3)
+                                    {
+                                        @:Weekly
+                                    }
+                                    else
+                                    {
+                                        @:Unknown
+                                    }
+                                </td>
+                                <td>@term.TermDescription</td>
+                                <td>
+                                    @if (term.IsPublished == true)
+                                    {
+                                        <span class="label label-success">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="label label-danger">No</span>
+
+                                    }
+
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Status</th>
+                            <th>Name</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Frequency</th>
+                            <th>Description</th>
+                            <th>Publish</th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+
+    <script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.11/sorting/date-eu.js" type="text/javascript"></script>
+
+    <script>
+        $(function () {
+            $('#terms-table').DataTable({});
+        })
+
+
+    </script>
+}

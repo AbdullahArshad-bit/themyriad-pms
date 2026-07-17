@@ -1,0 +1,105 @@
+﻿@model List<PMS.DTO.ViewModels.CommentViewModel>
+@using PMS.Common.Classes
+@{
+    Layout = "~/Areas/Student/Views/Shared/_Layout.cshtml";
+    ViewBag.Header = "Comments";
+    ViewBag.HeaderDescription = "All Comments";
+
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="box-body">
+            @if (Model != null)
+            {
+                foreach (var item in Model)
+                {
+                    <input hidden id="TicketId" value="@item.TicketId" />
+                    <div class="post">
+                        <div class="user-block">
+                            <img class="img-circle img-bordered-sm" src="@item.UserImageUrl" alt="user image">
+                            <span class="username">
+                                <a href="#">@item.CreatedBy</a>
+                                @*<a href="#" class="pull-right btn-tool deletebtn"><i class="fa fa-times"></i></a>*@
+                            </span>
+                            <span class="description">@item.CreatedDate</span>
+                        </div>
+
+                        <p>
+                            @item.Description
+                        </p>
+
+                    </div>
+                }
+            }
+            <div class="row">
+                <div class="col-md-12">
+                    <input class="form-control input-sm" type="text" id="Description" placeholder="Type a comment">
+                </div>
+                &nbsp;
+                <div class="col-md-12">
+                    <button type="submit" onclick="submit()" class="pull-right btn btn-themyriad">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="DeleteModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Confirm Delete</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are You sure you want to delete?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-themyriad-black" id="close1" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+            $(document).on("click", ".deletebtn", function () {
+                $("#DeleteModal").modal();
+            });
+        });
+        function submit() {
+
+            var description = $("#Description").val();
+            var ticketId = $("#TicketId").val();
+            if (description != "") {
+                var ticket = {
+                    TicketId: ticketId,
+                    Description: description
+                };
+
+                $.ajax({
+                    type: "Post",
+                    url: "/Student/Ticket/Comments",
+                    data: JSON.stringify(ticket),
+                    contentType: "application/json;charset=utf-8",
+                    success: function (data) {
+                        if (data.success) {
+                            window.location.reload();
+                        }
+                    }
+
+                });
+            }
+        }
+
+    </script>
+    }

@@ -1,0 +1,427 @@
+﻿@model PMS.DTO.ViewModels.SetupViewModels.LocationSettingsVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Location Settings";
+    ViewBag.HeaderDescription = "Add/Update Location Settings";
+    ViewBag.Title = "Add/Edit Location Settings | PMS";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+
+
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("LivingAreas", "Setup")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> Back to Locations</a>
+        </div>
+    </div>
+
+    <!-- form start -->
+    @using (Html.BeginForm("LocationSettings", "Setup", FormMethod.Post, new { enctype = "multipart/form-data", id = "inspection_fields_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.LocationId)
+
+
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+            <div class="row col-md-12">
+                <div class="row">
+                    
+                    <h4>Bank Detail</h4>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Bank)
+
+                            @Html.TextBoxFor(x => x.Bank, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter Bank " })
+                        </div>
+                        @Html.ValidationMessageFor(x => x.Bank)
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Branch)
+                            @Html.TextBoxFor(x => x.Branch, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter Branch Code" })
+                        </div>
+                        @Html.ValidationMessageFor(x => x.Branch)
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Title)
+                            @Html.TextBoxFor(x => x.Title, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter Title", })
+                        </div>
+                        @Html.ValidationMessageFor(x => x.Title)
+                    </div>
+                    <div class="row">
+                        <hr />
+                        <div class="col-md-4">
+                            <br />
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.Account)
+                                @Html.TextBoxFor(x => x.Account, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter Bank Account" })
+                            </div>
+                            @Html.ValidationMessageFor(x => x.Account)
+                        </div>
+
+                        <div class="col-md-4">
+                            <br />
+
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.Currency)
+                                @Html.TextBoxFor(x => x.Currency, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter Currency" })
+                            </div>
+                            @Html.ValidationMessageFor(x => x.Currency)
+                        </div>
+                        <div class="col-md-4">
+                            <br />
+
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.SwiftCode)
+                                @Html.TextBoxFor(x => x.SwiftCode, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter SwiftCode" })
+                            </div>
+                            @Html.ValidationMessageFor(x => x.SwiftCode)
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <br />
+                                <div class="form-group">
+                                    @Html.LabelFor(x => x.IBAN, "IBAN")
+                                    @Html.TextBoxFor(x => x.IBAN, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter IBAN" })
+                                </div>
+                                @Html.ValidationMessageFor(x => x.IBAN)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+                <hr />
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.RegistrationFee)
+                            @Html.TextBoxFor(x => x.RegistrationFee, new { @min = 1, @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter Registration Amount", @type = "number" })
+                        </div>
+                        @Html.ValidationMessageFor(x => x.RegistrationFee)
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.CompanyName, "Company Name")
+                            @Html.TextBoxFor(x => x.CompanyName, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter Company Name" })
+                        </div>
+                        @Html.ValidationMessageFor(x => x.CompanyName)
+                    </div>
+                    @if (Model.LocationId == ((int)Enumeration.LocationEnum.Muscat))
+                    {
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.VATNo, "VATIN")
+                                @Html.TextBoxFor(x => x.VATNo, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter VATIN" })
+                            </div>
+                            @Html.ValidationMessageFor(x => x.VATNo)
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.VATNo, "TRN")
+                                @Html.TextBoxFor(x => x.VATNo, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter TRN" })
+                            </div>
+                            @Html.ValidationMessageFor(x => x.VATNo)
+                        </div>
+                    }
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.TransactionPassword)
+
+                        <div class="input-group">
+                            @Html.PasswordFor(x => x.TransactionPassword, new { @class = "form-control", placeholder = "Enter Transaction password", value = Model.TransactionPassword })
+                            <div class="input-group-addon">
+                                <i class="fa fa-eye toggle-transaction-password" data-element="input[name='TransactionPassword']"></i>
+                            </div>
+                        </div>
+
+                        @Html.ValidationMessageFor(x => x.TransactionPassword)
+
+                    </div>
+                </div>
+
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.PaymentGateWay, "Payment Gateway")
+                            <div>
+                                <input type="radio" id="PaymentGateWay" class="PaymentGateWay" value="1" name="PaymentGateWay" @(Model.PaymentGateWay == "1" ? "checked" : "") checked />
+                                <label for="Thanwani Online"> Thawani Online</label>
+                                &nbsp; &nbsp; &nbsp;
+                                <input type="radio" id="PaymentGateWay" class="PaymentGateWay" value="2" name="PaymentGateWay" @(Model.PaymentGateWay == "2" ? "checked" : "") />
+                                <label for="Network Internation"> Network International</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.ReferralProgram, "Referral Program")
+                            <div>
+                                @Html.RadioButtonFor(x => x.ReferralIsActive, true, new { @checked = "checked", @class = "Referral" })
+                                <label for="Active"> Active</label>
+                                &nbsp; &nbsp; &nbsp;
+                                @Html.RadioButtonFor(x => x.ReferralIsActive, false, new { @class = "Referral" })
+
+                                <label for="InActive"> InActive</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="display: show; margin-bottom: 15px;" id="ReferralAmount">
+                    <div class="col-md-3">
+
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.ReferralProgram, "Referral Program-Dicounted Amount")
+                            @Html.TextBoxFor(x => x.ReferralProgram, htmlAttributes: new
+                            {
+                                type = "text",
+                                placeholder = "Enter Amount",
+                                @class = "form-control pull-right",
+                                autocomplete = "off"
+                            })
+                            @Html.ValidationMessageFor(x => x.ReferralProgram)
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.PreCheckinDocumention, "Pre Checkin Documentation")
+                            <div>
+                                @Html.RadioButtonFor(x => x.PreCheckinDocumentationIsActive, true, new { @checked = "checked", @class = "Prechekin" })
+                                <label for="Active"> Active</label>
+                                &nbsp; &nbsp; &nbsp;
+                                @Html.RadioButtonFor(x => x.PreCheckinDocumentationIsActive, false, new { @class = "Prechekin" })
+
+                                <label for="InActive"> InActive</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Def_Acc_Rec, "Default Account Receivable")
+                            @Html.DropDownList("Def_Acc_Rec", null, "Select Account...", htmlAttributes: new { @class = "form-control select2" })
+                            @Html.ValidationMessageFor(x => x.Def_Acc_Rec)
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Def_Acc_Pay, "Default Account Payable")
+                            @Html.DropDownList("Def_Acc_Pay", null, "Select Account...", htmlAttributes: new { @class = "form-control select2" })
+                            @Html.ValidationMessageFor(x => x.Def_Acc_Pay)
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Def_Acc_Discount, "Default Account Discount")
+                            @Html.DropDownList("Def_Acc_Discount", null, "Select Account...", htmlAttributes: new { @class = "form-control select2" })
+                            @Html.ValidationMessageFor(x => x.Def_Acc_Discount)
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Def_Acc_Adv_Pay, "Default Account Advance Payment")
+                            @Html.DropDownList("Def_Acc_Adv_Pay", null, "Select Account...", htmlAttributes: new { @class = "form-control select2" })
+                            @Html.ValidationMessageFor(x => x.Def_Acc_Adv_Pay)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row col-md-12">
+
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.CodeOfConduct_EN)
+                    @Html.TextAreaFor(x => x.CodeOfConduct_EN, new { @class = "form-control", id = "MessageBodyEN", name = "MessageBodyEN", placeholder = "Enter Message", style = "min-height:125px;" })
+                    @Html.ValidationMessageFor(x => x.CodeOfConduct_EN)
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row col-md-12">
+
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.CodeOfConduct_AR)
+                    @Html.TextAreaFor(x => x.CodeOfConduct_AR, new { @class = "form-control", id = "MessageBodyAR", name = "MessageBodyAR", placeholder = "Enter Message", style = "min-height:125px;" })
+                    @Html.ValidationMessageFor(x => x.CodeOfConduct_AR)
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row col-md-12">
+
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.TermsAndCondition_EN)
+                    @Html.TextAreaFor(x => x.TermsAndCondition_EN, new { @class = "form-control", id = "TermsMessageBodyEN", name = "TermsMessageBodyEN", placeholder = "Enter Message", style = "min-height:125px;" })
+                    @Html.ValidationMessageFor(x => x.TermsAndCondition_EN)
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row col-md-12">
+
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.TermsAndCondition_AR)
+                    @Html.TextAreaFor(x => x.TermsAndCondition_AR, new { @class = "form-control", id = "TermsMessageBodyAR", name = "TermsMessageBodyAR", placeholder = "Enter Message", style = "min-height:125px;" })
+                    @Html.ValidationMessageFor(x => x.TermsAndCondition_AR)
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad btnSave" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+    <script src="https://cdn.ckeditor.com/4.15.0/full/ckeditor.js"></script>
+
+
+    <script>
+        $(function () {
+            //Date picker
+            $('.datepicker').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy",
+                startDate: new Date()
+            })
+
+            $('.select2').select2()
+        })
+
+        $(document).ready(function () {
+
+        });
+
+        CKEDITOR.replace('MessageBodyEN', {
+            uiColor: '#CCEAEE',
+            removePlugins: 'elementspath'
+        });
+
+        CKEDITOR.replace('MessageBodyAR', {
+            uiColor: '#CCEAEE',
+            removePlugins: 'elementspath'
+        });
+
+        CKEDITOR.replace('TermsMessageBodyEN', {
+            uiColor: '#CCEAEE',
+            removePlugins: 'elementspath'
+        });
+
+        CKEDITOR.replace('TermsMessageBodyAR', {
+            uiColor: '#CCEAEE',
+            removePlugins: 'elementspath'
+        });
+        $(document).ready(function () {
+            var val = $('#ReferralIsActive').is(':checked');
+            //var value=$(".Referral").val();
+            if (val == true) {
+                $("#ReferralAmount").show();
+            }
+
+            else if (val == false) {
+                $("#ReferralAmount").hide();
+
+            }
+        });
+        $('.Referral').on('change', function () {
+            var value = $(this).val();
+            if (value == "True") {
+                $("#ReferralAmount").show();
+            }
+            ShowResidentDiv(value);
+
+        });
+        function ShowResidentDiv(value) {
+            if (value == "True") {
+                $("#ReferralAmount").show();
+            }
+
+            else {
+                $("#ReferralAmount").hide();
+
+            }
+        }
+
+        $(".toggle-transaction-password").click(function () {
+
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            //var input = $($(this).attr("toggle"));
+            var input = $($(this).data('element'));
+            console.log(input);
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
+            }
+        });
+
+    </script>
+}
+

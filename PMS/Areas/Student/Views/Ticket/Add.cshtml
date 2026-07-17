@@ -1,0 +1,248 @@
+﻿@model PMS.DTO.ViewModels.TicketViewModel
+@{
+    Layout = "~/Areas/Student/Views/Shared/_Layout.cshtml";
+    ViewBag.Header = "Complaint";
+    ViewBag.HeaderDescription = "Add New Complaint";
+    ViewBag.Title = "Create New Complaint | PMS";
+    var Detail = Model.TicketDetailViewModel == null ? new PMS.DTO.ViewModels.TicketDetailViewModel() : Model.TicketDetailViewModel.FirstOrDefault();
+}
+<style>
+    .highlight {
+        border-color: red;
+    }
+
+    .dropzone textarea:focus, .dropzone textarea {
+        outline: none;
+        border: none;
+        width: 100%;
+    }
+
+    #mydropzone {
+        padding: 3px;
+        border-color: #d2d6de;
+    }
+
+    .dz-success-mark, .dz-error-message, .dz-error-mark {
+        display: none !important;
+    }
+
+    .footer-custom-editor {
+        padding: 12px;
+        background: #f4f3f3;
+        margin-bottom: 11px;
+        border: 1px solid rgba(0,0,0,.3);
+        border-top: 0px transparent;
+    }
+    .dz-progress {
+        display: none !important;
+    }
+</style>
+<link rel="stylesheet" href="~/Assets/plugins/Autocomplete/styles.css">
+<link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Index", "Ticket",new {area="Student"})" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i>Back to Complaints</a>
+        </div>
+    </div>
+    <form id="credit-form">
+        @Html.HiddenFor(x => x.Id)
+        @Html.Hidden("DetailId", Detail.Id)
+        <div class="row">
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Name, "Subject")
+                    @Html.TextBoxFor(x => x.Name, htmlAttributes: new { @class = "form-control pull-right", placeholder = "Subject", autocomplete = "off" })
+                    @Html.ValidationMessageFor(x => x.Name)
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.GroupId, "Group")
+                    @Html.DropDownList("GroupId", null, "--- Select Group ---", htmlAttributes: new { @class = "form-control", @rows = 5 })
+                    @Html.ValidationMessageFor(x => x.GroupId)
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Description, "Reason")
+                    <div class="clsbox-1" runat="server">
+                        <div class="dropzone clsbox" id="mydropzone">
+                            <textarea type="text" name="description" id="description" placeholder=" Description" rows="4">@(Detail.Description)</textarea>
+                            <div class="dz-default dz-message" style="display: block;">
+                                <button class="dz-button" type="button">
+                                    Drop or Click here To Add File
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-footer">
+            <button class="btn btn-themyriad savebtn" type="button" onclick="Submit()">Save</button>
+        </div>
+    </form>
+
+</div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script src="~/Assets/plugins/Autocomplete/jquery.autocomplete.js"></script>
+<script src="~/Assets/plugins/Autocomplete/jquery.mockjax.js"></script>
+<script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval") 
+    @Scripts.Render("~/bundles/datepicker/Js")
+
+    <script>
+        var ExistingFile = [];
+        Dropzone.autoDiscover = false;
+        // Dropzone class:
+        // Dropzone class:
+        var myDropzone = new Dropzone("div#mydropzone", {
+            addRemoveLinks: true,
+            url: "asdasd",
+            maxFiles: 10, //change limit as per your requirements
+            dictMaxFilesExceeded: "Maximum upload limit reached",
+            dictInvalidFileType: "upload only JPG/PNG",
+            dictDefaultMessage: "Drop or Click here To Add File",
+            autoProcessQueue: false,
+            init: function () {
+                // Hack: Add the dropzone class to the element
+                $(this.element).addClass("dropzone");
+                this.on("removedfile", function (file) {
+                    if (file.hasOwnProperty("serverID")) {
+
+                        ExistingFile = $.grep(ExistingFile, function (e) {
+                            return e.serverID != file.serverID;
+                        });
+                    }
+                });
+            }
+        });
+        $(document).ready(function () {
+
+            var detailId = $("#DetailId").val();
+            if (detailId != "" && detailId != undefined && detailId != null) {
+                $.ajax({
+                    url: "/Student/Ticket/GetAttachementById",
+                    method: "Get",
+                    data: { id: detailId },
+                    success: function (data) {
+                        if (data.success) {
+                            $.each(data.data, function (index, value) {
+
+                                var mockFile = {
+                                    name: value.FileName,
+                                    size: value.FileSize,
+                                    serverID: value.Id
+                                };
+
+                                myDropzone.emit("addedfile", mockFile);
+                                myDropzone.emit("thumbnail", mockFile, value.FileUrl);
+                                myDropzone.emit("complete", mockFile);
+
+                                ExistingFile.push(mockFile);
+                            });
+
+                        }
+                    }
+                });
+            }
+        });
+        function Submit() {
+            Loaderbtn(true);
+            if (validate()) {
+                $('.savebtn')
+                    .prop("disabled", true)
+                    .html('<i class="fa fa-2x fa-sync-alt fa-spin  fa-refresh loading "></i>')
+                    .css('background', '#016891 !important');
+                var subject = $("#Name").val();
+                var description = $("#description").val();
+                var groupId = $("#GroupId").val();
+                var Id = $("#Id").val();
+                var ticket = {
+                    Id:Id,
+                    Name: subject,
+                    Description: description,
+                    GroupId: groupId
+                };
+
+                var formdata = new FormData();
+                var model = JSON.stringify(ticket);
+
+                var files = myDropzone.getAcceptedFiles();
+
+                $.each(files, function (index, value) {
+                    formdata.append(value.name, value, value.name);
+                });
+
+                formdata.append("detail", model);
+                formdata.append("ExistingFiles", JSON.stringify(ExistingFile));
+                $.ajax({
+                    url: "/Student/Ticket/Add",
+                    method: "Post",
+                    processData: false,
+                    contentType: false,
+                    data: formdata,
+                    success: function (data) {
+                        if (data.success) {
+                            window.location.replace(GetFormatedUrl('/Student/Ticket/Index'));
+                        } else {
+                            Toast.show(data.message, "error");
+                        }
+                    }
+                });
+
+            } else {
+                Loaderbtn(false);
+            }
+        }
+        // If you use jQuery, you can use the jQuery plugin Dropzone ships with:
+
+        function validate() {
+            var subject = $("#Name").val();
+            var description = $("#description").val();
+            var groupId = $("#GroupId").val();
+            if (subject == null || subject == '' || subject == undefined) {
+                showMessage('Please Enter Subject!');
+                return false;
+            }
+            if (description == null || description == '' || description == undefined) {
+                showMessage('Please Add Description!');
+                return false;
+            }
+            if (groupId == null || groupId == '' || groupId == undefined) {
+                showMessage('Please Select Group!');
+                return false;
+            }
+
+            return true;
+        }
+        function Loaderbtn(show) {
+            if (!show) {
+                $('.savebtn')
+                    .prop("disabled", false)
+                    .html('')
+                    .text('Save');
+            }
+            else {
+                $('.savebtn')
+                    .prop("disabled", true)
+                    .html('<i class="fa fa-2x fa-sync-alt fa-spin  fa-refresh loading "></i>')
+                    .css('background', '#016891 !important');
+            }
+        }
+    </script>
+}
+

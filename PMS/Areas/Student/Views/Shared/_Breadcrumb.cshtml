@@ -1,0 +1,18 @@
+﻿@using PMS.DTO.ViewModels
+@{
+    List<BreadCrumb> breadCrumb = ViewBag.breadcrumb as List<BreadCrumb>;
+}
+
+<h1>
+    @ViewBag.Header
+    <small>@ViewBag.HeaderDescription</small>
+</h1>
+
+@if (breadCrumb != null || false)
+{
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+        <li class="active">Here</li>
+    </ol>
+}
+

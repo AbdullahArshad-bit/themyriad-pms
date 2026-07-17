@@ -1,0 +1,254 @@
+﻿@model PMS.DTO.ViewModels.SetupViewModels.AddPriceConfigVM
+
+@using PMS.Common.Classes
+
+@{
+    /**/
+
+    ViewBag.Header = "Price Configuration";
+    ViewBag.HeaderDescription = "";
+    ViewBag.Title = "Price Configuration | PMS";
+
+    int TRMID = Model.TermID;
+
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+}
+
+
+<div class="box box-danger">
+    @if (Model.PriceConfigID > 0)
+    {
+        if (User.IsInRole(AppUserRoles.view_price_config))
+        {
+            <div class="box-header with-border">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("PriceConfig", "Setup")" @*href="\Setup\PriceConfig"*@ class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> Back to all price config.</a>
+                </div>
+            </div>
+        }
+    }
+    <div class="box-header with-border">
+    </div>
+    <!-- /.box-header -->
+    <!-- form start -->
+
+    @if (User.IsInRole(AppUserRoles.add_price_config))
+    {
+        using (Html.BeginForm("AddPriceConfig", "Setup", FormMethod.Post, new { enctype = "multipart/form-data", id = "price_config_form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(x => x.PriceConfigID)
+
+<div class="box-body">
+    @if (ViewBag.error != null)
+    {
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+            @ViewBag.error
+        </div>
+    }
+    @if (ViewBag.success != null)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-check"></i> Alert!</h4>
+            @ViewBag.success
+        </div>
+    }
+
+    <div class="row col-md-12">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.LocationId, "Location")
+                    @Html.DropDownList("LocationId", null, "Select...", htmlAttributes: new { @class = "form-control", @required = "required", @disabled = "disabled" })
+                    @Html.ValidationMessageFor(x => x.LocationId)
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Is Available</label>
+                    <div>
+                        <label class="switch">
+                            <input type="checkbox" name="IsActive" id="IsActive" value="@Model.IsAvailable" @(Model.IsAvailable ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    @Html.ValidationMessageFor(x => x.IsAvailable)
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Term</label>
+
+                @Html.DropDownListFor(x => x.TermID, null, "-- Select Location First --", new { @Class = "form-control", @readonly = "readonly" })
+
+                @Html.ValidationMessageFor(x => x.TermID)
+            </div>
+        </div>
+
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Room Type</label>
+
+                @Html.DropDownListFor(x => x.RoomTypeID, null, "-- Room Type --", new { @Class = "form-control", @readonly = "readonly" })
+
+                @Html.ValidationMessageFor(x => x.RoomTypeID)
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row col-md-12">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Currency</label>
+                @Html.DropDownList("Currency", null, "Select...  ", htmlAttributes: new { @class = "Dropdown form-control select2", @required = "required", style = "min-width:125px" })
+
+
+                @Html.ValidationMessageFor(x => x.Currency)
+
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Price</label>
+
+                @Html.TextBoxFor(x => x.Price, new { @min = 1, @class = "form-control", placeholder = "Enter Price", @type = "number" })
+
+                @Html.ValidationMessageFor(x => x.Price)
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row col-md-12">
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Initial Deposit</label>
+
+                @Html.TextBoxFor(x => x.Deposit, new { @class = "form-control", placeholder = "Enter Initial Deposit", @type = "number" })
+
+                @Html.ValidationMessageFor(x => x.Deposit)
+
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Cleaning Charge</label>
+
+                @Html.TextBoxFor(x => x.CleaningCharge, new { @class = "form-control", placeholder = "Enter Cleaning Charge", @type = "number" })
+
+                @Html.ValidationMessageFor(x => x.CleaningCharge)
+
+            </div>
+        </div>
+
+    </div>
+    <div class="row col-md-12">
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>OrderBy</label>
+
+                @Html.TextBoxFor(x => x.OrderBy, new { @class = "form-control", placeholder = "Enter OrderBy", @type = "number" })
+
+                @Html.ValidationMessageFor(x => x.OrderBy)
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="no-padding col-md-12">
+        <div class="col-md-6">
+            <div class="form-group">
+                <button type="submit" class="btn btn-themyriad">Save</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+            <!-- /.box-body -->
+
+        }
+    }
+
+
+
+
+</div>
+
+@section scripts {
+    <script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.11/sorting/date-eu.js" type="text/javascript"></script>
+    <script>
+
+        $('#LocationId').on('change', function () {
+            //$('#RoomId').html('');
+            var LocationId = $(this).val();
+            var url = GetFormatedUrl("/Setup/GetTermsAndRoomsBYLocationId");
+            $.ajax({
+                type: "Get",
+                url: url,
+                data: {
+                    Id: LocationId
+                },
+                success: function (data) {
+                    var data = data;
+                    var RoomsTypes = data.Rooms;
+                    $('#TermID').html('');
+
+                    var html = "<option value=''>--Select Term --</option>";
+                    $.each(data.Terms, function (key, value) {
+                        html = html + "<option Value='" + value.TermID + "'>" + value.TermName + "</option>"
+                    })
+                    $('#TermID').html(html);
+                    $("#RoomTypeID").html('');
+
+                    var html = "<option value=''>--Select Room --</option>";
+                    $.each(data.Rooms, function (key, value) {
+                        html = html + "<option Value='" + value.RoomTypeID + "'>" + value.RoomName + "</option>"
+                    })
+                    $('#RoomTypeID').html(html);
+                }
+            });
+        });
+        function setInitialLocation() {
+            
+            var initialLocation = localStorage.getItem("selectedLocation");
+
+            if (initialLocation) {
+
+                $('#LocationId').val(initialLocation);
+                $("#LocationId").prop('disabled', true);
+
+              /*  $('#LocationId').change();*/
+            }
+        }
+        setInitialLocation();
+    </script>
+}
+
+
+
+
+

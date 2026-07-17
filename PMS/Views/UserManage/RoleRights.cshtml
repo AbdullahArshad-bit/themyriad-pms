@@ -1,0 +1,151 @@
+﻿@model PMS.DTO.ViewModels.UserManageViewModels.RoleRightsVM
+@{
+    ViewBag.Header = "Role Permissions";
+    ViewBag.HeaderDescription = "Role Permissions";
+    ViewBag.Title = "Role Permissions | PMS";
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        @if (User.IsInRole(PMS.Common.Classes.AppUserRoles.view_roles))
+        {
+            <div class="box-header">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("Roles", "UserManage")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Roles</a>
+                </div>
+            </div>
+        }
+
+        @using (Html.BeginForm("RoleRights", "UserManage", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_room_type_form" }))
+        {
+            @Html.HiddenFor(x => Model.RoleId)
+            @Html.HiddenFor(x => Model.UserMasterId)
+
+    <div class="box-body">
+        @if (ViewBag.error != null)
+        {
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                @ViewBag.error
+            </div>
+        }@if (ViewBag.success != null)
+        {
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                @ViewBag.success
+            </div>
+        }
+        <div class="checkbox">
+            <label style="font-weight:bold;font-size:large;">
+                <input type="checkbox" id="selectAll" />
+                Select All
+            </label>
+        </div>
+
+        @for (int i = 0; i < Model.MenuList.Count; i++)
+        {
+            <div class="checkbox">
+                <label style="font-weight:bold;">
+                    <input type="checkbox" class="checkAll" data-id="@Model.MenuList[i].MainMenuId" />
+                    @Model.MenuList[i].MainMenuName
+                </label>
+            </div>
+
+            @Html.HiddenFor(x => @Model.MenuList[i].MainMenuName)
+            @Html.HiddenFor(x => @Model.MenuList[i].MainMenuId)
+
+            <div style="overflow: auto; width:100%" id="@Model.MenuList[i].MainMenuId">
+
+                <table class="table table-bordered table-striped">
+
+                    <tbody>
+                        <tr>
+                            @for (int j = 0; j < Model.MenuList[i].SubMenuList.Count; j++)
+                            {
+                                @Html.HiddenFor(x => Model.MenuList[i].SubMenuList[j].SubMenuId)
+                                @Html.HiddenFor(x => Model.MenuList[i].SubMenuList[j].DisplayName)
+                                @Html.HiddenFor(x => Model.MenuList[i].SubMenuList[j].ControllerName)
+                                @Html.HiddenFor(x => Model.MenuList[i].SubMenuList[j].ActionName)
+
+
+                                <td style="white-space:nowrap;padding-right:30px;">
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBoxFor(x => Model.MenuList[i].SubMenuList[j].IsChecked, new { @class = "checkbox" })
+                                            @Model.MenuList[i].SubMenuList[j].DisplayName
+                                        </label>
+                                    </div>
+                                </td>
+
+                            }
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        }
+
+
+
+    </div>
+
+            <div class="box-footer">
+                <input type="submit" class="btn btn-themyriad" value="Save">
+            </div>
+
+        }
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.11/sorting/date-eu.js" type="text/javascript"></script>
+
+    <script>
+        $(function () {
+            //$('#roles-table').DataTable({});
+        });
+        $("#selectAll").click(function () {
+            if (this.checked) {
+                $('input:checkbox').each(function () {
+                    this.checked = true;
+                });
+            } else {
+                $('input:checkbox').each(function () {
+                    this.checked = false;
+                });
+            }
+        });
+        
+        $(".checkAll").click(function () {
+
+            var id = $(this).data("id");
+            if (this.checked) {
+                $('#' + id + ' input:checkbox').each(function () {
+                    this.checked = true;
+                });
+            } else {
+                $('#' + id + ' input:checkbox').each(function () {
+                    this.checked = false;
+                });
+            }
+
+
+        });
+
+
+
+
+    </script>
+}

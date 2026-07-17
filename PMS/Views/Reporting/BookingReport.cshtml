@@ -1,0 +1,272 @@
+﻿@model IEnumerable<PMS.DTO.ViewModels.ReportingViewModels.BookingReportVM>
+@using PMS.Common.Classes
+
+@{ ViewBag.Header = "Booking Report";
+    ViewBag.HeaderDescription = "Booking Report";
+    ViewBag.Title = "Booking Report | PMS";
+}
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+}
+<style>
+    .right {
+        text-align: right;
+    }
+</style>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="">
+            <div class="">
+                <div class="col-md-2">
+                    <label>From Date</label>
+                    <input name="daterange" type="text" autocomplete="off" id="FromDate" class="form-control from_date" value="@ViewBag.FromDate" placeholder="From Date" />
+                </div>
+                <div class="col-md-2">
+                    <label>To Date</label>
+                    <input name="daterange" type="text" autocomplete="off" id="ToDate" class="form-control to_date" value="@ViewBag.ToDate" placeholder="To Date" />
+                </div>
+
+
+                <div class="col-md-3">
+                    <label> &nbsp; </label>
+                    <br />
+                    <button type="button" onclick="BookingReport();" class="btn btn-themyriad btn-bordered waves-effect w-md"><i class="fa fa-search"></i> <span> Search </span> </button>
+                    @if (User.IsInRole(AppUserRoles.Export_Booking_Report))
+                    {
+                        <button type="button" onclick="GetExcel()" class="btn btn-success btn-bordered waves-effect w-md button-effect"  style="margin-left: 5px;"> <i class="fa fa-download"> </i> <span> Export Report </span> </button>
+
+                    }
+                </div>
+            </div>
+            <br />
+
+        </div>
+
+        <div class="col-md-12">
+            <hr />
+        </div>
+        <div class="box-body">
+            <div style="overflow: auto; width:100%;white-space:nowrap;">
+                <table class="table table-bordered table-striped data-table" id="BookingTable">
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Booking Number</th>
+                            <th>Title</th>
+                            <th>MyriadID</th>
+                            <th>FullName</th>
+                            <th>Gender</th>
+                            <th>DOB</th>
+                            <th>Booking Date</th>
+                            <th>CheckIn Date</th>
+                            <th>CheckOut Date</th>
+                            <th>Occupancy</th>
+                            <th>Duration Month</th>
+                            <th>Frequency</th>
+                            <th>Duration Description</th>
+                            <th>Room Type </th>
+                            <th>Room Code </th>
+                            <th>Status </th>
+                            <th>Email</th>
+                            <th>University </th>
+                            <th>Phone</th>
+                            <th>Channel</th>
+                            <th>Source</th>
+                            <th>Uni Ref No</th>
+                            <th>Price</th>
+                            <th>Deposit</th>
+                            <th>Currency</th>
+                            <th>Payment Type</th>
+                            <th>Requests</th>
+                            <th>HearFrom </th>
+                            <th>HearFromOther </th>
+                            <th>Nationality </th>
+                            <th>CardLastDigits </th>
+                            <th>TransRef </th>
+                            <th>Message </th>
+                            <th>Tenant Passport Number</th>
+                            <th>Guardian FullName</th>
+                            <th>Guardian Phone</th>
+                            <th>Guardian Email</th>
+                            <th>Guardian Relation</th>
+                            <th>Preferable Floor</th>
+                            <th>Preferable View</th>
+                            <th>Religions</th>
+                            <th>Nationalities</th>
+                            <th>Universities</th>
+                            <th>AgeRange</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.LocationName</td>
+                                <td>@item.BookingNumber</td>
+                                <td>@item.Title</td>
+                                <td>@item.MyriadID</td>
+                                <td>@item.FullName</td>
+                                <td>@item.Gender</td>
+                                <td>@item.DOB</td>
+                                <td>@item.BookingDate.ToString("dd/MM/yyyy")</td>
+                                <td>@item.CheckInDate</td>
+                                <td>@item.CheckOutDate</td>
+                                <td>@item.Duration</td>
+                                <td>@item.DurationMonth</td>
+                                <td>@item.Frequency</td>
+                                <td>@item.DurationDescription</td>
+                                <td>@item.RoomName</td>
+                                <td>@item.RoomCode</td>
+                                @{ if (item.Status == Enumeration.BookingRptStatus.Allocated.ToString())
+                                    {
+                                        <td><span class='label label-success'>@item.Status</span></td>
+                                    }
+                                    else if (item.Status == Enumeration.BookingRptStatus.Pending.ToString())
+                                    {
+                                        <td><span class='label label-warning'>@item.Status</span></td>
+                                    }
+
+                                    else if (item.Status == Enumeration.BookingRptStatus.Cancelled.ToString())
+                                    {
+                                        <td><span class='label label-danger'>@item.Status</span></td>
+                                    }
+                                    else
+                                    {
+                                        <td><span class="label label-danger">@item.Status</span></td>
+                                    }
+                                }
+                                <td>@item.Email</td>
+                                <td>@item.University</td>
+                                <td>@item.Phone</td>
+                                <td>@item.Channel</td>
+                                <td>@item.Source</td>
+                                <td>@item.UniReferenceNo</td>
+                                <td>@item.Price</td>
+                                <td>@item.Deposit</td>
+                                <td>@item.Currency</td>
+                                <td>@item.PaymentType</td>
+                                <td>@item.AccessibilityRequest</td>
+                                <td>@item.HearFrom</td>
+                                <td>@item.HearFromOther</td>
+                                <td>@item.Nationality</td>
+                                <td>@item.CardLastDigits</td>
+                                <td>@item.TranRef</td>
+                                <td>@item.Message</td>
+                                <td>@item.TenantPassportNumber</td>
+                                <td>@item.GuardianFullName</td>
+                                <td>@item.GuardianPhone</td>
+                                <td>@item.GuardianEmail</td>
+                                <td>@item.GuardianRelation</td>
+                                <td>@item.PreferableFloor</td>
+                                <td>@item.PreferableView</td>
+                                <td>@item.Religions</td>
+                                <td>@item.Nationalities</td>
+                                <td>@item.Universities</td>
+                                <td>@item.AgeRange</td>
+
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+@section scripts{
+
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#BookingTable').DataTable({
+
+                "paging": true,
+                "searching": true,
+                "lengthChange": true,
+                "ordering": true,
+                "scrollCollapse": true,
+                "scrollY": '70vh',
+                "scrollX": "auto",
+                "iDisplayLength": 100,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+                dom: 'Blfrtip',
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                buttons: [
+                    '',
+                ],
+                columnDefs: [
+                    { type: 'date-euro', targets: 0 },
+                ]
+            });
+        });
+        function Print() {
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+            window.open('/Reporting/GetBookingDetailPdfReport?FromDate=' + SD + "&ToDate=" + ED, '_blank');
+        }
+    </script>
+    <script type="text/javascript">
+
+        var startDate = new Date();
+        var FromEndDate = new Date();
+        var ToEndDate = new Date();
+        ToEndDate.setDate(ToEndDate.getDate() + 365);
+
+        $('.from_date').datepicker({
+            weekStart: 1,
+            startDate: '',
+            format: "dd/M/yyyy",
+            autoclose: true
+        })
+            .on('changeDate', function (selected) {
+                startDate = new Date(selected.date.valueOf());
+                $('.to_date').datepicker('setStartDate', startDate);
+            });
+        $('.to_date')
+            .datepicker({
+                weekStart: 1,
+                startDate: new Date($('.from_date').val()),
+                endDate: ToEndDate,
+                format: "dd/M/yyyy",
+                autoclose: true,
+            })
+            .on('changeDate', function (selected) {
+                FromEndDate = new Date(selected.date.valueOf());
+                FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                $('.from_date').datepicker('setEndDate', FromEndDate);
+            });
+
+        function BookingReport() {
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+            window.location.href = GetFormatedUrl("/Reporting/BookingReport?FromDate=" + SD + "&ToDate=" + ED);
+        };
+        function GetExcel() {
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+            window.location.href = GetFormatedUrl("/Reporting/ExportBookingReport?FromDate=" + SD + "&ToDate=" + ED);
+
+        }
+    </script>
+}

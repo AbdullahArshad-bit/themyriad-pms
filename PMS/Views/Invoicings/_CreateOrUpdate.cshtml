@@ -1,0 +1,347 @@
+﻿@model PMS.EF.Invoicing
+@using PMS.EF;
+@using PMS.Common.Classes
+@using PMS.DTO.ViewModels
+@{
+    var items = (List<InvoicingDetailVM>)ViewBag.InvoicingDetail;
+    var i = 0;
+}
+<link rel="stylesheet" href="~/Assets/plugins/Autocomplete/styles.css">
+
+
+@Html.HiddenFor(x => x.CreatedDate)
+@Html.HiddenFor(x => x.Id)
+@Html.HiddenFor(x => x.TermID, htmlAttributes: new { id = "OccupancyId" })
+
+<input type="hidden" id="NetAmount" name="NetAmount" />
+<input type="hidden" id="SubTotal" name="SubTotal" />
+<input type="hidden" id="Tax" name="Tax" />
+<input type="hidden" id="TaxAmount" name="Tax" />
+<input type="hidden" id="TotalDiscountAmount" name="TotalDiscountAmount" />
+<input type="hidden" id="FrequencyId" />
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Index", "Invoicings")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i>Back to Invoices</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                @Html.LabelFor(x => x.LocationId, "Location")
+                @Html.DropDownList("LocationId", null, "--- Select Location ---", htmlAttributes: new { @class = "form-control", @required = "required" })
+                @Html.ValidationMessageFor(x => x.LocationId)
+
+            </div>
+            <input class="ConfigId" id="ConfigId" hidden />
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-group">
+                @Html.LabelFor(x => x.InvoiceTypeId, "Invoice Type")
+                @Html.DropDownList("InvoiceTypeId", null, "--- Select Invoice Type ---", htmlAttributes: new { @class = "form-control ", @required = "required" })
+                @Html.ValidationMessageFor(x => x.InvoiceTypeId)
+
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                @Html.LabelFor(x => x.Code, "Code")
+                @Html.TextBoxFor(x => x.Code, htmlAttributes: new { @class = "form-control pull-right", autocomplete = "off", @readonly = "", })
+                @Html.ValidationMessageFor(x => x.Code)
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.InvoiceDate, "Invoice Date")
+
+                <div class="input-group date">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    @Html.TextBoxFor(x => x.InvoiceDate, new { id = "datepicker", @Value = Model.InvoiceDate.ToString("dd/MMM/yyyy"), type = "datetime", @class = "form-control pull-right", autocomplete = "off", @readonly = "", placeholder = "Select Date" })
+
+                </div>
+
+            </div>
+        </div>
+        @*<div class="col-md-3">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.DueDate, "Due Date")
+                    <div class="input-group date">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        @Html.TextBoxFor(x => x.DueDate, new { id = "dueDatePicker", @Value = Model.DueDate?.ToString("dd/MMM/yyyy"), type = "text", @class = "form-control pull-right", autocomplete = "off", @readonly = "readonly", placeholder = "Due Date" })
+                    </div>
+                </div>
+            </div>*@
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.StudentId, "Resident ID")
+                @Html.DropDownList("StudentId", null, "Select...", htmlAttributes: new { @class = "form-control select2 StudentId", @required = "required" })
+                @Html.ValidationMessageFor(x => x.StudentId)
+            </div>
+        </div>
+    </div>
+    <div class="">
+        <div class="col-md-12">
+            <div class="form-group">
+                @Html.LabelFor(x => x.Remarks)
+                @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", placeholder = "Remarks" })
+                @Html.ValidationMessageFor(x => x.Remarks)
+            </div>
+        </div>
+    </div>
+    <hr class="border-pink" />
+    <div class="row">
+        <div class="col-md-12">
+            <table id="table1" class="table table-striped  table-responsive no-footer">
+                <thead>
+                    <tr>
+                        <th style="display:none" class=""></th>
+                        <th col="code" class="col-md-3">Service</th>
+                        <th col="qnt" class="amount col-md-2">Description </th>
+                        <th col="fromDate" class="datetd" width="12%">FromDate</th>
+                        <th col="toDate" class="datetd" width="12%">toDate</th>
+                        <th col="lastbuyrate" class="amount col-md-1" width="12%">Amount</th>
+                        <th col="lastbuyrate" class="amount col-md-1">Tax</th>
+                        <th col="discount" class="amount col-md-1">Discount%</th>
+                        <th col="lastbuyrate" class="amount col-md-3">Net Amount</th>
+                    </tr>
+                </thead>
+                <tbody class="tbdyGRN tbdyClone" id="tbody">
+                    @if (items == null || items.Count() == 0)
+                    {
+                        <tr class="parentRowGrider">
+                            <td style="display:none" class="amount"></td>
+                            <td>
+                                <select name="det[0][code]" class="items form-control items">
+                                    <option value="">--- Select Service ---</option>
+                                    @if (ViewBag.serviceid != null)
+                                    {
+                                        foreach (SelectListItem svc in (SelectList)ViewBag.serviceid)
+                                        {
+                                            <option value="@svc.Text" data-id="@svc.Value">@svc.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <input name="det[0][qnt]" type="text" class="form-control reqvalue NotNegative LimitChecker Desc" placeholder="Description" />
+                            </td>
+                            <td class="datetd">
+                                <input name="det[0][fromDate]" type="text" class="form-control date" id="fromDate" placeholder="dd-mm-yyyy" onfocus="Dateset()" />
+                            </td>
+                            <td class="datetd">
+                                <input name="det[0][toDate]" type="text" class="form-control date" id="toDate" placeholder="dd-mm-yyyy" onfocus="Dateset()" />
+                            </td>
+                            <td style="display:none;">
+                                <input name="det[0][baselastbuyrate]" type="text" class="form-control  basenetamountCls decimals" placeholder="Amount" readonly='readonly' />
+                            </td>
+                            <td>
+                                @if (Model.LocationId == (int)Enumeration.LocationEnum.Dubai && Model.InvoiceTypeId == (int)Enumeration.InvoiceTypes.Miscellaneous && User.IsInRole(AppUserRoles.Edit_Invoice_Amount))
+                                {
+                                    <input name="det[0][lastbuyrate]" type="text" class="form-control  netamountCls decimals" placeholder="Amount" />
+                                }
+                                else
+                                {
+                                    <input name="det[0][lastbuyrate]" type="text" class="form-control  netamountCls decimals" placeholder="Amount" readonly />
+                                }
+                            </td>
+                            <td>
+                                <input name="det[0][TaxIds]" type="text" class="form-control select2 taxes" placeholder="Tax" readonly='readonly' />
+
+                                @*@Html.DropDownList("TaxIds", null, htmlAttributes: new { @class = "form-control select2 taxes", @multiple = "multiple", @autocomplete = "off", @readonly = "readonly" })*@
+                            </td>
+
+
+
+                            @if (User.IsInRole(AppUserRoles.Add_Discount))
+                            {
+                                <td>
+                                    <input name="det[0][DiscountPercentage]" type="text" class="form-control discountPercentageCls" placeholder="Discount" />
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <input name="det[0][DiscountPercentage]" type="text" class="form-control discountPercentageCls" placeholder="Discount" readonly />
+                                </td>
+                            }
+                            <td>
+                                <input name="det[0][NetAmountPlusTax]" type="text" class="form-control  netamount" placeholder="Net Amount" readonly />
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        var j = -1;
+                        foreach (var item in items)
+                        {
+                            j = j + 1;
+
+                            <tr class="parentRowGrider">
+                                <td style="display:none" class="amount"></td>
+                                <td>
+                                    <select name="det[@j][code]" class="items form-control items" data-id="@item.ServiceId">
+                                        <option value="">--- Select Service ---</option>
+                                        @if (ViewBag.serviceid != null)
+                                        {
+                                            foreach (SelectListItem svc in (SelectList)ViewBag.serviceid)
+                                            {
+                                                <option value="@svc.Text" data-id="@svc.Value" @(svc.Value == item.ServiceId.ToString() ? "selected" : "")>@svc.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <input name="det[@j][qnt]" type="text" class="form-control reqvalue NotNegative LimitChecker Desc" value="@item.Description" placeholder="Description" disabled />
+                                </td>
+                                <td class="datetd">
+                                    <input name="det[@j][fromDate]" type="text" id="fromDate" onfocus="Dateset()" class="form-control date" value="@(item.FromDate.HasValue?item.FromDate.Value.Date.ToString("dd/MMM/yyyy"):"")" />
+                                </td>
+                                <td class="datetd">
+                                    <input name="det[@j][toDate]" type="text" id="toDate" onfocus="Dateset()" class="form-control date" value="@(item.ToDate.HasValue?item.ToDate.Value.Date.ToString("dd/MMM/yyyy"):"")" />
+                                </td>
+                                <td style="display:none;">
+                                    <input name="det[@j][baselastbuyrate]" type="text" class="form-control  basenetamountCls decimals" value="@item.BaseServicePrice" readonly='readonly' />
+                                </td>
+
+                                @if (User.IsInRole(AppUserRoles.Edit_Invoice_Amount) && item.LocationId == 17)
+                                {
+                                    <td>
+                                        <input name="det[@j][lastbuyrate]" type="text" class="form-control  netamountCls decimals" value="@item.Price" placeholder="Amount" />
+                                    </td>
+                                }
+
+                                else
+                                {
+                                    <td>
+                                        <input name="det[@j][lastbuyrate]" type="text" class="form-control  netamountCls decimals" value="@item.Price" placeholder="Amount" readonly="readonly" />
+                                    </td>
+                                }
+
+                                <td>
+                                    <select name=det[@j][TaxesIds] autocomplete="off" class="form-control select2 taxes" id="TaxIds" multiple="multiple" data-Taxids="@item.TaxesIds"></select>
+                                </td>
+                                @if (User.IsInRole(AppUserRoles.Add_Discount))
+                                {
+                                    <td>
+                                        <input name="det[@j][DiscountPercentage]" type="text" class="form-control discountPercentageCls" id="DiscountPercentage" value="@item.DiscountPercentage" placeholder="Discount" />
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        <input name="det[@j][DiscountPercentage]" type="text" class="form-control discountPercentageCls" id="DiscountPercentage" value="@item.DiscountPercentage" placeholder="Discount" readonly />
+                                    </td>
+                                }
+                                <td>
+                                    <input name="det[@j][NetAmountPlusTax]" type="text" class="form-control  netamount" value="@item.TotalAmount" placeholder="Net Amount" readonly />
+                                </td>
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+                <tfoot>
+                    <tr id="Add-New-Line">
+                        <td>
+                            <a href="#Line" class="fa fa-plus-circle Addnewrow">Add New</a>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <hr class="border-pink" />
+    <div class="col-md-4">
+        <div class="form-group">
+        </div><div class="form-group">
+        </div><div class="form-group">
+        </div><div class="form-group">
+        </div><div class="form-group">
+        </div>
+    </div>
+    <div class="col-md-5"></div>
+
+    <div class="col-md-3">
+        <div class="table-responsive">
+            <table class="table">
+                <tbody class="text-bold">
+                    <tr>
+                        <th style="width:50%">Subtotal:</th>
+                        <td class="SubTotal">00.00</td>
+                    </tr>
+                    <tr>
+                        <th>Tax Amount</th>
+                        <td class="TaxAmount">00.00</td>
+                    </tr>
+                    @if (User.IsInRole(AppUserRoles.Add_Discount))
+                    {
+                        <tr>
+                            <th>Discount Amount:</th>
+                            <td class="TotalDiscountAmount">00.00</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <th>Discount Amount:</th>
+                            <td class="TotalDiscountAmount">00.00</td>
+                        </tr>
+                    }
+                    <tr>
+                        <th>Net Total:</th>
+                        <td class="NetAmount">00.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="box-footer">
+        @if (Model.LocationId == ((int)Enumeration.LocationEnum.Muscat))
+        {
+
+            <button class="btn btn-themyriad savebtn" onclick="SaveInvoice(false);">Save</button>
+        }
+
+        @if (User.IsInRole(AppUserRoles.Approve_acc_Invoice))
+        {
+            <button class="btn btn-themyriad saveandapprovebtn" onclick="SaveInvoice(true);">Save & Approve</button>
+        }
+
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script src="~/Assets/plugins/Autocomplete/jquery.autocomplete.js"></script>
+<script src="~/Assets/plugins/Autocomplete/jquery.mockjax.js"></script>
+<script src="~/Content/Js/Invoicing/_CreateOrUpdate.js?v=@DateTime.Now.ToString(" hhmmsstt")"></script>
+
+<style>
+    .highlight {
+        border-color: red;
+    }
+</style>
+<script>
+
+        var userHasDiscountRole = @User.IsInRole(AppUserRoles.Add_Discount).ToString().ToLower();
+        var editInvoiceAmountRole = @User.IsInRole(AppUserRoles.Edit_Invoice_Amount).ToString().ToLower();
+        var dubaiLocationId = @((int)Enumeration.LocationEnum.Dubai);
+        var rentalInvoiceTypeId = @((int)Enumeration.InvoiceTypes.Rental);
+        var miscellaneousInvoiceTypeId = @((int)Enumeration.InvoiceTypes.Miscellaneous);
+
+</script>
+
+
+

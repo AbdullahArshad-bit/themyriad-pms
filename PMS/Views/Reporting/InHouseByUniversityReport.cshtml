@@ -1,0 +1,393 @@
+﻿@model IEnumerable<PMS.DTO.ViewModels.ReportingViewModels.InHouseByUniversityReportVM>
+@using PMS.Common.Classes
+
+@{ ViewBag.Header = "In-House By University Report";
+    ViewBag.HeaderDescription = "In-House By University Report";
+    ViewBag.Title = "In-House By University Report | PMS";
+}
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+}
+<style>
+    .right {
+        text-align: right;
+    }
+
+    /* Page Load Animation Styles */
+    .page-container {
+        opacity: 0;
+        transform: translateY(15px);
+        animation: pageLoad 0.4s ease-out forwards;
+    }
+
+    @@keyframes pageLoad {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Filter Controls Animation */
+    .filter-row > div {
+        opacity: 0;
+        transform: translateX(-10px);
+        animation: slideInLeft 0.3s ease-out forwards;
+    }
+
+        .filter-row > div:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .filter-row > div:nth-child(2) {
+            animation-delay: 0.08s;
+        }
+
+        .filter-row > div:nth-child(3) {
+            animation-delay: 0.11s;
+        }
+
+        .filter-row > div:nth-child(4) {
+            animation-delay: 0.14s;
+        }
+
+        .filter-row > div:nth-child(5) {
+            animation-delay: 0.17s;
+        }
+
+        .filter-row > div:nth-child(6) {
+            animation-delay: 0.2s;
+        }
+
+    @@keyframes slideInLeft {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* Table Animation Styles */
+    .data-table {
+        opacity: 0;
+        transform: translateY(10px);
+        animation: tableLoad 0.4s ease-out 0.3s forwards;
+    }
+
+    @@keyframes tableLoad {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Table Row Stagger Animation */
+    .data-table tbody tr {
+        opacity: 0;
+        transform: translateX(-8px);
+        animation: rowSlideIn 0.25s ease-out forwards;
+    }
+
+    @@keyframes rowSlideIn {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* Card Header Animation */
+    .card-header {
+        opacity: 0;
+        transform: translateY(-5px);
+        animation: headerSlide 0.3s ease-out 0.1s forwards;
+    }
+
+    @@keyframes headerSlide {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Search Button Hover Effect */
+    .btn-search {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+        .btn-search::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-search:hover::before {
+            left: 100%;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+
+
+    /* DataTable Enhancements */
+    .dataTables_wrapper {
+        opacity: 0;
+        transform: translateY(5px);
+        animation: dtWrapperLoad 0.3s ease-out 0.4s forwards;
+    }
+
+    @@keyframes dtWrapperLoad {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Smooth transitions for form elements */
+    .form-control, .select2 {
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus, .select2:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+        }
+</style>
+
+<div class="page-container">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"></h3>
+        </div>
+        <div class="box box-danger">
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+            </div>
+            <div class="row filter-row">
+                <div class="col-md-2">
+                    <label>From Date</label>
+                    <input name="daterange" type="text" autocomplete="off" id="FromDate" class="form-control from_date" value="@ViewBag.FromDate" placeholder="From Date" />
+                </div>
+                <div class="col-md-2">
+                    <label>Date</label>
+                    <input name="daterange" id="ToDate" autocomplete="off" class="form-control to_date" value="@ViewBag.ToDate" placeholder="To Date" />
+                </div>
+                <div class="col-md-2">
+                    <label>Status of Residents</label>
+                    <select class="form-control select2" name="CheckOut" id="checkout">
+                        <option value="0" @(ViewBag.CheckOut == 0 ? "selected" : "")>All</option>
+                        <option value="1" @(ViewBag.CheckOut == 1 ? "selected" : "")>Non Residents</option>
+                        <option value="2" @(ViewBag.CheckOut == 2 ? "selected" : "")>Residents</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label>University</label>
+                    @Html.DropDownList("UniversityId", null, "-- All Universities --", htmlAttributes: new { @class = "form-control select2", multiple = "multiple" })
+                </div>
+                <div class="col-md-2">
+                    <label>Student</label>
+                    @Html.DropDownList("StudentId", null, "-- All Users --", htmlAttributes: new { @class = "form-control select2" })
+                </div>
+                <div class="col-md-1">
+                    <label> &nbsp; </label>
+                    <br />
+                    <button type="button" onclick="GetReport();" class="btn btn-themyriad btn-bordered waves-effect w-md button-effect">
+                        <i class="fa fa-search"></i> <span>Search</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <hr />
+            </div>
+            <div class="box-body">
+                <div style="overflow: auto; width:100%;white-space:nowrap;">
+                    <table class="table table-bordered table-striped data-table" id="ReportTable">
+                        <thead>
+                            <tr>
+                                <th>MyriadID</th>
+                                <th>FullName</th>
+                                <th>Gender</th>
+                                <th>DOB</th>
+                                <th>Nationality </th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>University </th>
+                                <th>Guardian FullName</th>
+                                <th>Guardian Phone</th>
+                                <th>Guardian Email</th>
+                                <th>Guardian Relation</th>
+                                <th>MoveIn</th>
+                                <th>MoveOut</th>
+                                <th>CheckIn</th>
+                                <th>CheckOut</th>
+                                <th>Room Type </th>
+                                <th>RoomNo</th>
+                                <th>MSIS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.MyriadID</td>
+                                    <td>@item.FullName</td>
+                                    <td>@item.Gender</td>
+                                    <td>@item.DOB.ToString("dd/M/yyyy")</td>
+                                    <td>@item.Nationality</td>
+                                    <td>@item.Phone</td>
+                                    <td>@item.Email</td>
+                                    <td>@item.University</td>
+                                    <td>@item.GuardianFullName</td>
+                                    <td>@item.GuardianPhone</td>
+                                    <td>@item.GuardianEmail</td>
+                                    <td>@item.GuardianRelation</td>
+                                    <td>@item.MoveIn.ToString("dd/M/yyyy")</td>
+                                    <td>@item.MoveOut.ToString("dd/M/yyyy")</td>
+                                    <td>@(item.CheckIn.HasValue ? item.CheckIn.Value.ToString("dd/M/yyyy hh:mm:ss tt") : "N/A")</td>
+                                    <td>@(item.CheckOut.HasValue ? item.CheckOut.Value.ToString("dd/M/yyyy hh:mm:ss tt") : "N/A")</td>
+                                    <td>@item.RoomType</td>
+                                    <td>@item.RoomNo</td>
+                                    <td>@item.MSIS</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable with callback for additional animations
+            var table = $('#ReportTable').DataTable({
+                "paging": true,
+                "searching": true,
+                "lengthChange": true,
+                "ordering": true,
+                "scrollCollapse": true,
+                "scrollY": '70vh',
+                "scrollX": "auto",
+                "iDisplayLength": 100,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+                dom: 'Blfrtip',
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                buttons: ['excelHtml5']
+            });
+
+           // Handle "All Universities" selection logic
+        $('#UniversityId').on('change', function() {
+            var selectedValues = $(this).val() || [];
+
+            // If "All Universities" (value="0") is selected
+            if (selectedValues.includes('0')) {
+                if (selectedValues.length > 1) {
+                    // If other options are also selected, keep only "All Universities"
+                    $(this).val(['0']);
+                    if ($(this).hasClass('select2')) {
+                        $(this).trigger('change');
+                    }
+                }
+            }
+            // If other universities are selected after "All Universities" was selected
+            else if (selectedValues.length > 0) {
+                // Remove "All Universities" if specific universities are selected
+                var filteredValues = selectedValues.filter(function(val) {
+                    return val !== '0';
+                });
+                if (filteredValues.length !== selectedValues.length) {
+                    $(this).val(filteredValues);
+                    if ($(this).hasClass('select2')) {
+                        $(this).trigger('change');
+                    }
+                }
+            }
+        });
+    });
+    </script>
+
+    <script type="text/javascript">
+        var startDate = new Date();
+        var FromEndDate = new Date();
+        var ToEndDate = new Date();
+        ToEndDate.setDate(ToEndDate.getDate() + 365);
+
+        $('.from_date').datepicker({
+            weekStart: 1,
+            startDate: '',
+            format: "dd/M/yyyy",
+            autoclose: true
+        })
+            .on('changeDate', function (selected) {
+                startDate = new Date(selected.date.valueOf());
+                $('.to_date').datepicker('setStartDate', startDate);    
+            });
+
+        $('.to_date')
+            .datepicker({
+                weekStart: 1,
+                startDate: new Date($('.from_date').val()),
+                endDate: ToEndDate,
+                format: "dd/M/yyyy",
+                autoclose: true,
+            })
+            .on('changeDate', function (selected) {
+                FromEndDate = new Date(selected.date.valueOf());
+                FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                $('.from_date').datepicker('setEndDate', FromEndDate);
+            });
+
+        function GetReport() {
+            ShowLoader();
+
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+            var CheckOut = $('#checkout').val();
+            var UniversityIds = $('#UniversityId').val() || [];
+            var StudentId = $('#StudentId').val() || 0;
+
+            var universityIdParam;
+
+            // Check what's selected
+            if (UniversityIds.includes('0')) {
+                // "All Universities" is selected
+                universityIdParam = '0';
+            } else if (UniversityIds && UniversityIds.length > 0 && UniversityIds[0] !== '') {
+                // Specific universities selected
+                universityIdParam = UniversityIds.join(',');
+            } else {
+                // Nothing selected, use default
+                universityIdParam = '0';
+            }
+
+            setTimeout(function () {
+                window.location.href = GetFormatedUrl("/Reporting/InHouseByUniversityReport?FromDate=" + SD + "&ToDate=" + ED + "&CheckOut=" + CheckOut + "&universityIds=" + universityIdParam + "&StudentId=" + StudentId);
+            }, 150);
+        }
+
+
+    </script>
+}

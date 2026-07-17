@@ -1,0 +1,308 @@
+﻿@model PMS.DTO.ViewModels.NewsViewModels.NewsDetailVM
+
+@using PMS.Common.Classes
+
+@{
+    /**/
+
+    ViewBag.Header = "News";
+    ViewBag.HeaderDescription = "News Detail";
+    ViewBag.Title = "News Detail | PMS";
+}
+<div class="box box-danger">
+    <div class="box-header with-border">
+        @{
+            if (Model.NewsDetailId == 0)
+            {
+                if (User.IsInRole(AppUserRoles.view_news))
+                {
+                    <div class="input-group-btn">
+                        <a href="@Url.Action("All", "News")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All News</a>
+                    </div>
+                }
+            }
+            else
+            {
+                if (User.IsInRole(AppUserRoles.view_news_detail))
+                {
+                    <div class="input-group-btn">
+                        <a href="@Url.Action("NewsDetail", "News", new { id = Model.NewsId })" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> Back to News</a>
+                    </div>
+                }
+            }
+        }
+    </div>
+    <div class="box-header with-border">
+
+        <h3 class="box-title">News Detail</h3>
+    </div>
+    <!-- /.box-header -->
+    <!-- form start -->
+    @if (User.IsInRole(AppUserRoles.add_news_detail))
+    {
+        using (Html.BeginForm("AddNewsDetail", "News", FormMethod.Post, new { enctype = "multipart/form-data", id = "news_detail_form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(x => x.NewsId)
+            @Html.HiddenFor(x => x.NewsDetailId)
+
+            <div class="box-body">
+                @if (ViewBag.error != null)
+                {
+                    <div class="alert alert-danger alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                        @ViewBag.error
+                    </div>
+                }
+                @if (ViewBag.success != null)
+                {
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                        @ViewBag.success
+                    </div>
+                }
+
+                <div class="no-padding col-md-12">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Content Type</label>
+
+                            @Html.DropDownListFor(model => Model.SelectedContentType,
+                       new SelectList(new List<string> { "Editor", "Image" }, "", ""),
+                       "-- Content Type --",
+                       new { @Class = "form-control", id="content_type" })
+
+                            @Html.ValidationMessageFor(x => x.SelectedContentType)
+
+                        </div>
+                    </div>
+                </div>
+                <div class="no-padding col-md-12">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Image</label>
+                            @Html.TextBoxFor(x => x.ImageSource, new { @class = "form-control", type = "file" })
+                            @Html.ValidationMessageFor(x => x.ImageSource)
+                            <img id="Upload" src="@(!string.IsNullOrEmpty(Model.ImageUrl) ? Model.ImageUrl : "")" class="img-responsive" />
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Arabic Image</label>
+                            @Html.TextBoxFor(x => x.Ar_ImageSource, new { @class = "form-control", type = "file" })
+                            @Html.ValidationMessageFor(x => x.Ar_ImageSource)
+                            <img id="Ar_Upload" src="@(!string.IsNullOrEmpty(Model.Ar_ImageUrl) ? Model.Ar_ImageUrl : "")" class="img-responsive" />
+                        </div>
+
+                    </div>
+                </div>
+                <div class="no-padding col-md-12">
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Content Value</label>
+                            @Html.TextAreaFor(x => x.ContentValue, new { @class = "form-control", id = "ContentValue", name = "ContentValue", placeholder = "Enter Value", style = "min-height:125px" })
+                            @Html.ValidationMessageFor(x => x.ContentValue)
+                        </div>
+
+                    </div>
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Arabic Content Value</label>
+                            @Html.TextAreaFor(x => x.Ar_ContentValue, new { @class = "form-control", id = "ContentValue", name = "ContentValue", placeholder = "Enter Value", style = "min-height:125px" })
+                            @Html.ValidationMessageFor(x => x.Ar_ContentValue)
+                        </div>
+
+                    </div>
+                </div>
+                <div class="no-padding col-md-12">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-themyriad">Submit</button>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+            <!-- /.box-body -->
+
+        }
+    }
+
+    <div class="col-md-12 no-padding">
+        <div class="box">
+
+            @if (ViewBag.NewsDetail != null)
+            {
+                <!-- /.box-header -->
+                <div class="box-body no-padding" style="overflow: auto;width:100%;">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+
+                                <th>Content Type</th>
+                                <th>Content Value</th>
+                                <th>Arabic Content Value</th>
+                                <th>Action</th>
+
+                            </tr>
+
+                        </tbody>
+
+                        @foreach (var news in ViewBag.NewsDetail as List<PMS.EF.NewsDetail>)
+                        {
+                        <tr>
+
+                            <td>
+                                @news.ContentType
+                            </td>
+
+                            <td>
+                                @news.ContentValue
+                            </td>
+                            <td>
+                                @news.Ar_ContentValue
+                            </td>
+                          
+
+                            <td class="menu-icons">
+                                @if (User.IsInRole(AppUserRoles.add_news_detail))
+                                {
+                                    <a title="Edit" href="@Url.Action("NewsDetail", "News", new { id = news.NewsID, newsDetailId = news.NewsDetailID })"><i class="fa fa-edit"></i></a>
+                                }
+                                @if (User.IsInRole(AppUserRoles.delete_news_detail))
+                                {
+                                    <a title="Delete" href="#" data-href="@Url.Action("DeleteNewsDetail" ,"News", new { newsDetailId = news.NewsDetailID, newsId = news.NewsID })" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-remove"></i></a>
+                                }
+
+                            </td>
+                        </tr>
+
+
+                        }
+
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            }
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+@section scripts {
+    <!-- CK Editor -->
+    @*<script src="~/Assets/bower_components/ckeditor/ckeditor.js"></script>*@
+    <script src="https://cdn.ckeditor.com/4.15.0/full/ckeditor.js"></script>
+
+    <script>
+
+        //CKEDITOR.config.allowedContent = true;
+        CKEDITOR.replace('ContentValue', {
+            uiColor: '#CCEAEE',
+            removePlugins: 'elementspath'
+        });
+
+        CKEDITOR.replace('Ar_ContentValue', {
+            uiColor: '#CCEAEE',
+            removePlugins: 'elementspath'
+        });
+
+
+        $(function () {
+
+            function readURL(input) {
+                $('#Upload').attr('src', '');
+                if (input.files && input.files[0]) {
+                    var size = input.files[0].size / 1024 / 1024;
+                    if (size > 1) {
+                        $('#fileSizeMessage').modal('show');
+                        $("#ImageSource").val(null);
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#Upload').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            };
+            function Ar_readURL(input) {
+                $('#Ar_Upload').attr('src', '');
+                if (input.files && input.files[0]) {
+                    var size = input.files[0].size / 1024 / 1024;
+                    if (size > 1) {
+                        $('#fileSizeMessage').modal('show');
+                        $("#Ar_ImageSource").val(null);
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#Ar_Upload').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            };
+            $("#ImageSource").change(function () {
+                readURL(this);
+            });
+            $("#Ar_ImageSource").change(function () {
+                Ar_readURL(this);
+            });
+            $("#Upload").click(function () {
+                $("input[id='ImageSource']").click();
+            });
+            $("#Ar_Upload").click(function () {
+                $("input[id='Ar_ImageSource']").click();
+            });
+
+
+
+
+            setVal($("#content_type").val());
+
+            $("#content_type").change(function () {
+                setVal(this.value);
+            });
+
+
+            function setVal(d) {
+                if (d == "Image") {
+                    //$("#ImageSource").removeAttr('disabled');
+                    $("#ImageSource").prop("required", "true");
+
+                    //$("#ContentValue").prop("disabled", "true");
+                    //CKEDITOR.instances['ContentValue'].setReadOnly(true);
+                    $("#ContentValue").removeAttr('required');
+                    $("#ContentValue-error").text('');
+                }
+                else {
+                    //$("#ContentValue").removeAttr('disabled');
+                    //CKEDITOR.instances['ContentValue'].setReadOnly(false);
+                    $("#ContentValue").prop("required", "true");
+
+                    //$("#ImageSource").prop("disabled", "true");
+                    $("#ImageSource").removeAttr('required');
+                    $("#ImageSource-error").text('');
+                }
+            }
+        })
+    </script>
+
+
+}
+

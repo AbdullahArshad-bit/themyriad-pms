@@ -1,0 +1,139 @@
+﻿
+
+
+@{
+    /**/
+
+    ViewBag.Header = "Transport";
+    ViewBag.HeaderDescription = "Single Route Detail";
+    ViewBag.Title = "Single Route Details | PMS";
+
+    var SingleRouteDetails = ViewBag.singleRouteDetails;
+}
+
+
+
+<div class="box box-danger">
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("AllSchedules", "Transportation")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Schedules</a>
+        </div>
+    </div>
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddSchedule", "Transportation", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_Schedule_form" }))
+    {
+        @Html.AntiForgeryToken()
+
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+
+            <div class="col-md-6">
+
+                @*<div class="form-group">
+                        <label for="Title">Name</label>
+
+                        @Html.TextBoxFor(x => x.ScheduleName, new { @class = "form-control", placeholder = "Enter Schedule Name" })
+
+                        @Html.ValidationMessageFor(x => x.ScheduleName)
+
+                    </div>*@
+
+
+            </div>
+            <div style="overflow: auto; width:100%">
+
+                <table id="Schedules" class="table table-bordered table-striped">
+
+                    <thead>
+
+                        <tr>
+                        
+                            <th>Stop Number</th>
+                            <th>Stop Time</th>
+                            <th>Action</th>
+
+                        </tr>
+
+
+
+
+                    </thead>
+                    <tbody>
+
+                        @foreach (var stops in (SingleRouteDetails as List<PMS.EF.RouteStope>))
+                        {
+                            <tr>
+                                
+                                <td>@stops.StopNumber</td>
+
+                                @if (@stops.StopTime != null)
+                                {
+                                    @*<td style="text-align:center; font-weight:bold;">@Convert.ToDateTime(RouteStops.StopTime).ToString("hh:mm tt")</td>*@
+                                    <td>@Convert.ToDateTime(stops.StopTime).ToString("hh:mm tt")</td>
+                                }
+                                else
+                                {
+
+                                    <td style="font-weight:500;"><span style="border-radius:15px;background-color:#DCDCDC;padding:7px 15px;white-space: nowrap;">no stop</span></td>
+                                }
+
+
+                                <td class="menu-icons" style="text-align:inherit">
+
+                                    <a title="Edit" href="@Url.Action("EditRouteStopTime", "Transportation", new { RouteStopID = stops.RouteStopID })"><i class="fa fa-edit"></i></a>
+                                    @*<a title="Delete" href="#" data-href="@Url.Action("DeleteSchedule" ,"Transportation", new { ScheduleID = stops.RouteStopID })" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-remove"></i></a>*@
+                                </td>
+
+                            </tr>
+                        }
+
+
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                        
+                            <th>Stop Number</th>
+                            <th>Stop Time</th>
+                            <th>Action</th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+    <script>
+
+    </script>
+}
+
+

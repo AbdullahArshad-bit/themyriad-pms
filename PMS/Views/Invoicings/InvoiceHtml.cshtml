@@ -1,0 +1,289 @@
+﻿@model PMS.EF.Invoicing
+@using PMS.DTO.ViewModels;
+@using PMS.Common.Classes;
+@{
+    var Details = (List<InvoicingDetailVM>)ViewBag.InvoicingDetail;
+}
+<section class="invoice" id="Pdf2">
+    <!-- title row -->
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="page-header">
+                @*<span class="logo-lg"><img src="@Url.Content("~/Assets/Images/logo.png")" alt="logo"></span>*@
+                <span class="logo-lg"><img src="https://themyriad.com/Assets/images/logo.png" alt="logo"></span>
+            </h2>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- info row -->
+    <div class="row invoice-info">
+        <div class="col-sm-4 invoice-col">
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead"><b>Invoice #:</b> @Model.Code</p>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead"><b>Location:</b> @Model.Location.LocationName</p>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead"><b>Myriad ID:</b> @Model.Person.Code:  @Model.Person.FullName</p>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead"><b>Phone Number:</b> @Model.Person.Phone</p>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead"><b>Invoice Date:</b> @Model.InvoiceDate.ToString("dd/MM/yyyy")</p>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead"><b>Currency:</b> @Model.Location.Currencies.Select(x => x.Name).FirstOrDefault()</p>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead">
+                        <b>Status:</b>
+                        @if (Model.IsApproved)
+                        {
+                            <span class="label label-success">Approved</span>
+                        }
+                        else
+                        {
+                            <span class="label label-primary">Pending</span>
+                        }
+                    </p>
+                </div>
+            </div>
+
+
+
+            @*<b>Invoice #: @Model.Code </b><br>
+                <b>Location: </b> @Model.Location.LocationName<br>
+                <b>Myriad ID: </b> <a href="#">@Model.Person.Code:  @Model.Person.FullName </a><br>
+                <b>Phone Number: </b> @Model.Person.Phone<br>
+                <b>Invoice Date: </b>  @Model.InvoiceDate.ToString("dd/MM/yyyy")<br>
+                <b>Currency: </b> @Model.Location.Currencies.Select(x => x.Name).FirstOrDefault()<br>
+
+
+                <b>Status:</b> @{
+                    if (Model.IsApproved)
+                    {
+                        <span class="label label-success">Approved</span>
+                    }
+                    else
+                    {
+                        <span class="label label-primary">Pending</span>
+
+                    }
+
+                } <br>*@
+            @*<b>Account:</b> @Model.NetAmount
+                <br />*@
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+    <!-- Table row -->
+    <div class="row">
+        <div class="col-xs-12 table-responsive">
+            <table class="table table-striped" style=" border-collapse: collapse; border:solid">
+                <thead style=" border-collapse: collapse; border:solid">
+                    <tr style=" border-collapse: collapse; border:solid">
+                        <th style=" border-collapse: collapse; border: solid; padding: 10px;">Sr#</th>
+                        <th style=" border-collapse: collapse; border: solid; padding: 10px;">Service</th>
+                        <th style=" border-collapse: collapse; border: solid; padding: 10px;">Description</th>
+                        @if (Model.InvoiceTypeLookup.Id != (int)Enumeration.InvoiceTypes.Deposit)
+                        {
+                            <th style=" border-collapse: collapse; border: solid; padding: 10px;">FromDate</th>
+                            <th style=" border-collapse: collapse; border: solid; padding: 10px;">ToDate</th>
+                        }
+                        <th style=" border-collapse: collapse; border: solid; padding: 10px;">Amount</th>
+                        <th class="col-md-3" style=" border-collapse: collapse; border: solid; padding: 10px;">Taxes</th>
+                        <th style=" border-collapse: collapse; border: solid; padding: 10px;">Net Amount</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1; }
+                    @foreach (var item in Details)
+                    {
+
+                        <tr style=" border-collapse: collapse; border:solid">
+                            <td style=" border-collapse: collapse; border: solid; padding: 10px;">@count</td>
+                            <td style=" border-collapse: collapse; border:solid;padding: 10px;">@item.ServiceName</td>
+                            <td style=" border-collapse: collapse; border:solid;padding: 10px;">@item.Description</td>
+                            @if (Model.InvoiceTypeLookup.Id != (int)Enumeration.InvoiceTypes.Deposit)
+                            {
+                                <td style=" border-collapse: collapse; border:solid;padding: 10px;">@item.FromDateString</td>
+                                <td style=" border-collapse: collapse; border:solid;padding: 10px;">@item.ToDateString</td>
+                            }
+                            <td style=" border-collapse: collapse; border:solid;padding: 10px;">@item.Price</td>
+                            <td style=" border-collapse: collapse; border:solid;padding: 10px;" class="taxes" data-Taxids="@item.TaxesIds">
+                                @(item.TaxesName == null ? "" : item.TaxesName)
+                            </td>
+                            <td style=" border-collapse: collapse; border: solid; padding: 10px;">@item.TotalAmount</td>
+                        </tr>
+                        count++;
+                    }
+
+                </tbody>
+            </table>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+    <div class="row">
+        <!-- accepted payments column -->
+        <div class="col-xs-8" style="">
+            <p class="lead"><b>Remarks:</b></p>
+            <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
+                @Model.Remarks
+            </p>
+        </div>
+    </div>
+    <!-- /.col -->
+
+    <div class="row">
+        <!-- accepted payments column -->
+        <div class="col-xs-4" style="">
+            <p class="lead"><b>Subtotal:</b> @Model.TotalPrice</p>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- accepted payments column -->
+        <div class="col-xs-4" style="">
+            <p class="lead"><b>Tax Amount:</b> @Model.TaxAmount</p>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- accepted payments column -->
+        <div class="col-xs-4" style="">
+            @if (Model.InvoiceTaxDetails != null)
+            {
+                foreach (var item in Model.InvoiceTaxDetails.ToList())
+                {
+                    <p class="lead"><b>@item.TaxName:</b> @item.TaxAmount</p>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- accepted payments column -->
+        <div class="col-xs-4" style="">
+            <p class="lead"><b>Net Total:</b> @Model.NetAmount</p>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12" style="margin-top: 10px;">
+            <p class="lead"><b><i>This is a system-generated notification; for any questions, please contact the Resident Support Team in person or via email at care@dxb.themyriad.com.</i></b></p>
+        </div>
+    </div>
+
+
+    @*<div class="col-xs-4 " style=" width: 50%;">
+            <div class="table-responsive">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th style="width:50%">Subtotal:</th>
+                            <td>@Model.TotalPrice</td>
+                        </tr>
+                        <tr>
+                            <th>Tax Amount:</th>
+                            <td>@Model.TaxAmount</td>
+                        </tr>
+
+
+                        @if (Model.InvoiceTaxDetails != null)
+                        {
+                            foreach (var item in Model.InvoiceTaxDetails.ToList())
+                            {
+                                <tr>
+                                    <th>@item.TaxName</th>
+                                    <td>@item.TaxAmount</td>
+                                </tr>
+                            }
+                        }
+                        <tr>
+                            <th>Net Total:</th>
+                            <td>@Model.NetAmount</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>*@
+    <!-- /.col -->
+    <!-- /.row -->
+    <!-- this row will not appear when printing -->
+
+</section>
+@section scripts
+{
+    @*<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+        <script src="~/Scripts/jquery-3.3.1.js"></script>
+        <script>
+
+
+
+            $(function () {
+                    var url = GetFormatedUrl("/Invoicings/GetTaxes")
+                    $.ajax({
+                        type: "Get",
+                        url: url,
+                        async: false,
+                        success: function (data) {
+                            var data = data.data;
+                            $(".taxes").html('');
+                            var html = "";
+                            $('.taxes').each(function (i, e) {
+                                var ids = $(this).attr('data-taxids').split(',');
+                                var Taxs = '';
+                                $.each(ids, function (key, value) {
+                                    var element = data.filter(x => x.Value == value)
+                                    Taxs = Taxs + ',' + element[0].Text;
+                                })
+                                $(this).text(Taxs);
+                            })
+
+
+                        }
+                    });
+            })
+        </script>*@
+}

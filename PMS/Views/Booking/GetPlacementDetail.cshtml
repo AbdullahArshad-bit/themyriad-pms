@@ -1,0 +1,39 @@
+﻿@model PMS.DTO.ViewModels.BedSpacePlacementViewModels.GuestCountVm
+
+@{
+    Layout = null;
+}
+
+
+    <div class="col-md-1">
+        <div class="form-group">
+
+            <label>Bed Space</label>
+
+            <input class="form-control" type="text" value="@Model.BedSpace" disabled />
+            <input type="hidden" class="form-control" name="BedSpacePlacementID" value="@Model.BedSpacePlacementID"/>
+
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+
+            <label>Room</label>
+
+            <input class="form-control" type="text" value="@(Model.Room + " - " + Model.RoomType)" disabled />
+
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+
+            <label>MoveIn/MoveOut</label>
+
+            <input class="form-control" type="text" value="@(Model.MoveIn.ToString("dd/MM/yyyy") + " - " + Model.MoveOut.ToString("dd/MM/yyyy"))" disabled />
+
+        </div>
+    </div>
+    
+
+
+

@@ -1,0 +1,187 @@
+﻿@model PMS.EF.Invoicing
+
+@{
+    ViewBag.Header = "Invoicing";
+    ViewBag.HeaderDescription = "Update Invoice";
+    ViewBag.Title = "Update Invoice | PMS";
+}
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+
+
+}
+<input type="hidden" id="FrequencyId" />
+@Html.HiddenFor(x => x.Code)
+
+@Html.Partial("_CreateOrUpdate")
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            setInitialLocation();
+            // Populate service dropdowns filtered by invoice type on edit load
+            var invoiceTypeId = $('#InvoiceTypeId').val();
+            var studentId = $('.StudentId').val();
+            if (invoiceTypeId) {
+                $('select.items').each(function () {
+                    var currentDataId = $(this).attr('data-id');
+                    populateServiceDropdown($(this));
+                    // After population, restore the previously selected service
+                    var self = $(this);
+                    setTimeout(function () {
+                        self.find('option').each(function () {
+                            if ($(this).attr('data-id') === currentDataId) {
+                                self.val($(this).val());
+                                return false;
+                            }
+                        });
+                    }, 300);
+
+                });
+
+            }
+
+            // For deposit invoices on edit, build the deposit price dropdown for each row
+            var invoiceTypeId = $('#InvoiceTypeId').val();
+            if (invoiceTypeId == 2) {
+                $('.parentRowGrider').each(function () {
+                    var row = $(this);
+                    var serviceSelect = row.find('select.items');
+                    var serviceId = serviceSelect.attr('data-id');
+                    var studentId = $('.StudentId').val();
+
+                    if (serviceId && studentId) {
+                        $.ajax({
+                            type: 'GET',
+                            url: GetFormatedUrl('/invoicings/GetDepositOptions'),
+                            data: { serviceId: serviceId, studentId: studentId },
+                            success: function (response) {
+                                if (!response.success || !response.multiple) return;
+
+                                var amountCell = row.find('.netamountCls');
+                                var currentPrice = amountCell.val();
+
+                                var wrapper = $('<div class="deposit-price-select" style="position:relative; display:inline-block; width:100%;"></div>');
+                                var displayBox = $('<div class="deposit-display-box form-control" style="cursor:pointer; background:#fff; display:flex; justify-content:space-between; align-items:center;"><span class="deposit-selected-text" style="color:#333;">' + currentPrice + '</span><span>&#9660;</span></div>');
+                                var optionsList = $('<ul class="deposit-options-list" style="display:none; position:absolute; z-index:9999; background:#fff; border:1px solid #ccc; width:100%; list-style:none; padding:0; margin:0; max-height:200px; overflow-y:auto;"></ul>');
+
+                                $.each(response.data, function (i, opt) {
+                                    var li = $('<li style="padding:8px 12px; cursor:pointer; border-bottom:1px solid #f0f0f0;">' + opt.label + '</li>');
+                                    li.data('price', opt.price);
+                                    li.data('occupancy', opt.occupancy);
+                                    li.data('taxid', opt.taxId);
+                                    li.data('occupancyid', opt.occupancyId);
+
+                                    li.on('mouseenter', function () { $(this).css('background', '#f5f5f5'); });
+                                    li.on('mouseleave', function () { $(this).css('background', '#fff'); });
+
+                                    li.on('click', function () {
+                                        var price = $(this).data('price');
+                                        displayBox.find('.deposit-selected-text').text(price).css('color', '#333');
+                                        optionsList.hide();
+                                        amountCell.val(price);
+                                        row.find('.netamountCls').val(price).prop('disabled', false).prop('readonly', false);
+                                        row.find('.basenetamountCls').val(price).prop('disabled', false);
+                                        row.find('.Desc').val($(this).data('occupancy')).prop('disabled', true);
+                                        row.find('.taxes').val($(this).data('taxid')).change();
+                                        $('#OccupancyId').val($(this).data('occupancyid'));
+                                        $('#ConfigId').val($(this).data('occupancyid'));
+                                        GetFrequency();
+                                        CalculateAdjustmentAmount();
+                                    });
+
+                                    optionsList.append(li);
+                                });
+
+                                displayBox.on('click', function () { optionsList.toggle(); });
+                                $(document).on('click.depositDropdown', function (e) {
+                                    if (!wrapper.is(e.target) && wrapper.has(e.target).length === 0) {
+                                        optionsList.hide();
+                                    }
+                                });
+
+                                wrapper.append(displayBox).append(optionsList);
+                                amountCell.hide().after(wrapper);
+                            }
+                        });
+                    }
+                });
+            }
+
+        });
+        GetTaxesEdit();
+        $('.taxes').each(function (i, e) {
+            var raw = $(this).attr('data-taxids');
+            var ids = raw ? raw.split(',') : [];
+            $(this).select2().val(ids).trigger("change");
+        })
+
+
+    $('#Tax').val('@Model.TaxIds');
+    var taxRaw = '@(Model.TaxIds ?? "")';
+    var taxess = taxRaw ? taxRaw.split(',') : [];
+    $('#TaxIds').val(taxess);
+    $('#NetAmount').val('@Model.NetAmount');
+    $('#SubTotal').val('@Model.TotalPrice');
+    $('#TaxAmount').val('@Model.TaxAmount');
+    $('#TotalDiscountAmount').val('@Model.TotalDiscountAmount');
+    $('.NetAmount').text('@Model.NetAmount');
+    $('.SubTotal').text('@Model.TotalPrice');
+    $('.TaxAmount').text('@Model.TaxAmount');
+    $('.TotalDiscountAmount').text('@Model.TotalDiscountAmount');
+
+    </script>
+
+    <script>
+        $('#LocationId').on('change', function () {
+            var LocationId = $(this).val()
+            var url = GetFormatedUrl("/Payments/GetLocationBYId")
+            $.ajax({
+                type: "Get",
+                url: url,
+                data: {
+                    Id: LocationId
+                },
+                success: function (data) {
+                    var data = data;
+                    $('#StudentId').html('');
+                    var html = "<option value=''>--- Select Resident Id ---</option>";
+                    $.each(data.Students, function (key, value) {
+                        html = html + "<option Value='" + value.PersonID + "'>" + value.FullName + "</option>"
+                    })
+                    $('#StudentId').html(html);
+
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript">
+
+        function bindServiceDates() {
+            $('.date').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy",
+
+            })
+        }
+        function setInitialLocation() {
+            
+            var initialLocation = localStorage.getItem("selectedLocation");
+
+
+            if (initialLocation) {
+
+                $('#LocationId').val(initialLocation);
+                $("#LocationId").prop('disabled', true);
+
+            }
+        }
+      
+    </script>
+}
+

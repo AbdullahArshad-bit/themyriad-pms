@@ -1,0 +1,182 @@
+﻿@model PMS.DTO.ViewModels.COAViewModels.AddCOAVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Chat of Account";
+    ViewBag.HeaderDescription = "Add/Edit Account";
+    ViewBag.Title = "Add/Edit Account | PMS";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+
+
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Index", "Accounting")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Accounts</a>
+        </div>
+    </div>
+
+    <!-- form start -->
+    @using (Html.BeginForm("CreateOrUpdateCOA", "Accounting", FormMethod.Post, new { enctype = "multipart/form-data", id = "inspection_fields_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.Id)
+
+
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+        <div class="row col-md-12">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocationId, "Location")
+                        @Html.DropDownList("LocationId", null, "Select...", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.LocationId)
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+
+                    <label>Active</label>
+
+                    <div>
+                        <label class="switch">
+                            <input type="checkbox" name="Status" id="Status" value="@Model.Status" @(Model.Status ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Code)
+                    @Html.TextBoxFor(x => x.Code, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter Code" })
+                </div>
+                @Html.ValidationMessageFor(x => x.Code)
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Name)
+                    @Html.TextBoxFor(x => x.Name, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter Name" })
+                </div>
+                @Html.ValidationMessageFor(x => x.Name)
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Alias)
+                    @Html.TextBoxFor(x => x.Alias, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter Alias" })
+                </div>
+                @Html.ValidationMessageFor(x => x.Alias)
+            </div>
+
+        </div>
+            <div class="row col-md-12">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AccountTypeId, "Account Type")
+                        @Html.DropDownList("AccountTypeId", null, "Select...", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.AccountTypeId)
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad btnSave" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+    <script>
+        $(function () {
+            //Date picker
+            $('.datepicker').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy",
+                startDate: new Date()
+            })
+
+            $('.select2').select2()
+        })
+
+        $(document).ready(function () {
+
+        });
+
+        function setInitialLocation() {
+
+            var initialLocation = localStorage.getItem("selectedLocation");
+
+            if (initialLocation) {
+
+                $('#LocationId').val(initialLocation);
+                $("#LocationId").prop('disabled', true);
+
+
+            }
+        }
+        $('form').submit(function () {
+
+
+            var locationId = $('#LocationId').val();
+
+
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'LocationId',
+                value: locationId
+            }).appendTo('form');
+
+            return true;
+        });
+
+        setInitialLocation();
+    </script>
+
+
+}
+
+

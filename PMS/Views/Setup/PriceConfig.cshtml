@@ -1,0 +1,476 @@
+﻿@model PMS.DTO.ViewModels.SetupViewModels.AddPriceConfigVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Price Configuration";
+    ViewBag.HeaderDescription = "";
+    ViewBag.Title = "Price Configuration | PMS";
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+
+
+<div class="box box-danger">
+    @if (Model.PriceConfigID > 0)
+    {
+        if (User.IsInRole(AppUserRoles.view_price_config))
+        {
+            <div class="box-header with-border">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("PriceConfig", "Setup")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> Back to all price config.</a>
+                </div>
+            </div>
+        }
+    }
+
+    <div class="box-header with-border">
+    </div>
+    <!-- /.box-header -->
+    <!-- form start -->
+
+    @if (User.IsInRole(AppUserRoles.add_price_config))
+    {
+
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.PriceConfigID)
+
+        <style>
+            .closeErrorButton {
+                float: right;
+                font-size: 21px;
+                font-weight: 700;
+                line-height: 1;
+            }
+        </style>
+
+        <div class="box-body">
+            <div class="Alert-Ajax-Response hide">
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="closeErrorButton close">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    <span id="error"></span>
+                </div>
+            </div>
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            <div class="Alert-Success-Response hide">
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    <span id="success"></span>
+                </div>
+            </div>
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible" id="alert-success-fun">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+            <div class="row col-md-12">
+                @*<div class="row">
+                    <div class="form-group">
+
+                        <a href="http://localhost:54589//Upload/Files/ExcelImportFormats/ImportPriceConfig.xlsx" class="btn btn-themyriad">
+                            <i class="fa  fa-file-excel-o" style="padding-right: 5px;"></i>
+                            Import PriceConfig Format
+                        </a>
+
+                        <a href="javascript:void(0)" data-toggle="modal" data-target="#import-from-excel-modal" class="btn btn-themyriad">
+                            <i class="fa  fa-file-excel-o" style="padding-right: 5px;"></i>
+                            Import ImportPriceConfig From Excel
+                        </a>
+
+                    </div>
+                    </div>*@
+
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.LocationId, "Location")
+                            @Html.DropDownList("LocationId", null, "Select...", htmlAttributes: new { @class = "form-control", @required = "required" })
+                            @Html.ValidationMessageFor(x => x.LocationId)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Term</label>
+
+                        @Html.DropDownListFor(x => x.TermID, new SelectList(""), "-- Select Location First --", new { @Class = "form-control select2" })
+
+                        @Html.ValidationMessageFor(x => x.TermID)
+                    </div>
+                </div>
+                <div id="RoomId">
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Currency</label>
+                        @Html.DropDownList("Currency", null, "Select...  ", htmlAttributes: new { @class = "Dropdown form-control select2", @required = "required", style = "min-width:125px" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Initial Deposit</label>
+                        @Html.TextBoxFor(x => x.Deposit, new { @class = "form-control", placeholder = "Enter Initial Deposit", @type = "number" })
+                        @Html.ValidationMessageFor(x => x.Deposit)
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Cleaning Charge</label>
+                        @Html.TextBoxFor(x => x.CleaningCharge, new { @class = "form-control", placeholder = "Enter Cleaning Charge", @type = "number" })
+                        @Html.ValidationMessageFor(x => x.CleaningCharge)
+                    </div>
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>OrderBy</label>
+                        @Html.TextBoxFor(x => x.OrderBy, new { @class = "form-control", placeholder = "Enter OrderBy", @type = "number" })
+                        @Html.ValidationMessageFor(x => x.OrderBy)
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <button type="button" onclick="SavePriceConfig();" class="btn btn-themyriad">Save</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.box-body -->
+
+    }
+
+    <div class="col-md-12 no-padding">
+        <div class="box">
+            @if (ViewBag.PriceConfig != null)
+            {
+                <!-- /.box-header -->
+                <div class="box-body" style="overflow: auto;width:100%;">
+                    <table id="table" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>OrderBy</th>
+                                <th>Location</th>
+                                <th>Term</th>
+                                <th>Room Type</th>
+                                <th>Total Price</th>
+                                <th>Deposit</th>
+                                <th>Cleaning Charge</th>
+                                <th>Available</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var price in ViewBag.PriceConfig as List<PMS.DTO.ViewModels.SetupViewModels.PriceConfigVM>)
+                            {
+                                <tr>
+                                    <td>@price.OrderBy</td>
+                                    <td>@price.LocationName</td>
+                                    <td>@price.TermName - @price.TermDescription @(price.UniversityName == null ? "" : "- " + price.UniversityName)</td>
+                                    <td>@price.RoomTypeName</td>
+                                    <td>@(price.Currency + " " + String.Format("{0:f3}", price.Price + (price.CleaningCharge ?? 0)))</td>
+                                    <td>@(price.Currency + " " + String.Format("{0:f3}", price.Deposit))</td>
+                                    <td>@(price.Currency + " " + String.Format("{0:f3}", price.CleaningCharge ?? 0))</td>
+                                    <td>
+                                        @if (price.IsAvailable == true)
+                                        {
+                                            <span class="label label-success">Yes</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="label label-danger">No</span>
+                                        }
+
+                                    </td>
+
+                                    <td class="menu-icons" style="text-align:inherit">
+                                        @if (User.IsInRole(AppUserRoles.add_price_config))
+                                        {
+                                            <a title="Edit" href="@Url.Action("UpdatePriceConfig", "Setup", new { id = price.PriceConfigID })"><i class="fa fa-edit"></i></a>
+                                        }
+                                        @if (User.IsInRole(AppUserRoles.delete_price_config))
+                                        {
+                                            <a title="Delete" href="#" data-href="@Url.Action("DeletePriceConfig" ,"Setup", new { id = price.PriceConfigID })" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-remove"></i></a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            }
+        </div>
+
+    </div>
+
+</div>
+
+<div class="modal fade" id="import-from-excel-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+    @using (Html.BeginForm("ImportPriceConfigFromExcel", "Setup", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken();
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Import PriceConfig from excel file</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Excel File</label>
+
+                        @Html.TextBoxFor(x => x.fileBase, new { @class = "form-control", type = "file" })
+
+                        @Html.ValidationMessageFor(x => x.fileBase)
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-themyriad">Save</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+    <script src="~/Assets/build/js/Layout.js"></script>
+    <script>
+        $(function () {
+            $('table').DataTable({
+                "scrollY": "70vh",
+                "scrollCollapse": true,
+                "scrollX": "auto",
+                dom: 'Blfrtip',
+                "iDisplayLength": 100,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                buttons: [
+                    'excelHtml5',
+                ],
+            });
+        });
+
+        //Get
+        $('#LocationId').on('change', function () {
+            $('#RoomId').html('');
+            var LocationId = $(this).val();
+            var url = GetFormatedUrl("/Setup/GetTermsAndRoomsBYLocationId");
+            $.ajax({
+                type: "Get",
+                url: url,
+                data: {
+                    Id: LocationId
+                },
+                success: function (data) {
+                    var data = data;
+                    var RoomsTypes = data.Rooms;
+                    $('#TermID').html('');
+                    var html = "<option value=''>--Select Term --</option>";
+                    $.each(data.Terms, function (key, value) {
+                        html = html + "<option Value='" + value.TermID + "'>" + value.TermName + "</option>"
+                    })
+                    $('#TermID').html(html);
+                    $.each(RoomsTypes, function (i, e) {
+                        var htmlRooms = '<div class="col-md-6"><div class="form-group"><label>' + e.RoomName + ' (Price)' + '</label><input class="form-control PriceConfig" data-id="' + e.RoomTypeID + '" placeholder="Enter Room Price" type="number"></div></div>'
+                        $("#RoomId").append(htmlRooms)
+
+                    });
+
+
+                }
+            });
+        });
+
+        //Post
+        function SavePriceConfig() {
+            $('.Alert-Ajax-Response').addClass('hide');
+            var LocationId = $('#LocationId').val();
+            var termid = $('#TermID').val();
+            var Currency = /*$("#Currency option:selected").text()*/ $('#Currency').val();
+            var deposit = $('#Deposit').val();
+            var cleaningCharge = $('#CleaningCharge').val();
+            var OrderBy = $('#OrderBy').val();
+            var myarray = [];
+            var count = 0;
+
+            if (LocationId == null || LocationId == '' || LocationId == undefined) {
+                $('#error').text('Pleae Select Location First!');
+                $('.Alert-Ajax-Response').removeClass('hide');
+                return;
+            }
+            if (termid == null || termid == '' || termid == undefined) {
+                $('#error').text('Pleae Select Term!');
+                $('.Alert-Ajax-Response').removeClass('hide');
+                return;
+            }
+
+            $('.PriceConfig').each(function (i, e) {
+                var price = $(this).val();
+                price = Number(price);
+                if (price != '' & price >= 1) {
+                    count++;
+                }
+            });
+
+            if (count < 1) {
+                $('#error').text('Please Add Room Price Greater Than 0');
+                $('.Alert-Ajax-Response').removeClass('hide');
+                return;
+            }
+
+            if (Currency == null || Currency == '' || Currency == undefined) {
+                $('#error').text('Pleae Select Currency!');
+                $('.Alert-Ajax-Response').removeClass('hide');
+                return;
+            }
+            if (deposit == null) {
+                $('#error').text('Pleae Add Initial Deposit!');
+                $('.Alert-Ajax-Response').removeClass('hide');
+                return;
+            }
+
+            if (deposit == '') {
+                $('#error').text('Pleae Add Initial Deposit!');
+                $('.Alert-Ajax-Response').removeClass('hide');
+                return;
+            }
+            if (OrderBy == null || OrderBy == '' || OrderBy == undefined) {
+                $('#error').text('Pleae add OrderBy!');
+                $('.Alert-Ajax-Response').removeClass('hide');
+                return;
+            }
+
+            //if (deposit == 0) {
+            //    $('#error').text('Please enter deposit value greater than or equal to 1.');
+            //    $('.Alert-Ajax-Response').removeClass('hide');
+            //    return;
+            //}
+
+            $('.PriceConfig').each(function (i, e) {
+                var price = $(this).val();
+                if (price == null || price == '' || price == undefined || Number(price) <= 0) {
+                    return;
+                }
+                var priceconfig = {
+                    LocationId: LocationId,
+                    TermID: termid,
+                    RoomTypeID: $(this).attr('data-id'),
+                    Currency: Currency,
+                    Price: $(this).val(),
+                    Deposit: deposit,
+                    CleaningCharge: cleaningCharge || 0,
+                    OrderBy: OrderBy,
+                }
+                myarray.push(priceconfig);
+            });
+            console.log(myarray);
+            if (myarray.length > 0) {
+                var url = GetFormatedUrl("/Setup/AddPriceConfigList")
+                $.ajax({
+                    type: "Post",
+                    url: url,
+                    data: {
+                        list: myarray
+                    },
+                    success: function (data) {
+                        if (data.status == false) {
+                            $('#error').text('Term Already Exist With Same Room.');
+                            $('.Alert-Ajax-Response').removeClass('hide');
+                        }
+                        else {
+
+                            $('#success').text('Price Config Save Successfully');
+                            $('.Alert-Success-Response').removeClass('hide');
+                            window.location.reload(true);
+                        }
+
+                        $(document).ready(function () {
+                            setTimeout(function () {
+                                $("#alert-success-fun").fadeOut();
+                            }, 5000);
+                        });
+
+                    }
+                });
+            }
+
+        };
+
+        $('.closeErrorButton').on('click', function () {
+            $(this).closest('.Alert-Ajax-Response').addClass('hide');
+
+        })
+
+        //$(document).ready(function () {
+        //    setTimeout(function () {
+        //        $(".alert-success").fadeOut();
+        //    }, 5000);
+        //});
+
+        function setInitialLocation() {
+
+            var initialLocation = localStorage.getItem("selectedLocation");
+
+            if (initialLocation) {
+
+                $('#LocationId').val(initialLocation);
+                $("#LocationId").prop('disabled', true);
+
+                $('#LocationId').change();
+            }
+        }
+        setInitialLocation();
+    </script>
+
+
+}
+
+
+

@@ -1,0 +1,504 @@
+﻿@model PMS.DTO.ViewModels.PartnerLedgerPageViewModel
+
+@{
+    ViewBag.Header = "Resident Ledger";
+    ViewBag.HeaderDescription = "Invoices, Payments & Credit Notes";
+    ViewBag.Title = "Resident Ledger | PMS";
+}
+@{
+    var canRefund = User.IsInRole(PMS.Common.Classes.AppUserRoles.Refund_Deposit_Invoices);
+    var canPayRefund = User.IsInRole(PMS.Common.Classes.AppUserRoles.Pay_Refund);
+    var isDubai = Model.LocationId == (int)PMS.Common.Classes.Enumeration.LocationEnum.Dubai;
+
+
+}
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="~/Content/Css/PartnerLedger.css" />
+}
+
+<div class="report-container">
+    <!-- Header -->
+    <div class="report-header">
+        <h1>Resident Ledger Report</h1>
+        <p>Track All Invoices, Payments, and Credit Notes</p>
+        <p>Period: @(Model.FromDate.HasValue ? Model.FromDate.Value.ToString("dd/MMM/yyyy") : "") - @(Model.ToDate.HasValue ? Model.ToDate.Value.ToString("dd/MMM/yyyy") : "")</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (ViewBag.success != null)
+    {
+        <div class="alert alert-success alert-dismissible" style="margin: 20px;">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h4><i class="icon fa fa-check"></i> Success!</h4>
+            @ViewBag.success
+        </div>
+    }
+    @if (ViewBag.error != null)
+    {
+        <div class="alert alert-danger alert-dismissible" style="margin: 20px;">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+            @ViewBag.error
+        </div>
+    }
+
+    <!-- Customer Information -->
+    <div class="customer-info">
+        <h2>Customer Details</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Customer Name:</span>
+                <span class="info-value">@Model.PersonName</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Myriad ID:</span>
+                <span class="info-value">@Model.PersonCode</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Location:</span>
+                <span class="info-value">@Model.LocationName</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Credit Balance Alert -->
+    <div class="credit-balance-alert">
+        <h3>🏦 Available Credit Balance: @string.Format("{0} {1:N2}", Model.CurrencySymbol, Model.AvailableCreditBalance)</h3>
+        <p>Unused credit notes can be applied to future invoices or refunded upon request.</p>
+
+    </div>
+
+    <!-- Filters -->
+    <div class="customer-info">
+        <div class="row">
+            <div class="col-md-4">
+                <label>Status</label>
+                <select name="Status" id="Status" class="form-control select2">
+                    <option value="true" @(Model.Status == true ? "selected" : "")>Approved Only</option>
+                    <option value="false" @(Model.Status == false ? "selected" : "")>All</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label>From Date</label>
+                <input name="daterange" id="FromDate" autocomplete="off" class="form-control from_date" value="@(Model.FromDate.HasValue ? Model.FromDate.Value.ToString("dd/MMM/yyyy") : "")" placeholder="From Date" />
+            </div>
+            <div class="col-md-2">
+                <label>To Date</label>
+                <input name="daterange" id="ToDate" autocomplete="off" class="form-control to_date" value="@(Model.ToDate.HasValue ? Model.ToDate.Value.ToString("dd/MMM/yyyy") : "")" placeholder="To Date" />
+            </div>
+            <div class="col-md-1">
+                <label> &nbsp; </label>
+                <br />
+                <button type="button" onclick="GetLedger();" class="btn btn-themyriad btn-bordered waves-effect w-md"><i class="fa fa-search"></i> <span>Search</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ledger Table -->
+    <div class="row">
+
+        <div class="col-md-12">
+            <table id="Ledger" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Reference</th>
+                        <th>Type</th>
+                        <th>Description</th>
+
+                        @if (isDubai)
+                        {
+                            <th>Action</th>
+                        }
+                        <th>From Date</th>
+                        <th>To Date</th>
+                        <th>Debit</th>
+                        <th>Credit</th>
+                        <th>Running Balance</th>
+                        <th>Payment Type</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model.LedgerTransactions)
+                    {
+                        if (isDubai && item.Type.ToLower() == "credit note")
+                        {
+                            continue;
+                        }
+                        string typeClass = "";
+                        if (item.Type != null)
+                        {
+                            var t = item.Type.ToLower();
+                            if (t == "invoice")
+                            {
+                                typeClass = "type-invoice";
+                            }
+
+
+                            else if (t == "payment")
+                            {
+                                typeClass = "type-payment";
+                            }
+                            else if (t == "credit note")
+                            {
+                                typeClass = "type-credit";
+                            }
+                            else if (t == "credit applied")
+                            {
+                                typeClass = "type-credit-applied";
+                            }
+                        }
+
+                        string debitClass = (item.Debit.HasValue && item.Debit.Value > 0) ? "amount-debit" : "";
+                        string creditClass = (item.Credit.HasValue && item.Credit.Value > 0) ? "amount-credit" : "";
+
+                        // Check if it's a refund invoice or payment
+                        if (item.Type != null && (item.Type.ToLower().Contains("refund") || item.Type.ToLower().Contains("reversal")))
+                        {
+                            if (item.Debit.HasValue && item.Debit.Value > 0)
+                            {
+                                debitClass = "amount-refund-invoice";
+                            }
+                            if (item.Credit.HasValue && item.Credit.Value > 0)
+                            {
+                                // For refund/reversal invoices, use red color even in credit column
+                                if (item.Reference != null && (item.Reference.ToLower().Contains("ref-inv") || item.Reference.ToLower().Contains("r-inv") || item.Reference.ToLower().Contains("reversal")))
+                                {
+                                    creditClass = "amount-refund-invoice";
+                                }
+                                else
+                                {
+                                    creditClass = "amount-refund-payment";
+                                }
+                            }
+                        }
+                        <tr>
+                            <td>@item.Date.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Reference</td>
+                            <td><span class="transaction-type @typeClass">@item.Type</span></td>
+                            <td>@Html.Raw(item.Description)</td>
+                            @if (isDubai)
+                            {
+                                <td>
+                                    @{
+                                        var isDepositInvoice = (item.InvoiceTypeId ?? 0) == (int)PMS.Common.Classes.Enumeration.InvoiceTypes.Deposit;
+                                        var showRefund = canRefund && item.Type == "Invoice" && isDepositInvoice && item.Status == "Approved" && item.ParentInvoiceId == null && item.Refunded == null && (item.InvoiceId ?? 0) != 0;
+                                    }
+                                    @if (showRefund)
+                                    {
+                                        <a class="reverseInvoice-action menu-icons" style="text-align:inherit" title="Create Refund" onclick="OpenRefundInvoiceModal(@item.InvoiceId)">
+                                            <i class="fa fa-level-down action-for-Invoice"> Create refund</i>
+                                        </a>
+                                    }
+                                </td>
+                            }
+                            <td>@(item.FromDate.HasValue ? item.FromDate.Value.ToString("dd/MM/yyyy") : "-")</td>
+                            <td>@(item.ToDate.HasValue ? item.ToDate.Value.ToString("dd/MM/yyyy") : "-")</td>
+                            <td class="@debitClass">
+                                @(item.Debit.HasValue ? (item.Debit.Value < 0 ? string.Format("({0} {1:N2})", Model.CurrencySymbol, Math.Abs(item.Debit.Value)) : string.Format("{0} {1:N2}", Model.CurrencySymbol, item.Debit.Value)) : "-")
+                            </td>
+                            <td class="@creditClass">
+                                @(item.Credit.HasValue ? (item.Credit.Value < 0 ? string.Format("({0} {1:N2})", Model.CurrencySymbol, Math.Abs(item.Credit.Value)) : string.Format("{0} {1:N2}", Model.CurrencySymbol, item.Credit.Value)) : "-")
+                            </td>
+                            <td>
+                                @(item.RunningBalance < 0 ? string.Format("({0} {1:N2})", Model.CurrencySymbol, Math.Abs(item.RunningBalance)) : string.Format("{0} {1:N2}", Model.CurrencySymbol, item.RunningBalance))
+                            </td>
+                            <td>@item.PaymentType</td>
+                            <td>
+                                @if (item.Type == "Opening")
+                                {
+                                    <span class="text-muted label label-default">Opening Balance</span>
+                                }
+                                else if (item.Status == "Approved")
+                                {
+                                    <span class="text-success label label-success">Approved</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger label label-primary">Pending</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Credit Management Section -->
+    @if (!isDubai)
+    {
+        <div class="credit-management-section">
+            <h3>Credit Note Overview</h3>
+            <p>Easily track, apply, and manage credit notes for improved cash flow and transparency.</p>
+            <table class="credit-table">
+                <thead>
+                    <tr>
+                        <th>Credit Note</th>
+                        <th>Issue Date</th>
+                        <th>Original Amount</th>
+                        <th>Applied Amount</th>
+                        <th>Available Balance</th>
+                        <th>Status</th>
+                        <th>Applied To</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cn in Model.CreditNotes)
+                    {
+                        var statusClass = cn.Status == "AVAILABLE" ? "status-available" : "status-applied";
+                        <tr>
+                            <td>@cn.CreditNoteCode</td>
+                            <td>@cn.IssueDate.ToString("dd/MM/yyyy")</td>
+                            <td>@string.Format("{0} {1:N2}", Model.CurrencySymbol, cn.OriginalAmount)</td>
+                            <td>@string.Format("{0} {1:N2}", Model.CurrencySymbol, cn.AppliedAmount)</td>
+                            <td>@string.Format("{0} {1:N2}", Model.CurrencySymbol, cn.AvailableBalance)</td>
+                            <td><span class="@statusClass">@cn.Status</span></td>
+                            <td>@cn.AppliedTo</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- Summary Section -->
+    <div class="summary-section">
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h3>Total Invoices</h3>
+                <p class="amount" style="color: #d32f2f;">@string.Format("{0} {1:N2}", Model.CurrencySymbol, Model.Summary.TotalInvoices)</p>
+            </div>
+            <div class="summary-card">
+                <h3>Total Refund Invoices</h3>
+                <p class="amount" style="color: #9c27b0;">@string.Format("{0} {1:N2}", Model.CurrencySymbol, Model.Summary.TotalRefundInvoices)</p>
+            </div>
+            <div class="summary-card">
+                <h3>Total Payments</h3>
+                <p class="amount" style="color: #388e3c;">@string.Format("{0} {1:N2}", Model.CurrencySymbol, Model.Summary.TotalPayments)</p>
+            </div>
+            <div class="summary-card">
+                <h3>Total Refund Payments</h3>
+                <p class="amount" style="color: #ff9800;">@string.Format("{0} {1:N2}", Model.CurrencySymbol, Model.Summary.TotalRefundPayments)</p>
+            </div>
+            @if (!isDubai)
+            {
+                <div class="summary-card">
+                    <h3>Credit Notes Issued</h3>
+                    <p class="amount" style="color: #795548;">@string.Format("{0} {1:N2}", Model.CurrencySymbol, Model.Summary.CreditNotesIssued)</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Credits Applied</h3>
+                    <p class="amount" style="color: #c2185b;">@string.Format("{0} {1:N2}", Model.CurrencySymbol, Model.Summary.CreditsApplied)</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Available Credits</h3>
+                    <p class="amount" style="color: #4caf50;">@string.Format("{0} {1:N2}", Model.CurrencySymbol, Model.Summary.AvailableCredits)</p>
+                </div>
+            }
+            <div class="summary-card">
+                <h3>Total Balance</h3>
+                <p class="amount" style="color: @(Model.Summary.TotalBalance >= 0 ? "#388e3c" : "#d32f2f");">@string.Format("{0} {1:N2}", Model.CurrencySymbol, Model.Summary.TotalBalance)</p>
+                @if (isDubai && Model.Summary.TotalBalance != 0 && canPayRefund)
+                {
+                    @*<button type="button" onclick="OpenTransactionPasswordModal();" class="btn btn-success btn-sm" style="margin-top: 10px;">*@
+                    <button type="button" onclick="OpenPaymentModal();" class="btn btn-success btn-sm" style="margin-top: 10px;">
+                        <i class="fa fa-money"></i> Pay Refund
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="PaymentModal" tabindex="-1" role="dialog" aria-labelledby="PaymentModalLabel">
+    <form method="post" id="paymentModalForm" action="@Url.Action("CreatePartnerLedgerPayment", "Payments")">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="PaymentModalLabel">Confirm Payment</h4>
+                </div>
+
+                <div class="modal-body">
+                    <p>You are about to make a payment for this customer. This process is irreversible.</p>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="DebitAmountLabel">Amount <span style="color: #dc3545;">(Total Remaining: @string.Format("{0} {1:N2}", Model.CurrencySymbol, Math.Abs(Model.Summary.TotalBalance)))</span></label>
+                                <input type="text" class="form-control" name="DebitAmount" id="DebitAmount" required placeholder="Enter Debit Amount">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Payment Method</label>
+                                @Html.DropDownList("PaymentTypeId", null, "--- Select Payment Method ---", htmlAttributes: new { @class = "form-control select", @required = "required", Id = "PaymentTypeId" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="Remarks">Enter remarks</label>
+                                <textarea id="Remarks" class="form-control" name="Remarks" required placeholder="Remarks" style="min-height:70px"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="info" class="InformationLabel">Payment Information</label>
+                                <div id="info" class="well">
+                                    <strong>Customer:</strong> @Model.PersonName (@Model.PersonCode)<br>
+                                    <strong>Location:</strong> @Model.LocationName<br>
+                                    <strong>Outstanding Balance:</strong> @string.Format("{0} {1:N2}", Model.CurrencySymbol, Math.Abs(Model.Summary.TotalBalance))
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="paymentConfirmation" style="display: none;">
+                                <p class="mark-isPaid">The Debit Amount is less than the Outstanding Balance. This will create a partial payment.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 empty-body">
+                        <input type="hidden" name="PersonId" value="@Model.PersonId" />
+                        <input type="hidden" name="LocationId" value="@Model.LocationId" />
+                        <input type="hidden" name="OutstandingBalance" value="@Model.Summary.TotalBalance" />
+                        @Html.AntiForgeryToken()
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-themyriad btn-ok" type="submit" onclick="PostPaymentModal()">Create Payment</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Refund Modal (ported from Invoicings/Index) -->
+<div class="modal fade" id="CloneModal" tabindex="-1" role="dialog" aria-labelledby="CloneModalLabel">
+    <form method="post" id="invoiceCloneForm" action="@Url.Action("CreateRefundInvoice", "Invoicings", new { source = "partnerledger" })">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="CloneModalLabel">Confirm Refund Invoice</h4>
+                </div>
+
+                <div class="modal-body">
+                    <p>You are about to create a refund invoice. This process is irreversible.</p>
+                    <p class="debug-url"></p>
+                    <div class="col-md-12 empty-body">
+                        <div class="form-group">
+                            <label for="Remarks">Enter remarks</label>
+                            <textarea id="Remarks" class="form-control" name="Remarks" required placeholder="Remarks" style="min-height:70px"></textarea>
+                        </div>
+
+                        <textarea class="emp" id="InvoiceId" name="InvoiceId" hidden></textarea>
+                        <textarea class="emp" id="InvoiceCode" name="InvoiceCode" hidden></textarea>
+                        <textarea class="emp" id="InvoiceDate" name="InvoiceDate" hidden></textarea>
+                        <textarea class="emp" id="personId" name="personId" hidden></textarea>
+                        <textarea class="emp" id="InvoicePrice" name="InvoicePrice" hidden></textarea>
+                        <textarea class="emp" id="TaxAmount" name="TaxAmount" hidden></textarea>
+                        <textarea class="emp" id="NetAmount" name="NetAmount" hidden></textarea>
+                        <textarea class="emp" id="TaxIds" name="TaxIds" hidden></textarea>
+                        <textarea class="emp" id="Status" name="Status" hidden></textarea>
+                        <textarea class="emp" id="CreatedDate" name="CreatedDate" hidden></textarea>
+                        <textarea class="emp" id="UpdatedDate" name="UpdatedDate" hidden></textarea>
+                        <textarea class="emp" id="LocationId" name="LocationId" hidden></textarea>
+                        <textarea class="emp" id="IsPaid" name="IsPaid" hidden></textarea>
+                        <textarea class="emp" id="InvoiceTypeId" name="InvoiceTypeId" hidden></textarea>
+                        <textarea class="emp" id="Refunded" name="Refunded" hidden></textarea>
+                        <textarea class="emp" id="ParentInvoiceId" name="ParentInvoiceId" hidden></textarea>
+                        <textarea class="emp" id="TermID" name="TermID" hidden></textarea>
+                        <textarea class="emp" id="TotalDiscountAmount" name="TotalDiscountAmount" hidden></textarea>
+
+                    </div>
+
+                    <div id="invoice-data"></div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-themyriad btn-ok" onclick="PostCloneInvoice()" type="submit"> Yes</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+        </div>
+        <!-- /.modal-dialog -->
+    </form>
+</div>
+
+<!-- Transaction Password Modal -->
+<div class="modal fade" id="TransactionPasswordModal" tabindex="-1" role="dialog" aria-labelledby="TransactionPasswordModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="TransactionPasswordModalLabel">Transaction Password Required</h4>
+            </div>
+            <div class="modal-body">
+                <p>Please enter the transaction password to proceed with the refund payment.</p>
+                <div class="form-group">
+                    <label for="TransactionPassword">Transaction Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="TransactionPassword" placeholder="Enter transaction password" required>
+                        <div class="input-group-addon">
+                            <i class="fa fa-eye toggle-transaction-password" data-element="#TransactionPassword"></i>
+                        </div>
+                    </div>
+                    <div id="passwordError" class="text-danger" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-themyriad" onclick="ValidateTransactionPassword()">Validate</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@section scripts{
+    <script>
+        var PartnerLedgerConfig = {
+            personId: @Model.PersonId,
+            locationId: @Model.LocationId,
+            totalBalanceAbs: @Math.Abs(Model.Summary.TotalBalance)
+        };
+    </script>
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/Content/Js/PartnerLedger/partner-ledger.js"></script>
+
+}

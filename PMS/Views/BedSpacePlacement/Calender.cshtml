@@ -1,0 +1,157 @@
+﻿@model PMS.DTO.ViewModels.SetupViewModels.dummy
+
+
+@{
+    ViewBag.Header = "Calendar-Bed Space Bookings";
+    //ViewBag.HeaderDescription = "All Bed Space Placements";
+    ViewBag.Title = "Calendar-Bed Space Bookings | PMS";
+
+    var placements = ViewBag.Placements as List<PMS.DTO.ViewModels.BedSpacePlacementViewModels.PlacementsListVM>;
+}
+
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+
+}
+
+
+
+<div class="box box-danger">
+
+
+    <!-- form start -->
+    @using (Html.BeginForm("Calender", "BedSpacePlacement", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+     
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+             }
+             
+
+            <div class="row col-md-12">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+
+
+                        @Html.Label("Select building")
+
+
+
+                        @Html.DropDownListFor(model => model.BuildingName, ViewBag.Buildings as SelectList, "Select one..." ,  new { @class = "form-control" })
+
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+                <div class="col-md-6">
+                    <div class="form-group ">
+                        <label>Start date:</label>
+
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(Model => Model.TermStartDate, new { id = "datepicker", type = "datetime", @class = "form-control pull-right", autocomplete = "off", @readonly = "", placeholder = "Select Date" })
+
+                        </div>
+                        <!-- /.input group -->
+
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group ">
+                        <label>End date:</label>
+
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(Model => Model.TermEndDate, new { id = "enddatepicker", type = "datetime", @class = "form-control pull-right", autocomplete = "off", @readonly = "", placeholder = "Select Date" })
+
+                        </div>
+                        <!-- /.input group -->
+
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="View Calender">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+
+
+    <script>
+     
+        var str = $("#datepicker").val();
+
+        $(function () {
+            //Date picker
+            $('#datepicker').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy",
+                
+            })
+
+            $('.select2').select2()
+        })
+
+        $(function () {
+            //Date picker
+            $('#enddatepicker').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy",
+                startDate: str
+            })
+
+            $('.select2').select2()
+        })
+
+        $(document).ready(function () {
+
+        });
+    </script>
+}
+
+
+
+

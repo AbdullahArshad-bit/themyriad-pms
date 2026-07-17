@@ -1,0 +1,42 @@
+﻿@model PMS.DTO.ViewModels.BookingViewModels.CommitmentDetailVM
+
+@{ 
+    Layout = null;
+}
+
+<div class="row col-md-12">
+
+    <div class="col-md-6">
+        <div class="form-group">
+
+            <label>Term</label>
+
+            <input class="form-control" type="text" value="@(Model.Term + " - " + Model.TermDescription)" disabled />
+
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="form-group">
+
+            <label>Room Type</label>
+
+            <input class="form-control" type="text" value="@Model.RoomType" disabled />
+
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="form-group">
+
+            <label>Price</label>
+
+            <input class="form-control" type="text" value="@(Model.Currency + " " + String.Format("{0:f3}", Model.Price + (Model.CleaningCharge ?? 0)))" disabled />
+
+        </div>
+    </div>
+
+
+</div>
+
+

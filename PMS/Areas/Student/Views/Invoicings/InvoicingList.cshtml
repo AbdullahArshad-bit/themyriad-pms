@@ -1,0 +1,463 @@
+﻿@using PMS.Common.Classes
+@{
+    Layout = "~/Areas/Student/Views/Shared/_Layout.cshtml";
+    ViewBag.Header = "Invoices List";
+    ViewBag.HeaderDescription = "All Invoices";
+    ViewBag.Title = "All Invoices | PMS";
+
+    var Invoicings = ViewBag.Invoicings as List<PMS.DTO.ViewModels.OutputInvoicingVM>;
+    var paymentModel = ViewBag.success;
+    var isPaid = ViewBag.IsPaid;
+    var defaultStatus = isPaid ? "Paid" : "Unpaid";
+    var error = ViewBag.error;
+
+    var dubaiLocationId = (int)Enumeration.LocationEnum.Dubai;
+    var muscatLocationId = (int)Enumeration.LocationEnum.Muscat;
+}
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+
+    <style>
+        .bold-font {
+            font-weight: bold;
+        }
+    </style>
+
+}
+
+<div class="card">
+    <input id="reference" value="@paymentModel" hidden />
+    <input id="error" value="@error" hidden />
+    <input id="defaultStatus" value="@defaultStatus" hidden />
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        @*<div class="box-header">
+                <h3 class="box-title"></h3>
+            </div>*@
+        <div class="box-body">
+            <div class="col-md-3">
+                <label>Status</label>
+                <select id="statusFilter" class="form-control" style="width:49%">
+                    @*<option value="">All</option>*@
+                    <option value="Paid" @(defaultStatus == "Paid" ? "selected" : "")>Paid</option>
+                    <option value="Unpaid" @(defaultStatus == "Unpaid" ? "selected" : "")>Unpaid</option>
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <hr />
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+
+                    <table id="Invoices" class="table table-bordered table-striped">
+
+                        <thead>
+
+                            <tr>
+                                <th hidden></th>
+                                <th>Invoice Id</th>
+                                <th>Invoice Date</th>
+                                @*<th>Remarks</th>*@
+                                <th>Net Amount</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var invoicing in Invoicings)
+                            {
+                                <tr id="b-tr">
+                                    <td class="id" style="display:none;">@invoicing.Id</td>
+                                    <td class="code">@invoicing.Code</td>
+                                    <td>@invoicing.InvoiceDate.ToString("dd/MM/yyyy")</td>
+                                    @*<td>@invoicing.Remarks</td>*@
+                                    <td class="amount">@invoicing.NetAmount</td>
+                                    <td>
+                                        @if (invoicing.Status == true)
+                                        {
+                                            <span class="text-success label label-success">Paid</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger label label-primary">Unpaid</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (invoicing.Status == true)
+                                        {
+                                            <a title="Details" onclick="openReport(@invoicing.Id)"><i class="fa fa-download"></i></a>
+                                        }
+
+                                        @if (invoicing.Status == false)
+
+                                        {
+                                            //if (User.IsInRole(AppUserRoles.View_Payment_Link))
+                                            {
+                                                <a title="Pay Now" class="payment_Btn" onclick="ConfirmPayment(@invoicing.Id,@invoicing.LocationID)" id="payNow"><i class="fa fa-credit-card"></i></a>
+                                            }
+                                        }
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="modal" id="PaymenterrorModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="col-md-12 text-center">
+                    <h4 style="color:#d40808;">Payment Failed!</h4>
+                </div>
+            </div>
+            <div class="modal-body text-center">
+                <div class="text-center" style="padding-bottom: 24px;">
+                    <i class="fa fa-exclamation-triangle" style="font-size: 83px; color: #d40808"></i>
+                </div>
+                <div class="">
+                    <p id="errorMassage"></p>
+                    <p>Your Payment has Been Failed! Please try again Later</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="modal" id="PaymentConfirmModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="col-md-12 text-center">
+                    <h4 style="color:green;">Payment Successful!</h4>
+                </div>
+            </div>
+            <div class="modal-body text-center">
+                <div class="text-center" style="padding-bottom: 24px;">
+                    <i class="fa fa-check-circle" style="font-size: 83px; color: green"></i>
+                </div>
+                <p>
+                    Your Payment Has Made Successfuly
+                </p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>InvoiceRef</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="bold-font" id="code"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>Amount</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="bold-font" id="amount"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>Card No</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="bold-font" id="card"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>Payment Date</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="bold-font" id="date"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>Payment Reference</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="bold-font" id="ref"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="modal" id="PaymentModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="ConfirmPaymentLink">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Are you sure you want to Generate Link?</h4>
+
+            </div>
+            <div class="modal-body" id="paymentConfirmBody">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="GenratePaymentLink();" class="btn btn-danger">Generate</button>
+                <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div class="modal" id="PaymentLinkModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Payment Link</h4>
+            </div>
+            <div class="modal-body">
+                <div class="">
+                    <div class="input-group">
+                        <textarea type="text" id="paymentlink" class="form-control" readonly></textarea>
+                        <span class="input-group-addon" style="cursor:pointer;" onclick="Copy()"><i class="fa fa-clipboard" style="font-size: 24px;"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="col-md-4"></div>
+                <div class="col-md-5"></div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+@section scripts{
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script>
+
+        $(document).ready(function () {
+
+            if ($("#error").val() != "") {
+                $("#errorMassage").html($("#error").val());
+                $("#PaymenterrorModal").modal();
+            }
+            var invoiceTable = $('#Invoices').DataTable({
+                order: [[2, 'desc']],
+                scrollX: true
+
+            });
+            var defaultStatus = $("#defaultStatus").val();
+
+            //$(document).on('click','.payment_Btn', function () {
+            //    var code = $(this).closest('tr').find(".code").text();
+            //    var amount = $(this).closest('tr').find(".amount").text();
+            //    var invoicingId = $(this).closest('tr').find(".id").text();
+            //    //var defaultStatus = $('#statusFilter').val();
+
+            //    $.ajax({
+            //        url: GetFormatedUrl('/Student/Invoicings/GetPayableInvoice'),
+            //        type: "Get",
+            //        data: { Id: invoicingId },
+            //        success: function (response) {
+            //            if (response.success) {
+            //                $("#PaymentModal .modal-content").html("");
+            //                var html = `<div class="modal-header">
+            //        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            //            <span aria-hidden="true">×</span>
+            //        </button>
+            //        <h4 class="modal-title">Confirm Payment</h4>
+            //    </div>
+            //    <div class="modal-body">
+            //     <p>Invoice Code  <b style="color:#c20e1a">${response.data.Code}</b></p>
+            //     <p>Your Net Amount is  <b style="color:#c20e1a">${response.data.NetAmount}</b>
+            //     <p>Your Payable Amount is  <b style="color:#c20e1a">${response.data.NetAmount}</b>
+            //    </div>
+            //    <div class="modal-footer">
+            //        <button type="button" class="btn btn-themyriad-black" id="close1" data-dismiss="modal">Cancel</button>
+            //        <button type="button" onclick="payment(${invoicingId})" id="pay" class="btn btn-themyriad btn-ok">Confirm</button>
+            //    </div>`
+            //                $("#PaymentModal .modal-content").append(html);
+            //                $("#PaymentModal").modal();
+            //            } else {
+            //                Toast.show("Invoice not Found!", "error");
+            //            }
+            //        }
+            //    });
+
+            //});
+
+            //invoiceTable.column(4).search('^Paid$', true, false).draw();
+
+            invoiceTable.column(4).search('^' + defaultStatus + '$', true, false).draw();
+
+
+            $('#statusFilter').on('change', function () {
+                var value = $(this).val();
+
+               {
+                    // Search for exact match using regex
+                    invoiceTable.column(4).search('^' + value + '$', true, false).draw();
+                }
+            });
+
+            var referenceId = $("#reference").val();
+            if (referenceId != "" && referenceId != undefined) {
+                GetPayment(referenceId);
+            }
+        });
+
+        function openReport(id) {
+
+            window.open('/Reporting/GenerateInvoiceDetailReport?Id=' + id, '_blank');
+
+        }
+        function payment(id) {
+            $('#close1,#pay')
+                .prop("disabled", true)
+                .html('<i class="fa fa-2x fa-sync-alt fa-spin  fa-refresh loading "></i>')
+                .css('background', '#016891 !important');
+
+            $.ajax({
+                url: GetFormatedUrl('/Student/PaymentGateway/PayNow'),
+                data: { id: id },
+                type: "Get",
+                success: function (response) {
+                    if (response.success) {
+                        window.open("" + response.data + "", "_self");
+                    } else {
+                        $('#pay')
+                            .prop("disabled", false)
+                            .html('')
+                            .text('Confirm');
+
+                        $('#close1')
+                            .prop("disabled", false)
+                            .html('')
+                            .text('Close')
+                        Toast.show(response.data, "error");
+                    }
+                }
+            })
+
+        }
+        function GetPayment(id) {
+
+            $.ajax({
+                url: GetFormatedUrl('/Student/PaymentGateway/GetUserPayment'),
+                data: { referenceId: id },
+                type: "Get",
+                success: function (response) {
+                    if (response.success) {
+                        $("#amount").html(response.data.Amount+" OMR");
+                       $("#ref").html(response.data.ReferenceNo);
+                        $("#code").html(response.data.InvoiceCode);
+                        $("#card").html(response.data.Card);
+                        $("#date").html(response.data.Date);
+                        $("#PaymentConfirmModal").modal();
+                    }
+                }
+            })
+
+        }
+
+
+        function ConfirmPayment(id, locationId) {
+            debugger
+            Id = id;
+            $.ajax({
+                url: GetFormatedUrl('/Student/Invoicings/GetPayableInvoice'),
+                type: "Get",
+                data: { id: id },
+                success: function (response) {
+                    if (response.success) {
+                        var data = response.data;
+                        $("#paymentConfirmBody").html('');
+                        var resolvedLocationId = parseInt(locationId || data.LocationId || "0");
+
+                        var html = `<p>Invoice Code  <b style="color:#c20e1a">${data.Code}</b></p>
+                         <input id="PaymentLink_InvoiceId" value='${data.Id}' hidden/>
+                         <input id="PaymentLink_LocationId" value='${resolvedLocationId}' hidden/>
+                         <p>Net Amount is  <b style="color:#c20e1a">${data.NetAmount}</b>`;
+                        $("#paymentConfirmBody").html(html);
+                        $("#ConfirmPaymentLink").modal();
+                    } else {
+                        Toast.show("Invoice not Found!", "error");
+                    }
+                }
+            });
+
+        }
+
+        function GenratePaymentLink() {
+            debugger
+            $("#ConfirmPaymentLink").modal('hide');
+            var Id = $("#PaymentLink_InvoiceId").val();
+
+            $.ajax({
+                type: "Get",
+                url: GetFormatedUrl('/Student/PaymentGateway/PayNow'),
+                data: { id: Id },
+                async: true,
+                success: function (response) {
+                    if (response.success) {
+                        window.open("" + response.data + "", "_self");
+
+                    } else {
+                        Toast.show(response.data, "error");
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        }
+
+        function Copy() {
+            var copyText = document.getElementById("paymentlink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+
+            navigator.clipboard.writeText(copyText.value);
+        }
+
+    </script>
+}

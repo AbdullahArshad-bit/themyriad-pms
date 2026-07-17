@@ -1,0 +1,79 @@
+﻿@model PMS.EF.Invoicing
+
+@{
+    ViewBag.Header = "Invoicing";
+    ViewBag.HeaderDescription = "Fee Assessment Invoice";
+    ViewBag.Title = "Fee Assessment Invoice | PMS";
+}
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+
+
+}
+<input type="hidden" id="FrequencyId" />
+@Html.HiddenFor(x => x.Code)
+
+@Html.Partial("_CreateOrUpdate")
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+    <script>
+        GetTaxesEdit();
+        $('.taxes').each(function (i, e) {
+            $(this).select2().val($(this).attr('data-taxids').split(',')).trigger("change");
+        })
+
+
+    $('#Tax').val('@Model.TaxIds');
+    var taxess = ('@Model.TaxIds').split(',');
+    $('#TaxIds').val(taxess);
+    $('#NetAmount').val('@Model.NetAmount');
+    $('#SubTotal').val('@Model.TotalPrice');
+    $('#TaxAmount').val('@Model.TaxAmount');
+    $('#TotalDiscountAmount').val('@Model.TotalDiscountAmount');
+    $('.NetAmount').text('@Model.NetAmount');
+    $('.SubTotal').text('@Model.TotalPrice');
+    $('.TaxAmount').text('@Model.TaxAmount');
+    $('.TotalDiscountAmount').text('@Model.TotalDiscountAmount');
+
+    </script>
+
+    <script>
+        $('#LocationId').on('change', function () {
+            var LocationId = $(this).val()
+            var url = GetFormatedUrl("/Payments/GetLocationBYId")
+            $.ajax({
+                type: "Get",
+                url: url,
+                data: {
+                    Id: LocationId
+                },
+                success: function (data) {
+                    var data = data;
+                    $('#StudentId').html('');
+                    var html = "<option value=''>--- Select Resident Id ---</option>";
+                    $.each(data.Students, function (key, value) {
+                        html = html + "<option Value='" + value.PersonID + "'>" + value.FullName + "</option>"
+                    })
+                    $('#StudentId').html(html);
+
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript">
+
+        function bindServiceDates() {
+            $('.date').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy",
+
+            })
+        }
+    </script>
+}
+

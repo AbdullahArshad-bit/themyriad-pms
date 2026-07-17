@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <g id="Double_Bed" data-name="Double Bed" transform="translate(-771 -96)">
+    <rect id="Rectangle_485" data-name="Rectangle 485" width="40" height="40" transform="translate(771 96)" fill="none"/>
+    <g id="Group_343" data-name="Group 343" transform="translate(458 -90.104)">
+      <g id="Rectangle_463" data-name="Rectangle 463" transform="translate(322 203)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="24" height="10" stroke="none"/>
+        <rect x="0.5" y="0.5" width="23" height="9" fill="none"/>
+      </g>
+      <g id="Rectangle_471" data-name="Rectangle 471" transform="translate(335 207)" fill="none" stroke="#c20e1a" stroke-width="1">
+        <rect width="8" height="6" stroke="none"/>
+        <rect x="0.5" y="0.5" width="7" height="5" fill="none"/>
+      </g>
+      <g id="Rectangle_462" data-name="Rectangle 462" transform="translate(325 207)" fill="#fff" stroke="#c20e1a" stroke-width="1">
+        <rect width="8" height="6" stroke="none"/>
+        <rect x="0.5" y="0.5" width="7" height="5" fill="none"/>
+      </g>
+      <g id="Rectangle_464" data-name="Rectangle 464" transform="translate(318 212)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="32" height="10" stroke="none"/>
+        <rect x="0.5" y="0.5" width="31" height="9" fill="none"/>
+      </g>
+      <path id="Path_740" data-name="Path 740" d="M2265.1,623.557V629.1" transform="translate(-1946.595 -403)" fill="none" stroke="#000" stroke-width="1"/>
+      <path id="Path_743" data-name="Path 743" d="M2265.1,623.557v2.7" transform="translate(-1942.595 -402)" fill="none" stroke="#000" stroke-width="1"/>
+      <path id="Path_741" data-name="Path 741" d="M2265.1,623.557V629.1" transform="translate(-1915.595 -403)" fill="none" stroke="#000" stroke-width="1"/>
+      <path id="Path_742" data-name="Path 742" d="M2265.1,623.557v2.7" transform="translate(-1919.595 -402)" fill="none" stroke="#000" stroke-width="1"/>
+    </g>
+  </g>
+</svg>

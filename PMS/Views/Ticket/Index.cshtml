@@ -1,0 +1,323 @@
+﻿@model List<PMS.DTO.ViewModels.TicketViewModel>
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Complaint";
+    ViewBag.HeaderDescription = "All Complaints";
+    ViewBag.Title = "All Complaint | PMS";
+
+}
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+}
+<style>
+    .description img {
+        width: 100%;
+    }
+
+    .tdWidth {
+        max-width: 90px;
+        min-width: 90px;
+    }
+</style>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }@if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+            @if (User.IsInRole(AppUserRoles.add_Ticket))
+            {
+                <div class="col-sm-12 " style="margin-bottom:30px ; padding:0px;">
+                    <div class="input-group-btn">
+                        <a href="@Url.Action("Add", "Ticket")" class="btn btn-themyriad"><i class="fa fa-plus" style="padding-right: 5px;"></i> Add New Complaint</a>
+                    </div>
+                </div>
+            }
+            <div class="">
+                <div class="">
+
+                    <div class="col-md-3">
+                        <label>Status</label>
+                        @Html.DropDownList("Status", null, "--- All ---", htmlAttributes: new { @class = "form-control select2 ", @required = "required" })
+                    </div>
+                    <div class="col-md-3">
+                        <label>Complaints</label>
+                        <select class="select2" name="Tickets" id="ticketId">
+                            <option value="0">All Complaints</option>
+                            <option value="1" @(ViewBag.TicketId == 1 ? "selected" : "")>Complaint I Raised</option>
+                            <option value="2" @(ViewBag.TicketId == 2 ? "selected" : "")>Complaint I Am Mention In</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <label> &nbsp; </label>
+                    <br />
+                    <button type="button" onclick="GetTickets();" class="btn btn-themyriad btn-bordered waves-effect w-md"><i class="fa fa-search"></i> <span>Search</span></button>
+                </div>
+            </div>
+            <br />
+
+        </div>
+        <div class="col-md-12">
+            <hr />
+        </div>
+        <div style="overflow: auto; width:100%">
+            <div class="col-md-12">
+                <table id="ticket" class="table table-bordered table-striped ">
+
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Subject</th>
+                            <th>Description</th>
+                            <th>Location</th>
+                            <th>State</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Source</th>
+                            <th>Group</th>
+                            <th>Assign To</th>
+                            <th>Issue By</th>
+                            <th>Created By</th>
+                            <th>Created Date</th>
+                            <th>Due Date</th>
+                            <th>Resolve Date</th>
+                            <th>action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null)
+                        {
+                            foreach (var ticket in Model)
+                            {
+                                <tr>
+                                    <td class="tdWidth">@ticket.Code</td>
+                                    <td>@ticket.Name</td>
+                                    <td>@(ticket.Description != null ? ticket.Description : "------")</td>
+                                    <td>@ticket.LocationName</td>
+                                    @{
+                                        if (ticket.StatusId == (int)Enumeration.TicketStatus.Open && (ticket.DueDate > DateTime.Now.Date || ticket.DueDate == null))
+                                        {
+                                            <td><span class='label label-primary'>New</span></td>
+                                        }
+                                        else if (ticket.DueDate < DateTime.Now.Date)
+                                        {
+                                            <td><span class='label label-danger'>Overdue</span></td>
+                                        }
+                                        else
+                                        {
+                                            <td><span>-----</span></td>
+                                        }
+                                    }
+                                    @{
+                                        if (ticket.PeriorityId == (int)Enumeration.TicketPeriority.Low)
+                                        {
+                                            <td><span class='label label-primary'>@ticket.PriorityName</span></td>
+                                        }
+                                        else if (ticket.PeriorityId == (int)Enumeration.TicketPeriority.Pending)
+                                        {
+                                            <td><span class='label label-warning'>@ticket.PriorityName</span></td>
+                                        }
+                                        else
+                                        {
+                                            <td><span class='label label-danger'>@ticket.PriorityName</span></td>
+                                        }
+
+                                    }
+                                    <td>@ticket.Status</td>
+                                    <td>@ticket.Source</td>
+                                    <td>@ticket.GroupName</td>
+                                    <td>@ticket.AssignToName</td>
+                                    <td>@ticket.IssueByName</td>
+                                    <td>@ticket.CreatedByName</td>
+                                    <td class="tdWidth">@ticket.CreatedDate</td>
+                                    <td class="tdWidth">@(ticket.DueDate != null ? Convert.ToDateTime(ticket.DueDate).ToString("dd-MMM-yyyy") : "-")</td>
+                                    <td>@ticket.ResolvedDate</td>
+                                    <td class="menu-icons" style="text-align:inherit">
+                                        @if (ticket.StatusId != (int)Enumeration.TicketStatus.Closed)
+                                        {
+                                            if (User.IsInRole(AppUserRoles.update_TicketStatus))
+                                            {
+                                                <a title="Update Status" onclick="OpenDetailModal(@ticket.Id)" href="#"><i class="fa fa-list"></i></a>
+                                            }
+                                            if (User.IsInRole(AppUserRoles.update_TicketComments))
+                                            {
+                                                <a title="Comments" href="@Url.Action("Comments", "Ticket", new { Id = ticket.Id })"><i class="fa fa-comments"></i></a>
+                                            }
+                                            if (ticket.StatusId == (int)Enumeration.TicketStatus.Open && ticket.CreatedBy == PMS.Common.Globals.User.ID)
+                                            {
+                                                <a title="Edit" href="@Url.Action("Add","Ticket",new {id=ticket.Id })"><i class="fa fa-pencil-square-o"></i></a>
+                                            }
+                                        }
+                                        @if (User.IsInRole(AppUserRoles.delete_Ticket))
+                                        {
+                                            <a title="Delete" href="#" data-href="@Url.Action("Delete","Ticket",new {id=ticket.Id })" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-close"></i></a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="DetailModal">
+        <form method="post" action="@Url.Action("UpdateStatus", "Ticket")">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel" style="font-weight: bold">Update Status</h4>
+                    </div>
+                    <div class="modal-header">
+                        <h4 class="modal-title" style="text-align:center" id="Detail">Detail</h4>
+                        <br />
+                        <div class="row" style="border: solid 2px; border-color: #ededed ">
+                            <div class="col-md-12 description" style="padding:20px;">
+                                <p id="Description"></p>
+                                <br />
+                                <div class="col-md-12" id="AttachementDetail">
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-body">
+                        @Html.Hidden("Id", new { id = "Id" })
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Status</label>
+                                        @Html.DropDownList("StatusId", null, "--- Select Status ---", htmlAttributes: new { @class = "form-control select ", @required = "required", Id = "StatusId" })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Priority</label>
+                                        @Html.DropDownList("PeriorityId", null, "--- Select Priority ---", htmlAttributes: new { @class = "form-control select ", @required = "required", Id = "Priority" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Assign To</label>
+                                        @Html.DropDownList("AssignTo", null, "--- Select Assign To ---", htmlAttributes: new { @class = "form-control select ", @required = "required" })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Due Date</label>
+                                        @*@Html.TextBoxFor(x => x.DueDate, htmlAttributes: new { type = "date", @class = "form-control pull-right", autocomplete = "off" })*@
+
+                                        <input class="form-control" id="DueDate" placeholder="Due Date" name="DueDate" type="date" autocomplete="off" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-themyriad">Save</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@section scripts{
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+
+    <script>
+        $(function () {
+            $('#ticket').DataTable({
+                "scrollY": "70vh",
+                "scrollCollapse": true,
+                "scrollX": "auto",
+                dom: 'Blfrtip',
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                buttons: [
+                    'excelHtml5',
+                ],
+                "order": [[3, "asc"]]
+            });
+        });
+
+        function OpenDetailModal(Id) {
+            $.ajax({
+                url: "/Ticket/GetTicketDetail?Id=" + Id,
+                method: "Get",
+                success: function (data) {
+                    if (data.success) {
+                        var ticket = data.data;
+
+                        $('#StatusId').val(ticket.StatusId);
+                        $('#Priority').val(ticket.PeriorityId);
+                        if (ticket.AssignTo != "0") {
+                            $('#AssignTo').val(ticket.AssignTo);
+                        }
+
+                        $('#DueDate').val(ticket.DueDateString);
+                        $("#Id").val(ticket.Id);
+                        $("#AttachementDetail").html('');
+                        var detail = ticket.TicketDetailViewModel[0];
+                        $('#Description').html(detail.Description);
+                        $.each(detail.TicketDetailAttachementVm, function (index, value) {
+
+                            var html = ` <div class="col-md-3 col-sm-3 col-xs-3">
+                                                            <a href="javascript:window.open('${value.FileUrl}')"><img src="${value.FileUrl}" style="height:100px;" /></a>
+                                                        </div>`;
+                            $("#AttachementDetail").append(html);
+                        });
+                        $("#DetailModal").modal();
+                    }
+                }
+            });
+        }
+
+        function GetTickets() {
+            var Status = $('#Status').val();
+            var TicketId = $('#ticketId').val();
+            window.location.href = GetFormatedUrl("/Ticket/Index?statusId=" + Status + "&ticketId=" + TicketId);
+        };
+
+    </script>
+}

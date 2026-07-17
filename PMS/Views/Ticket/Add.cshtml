@@ -1,0 +1,612 @@
+﻿@model PMS.DTO.ViewModels.TicketViewModel
+@{
+    ViewBag.Header = "Complaint";
+    ViewBag.HeaderDescription = "Add New Complaint";
+    ViewBag.Title = "Create New Complaint | PMS";
+    var Detail = Model.TicketDetailViewModel == null ? new PMS.DTO.ViewModels.TicketDetailViewModel() : Model.TicketDetailViewModel.FirstOrDefault();
+}
+<style>
+    .highlight {
+        border-color: red;
+    }
+
+    .dropzone textarea:focus, .dropzone textarea {
+        outline: none;
+        border: none;
+        width: 100%;
+    }
+
+    #mydropzone {
+        padding: 3px;
+        border-color: #d2d6de;
+    }
+
+    .dz-success-mark, .dz-error-message, .dz-error-mark {
+        display: none !important;
+    }
+
+    .footer-custom-editor {
+        padding: 12px;
+        background: #f4f3f3;
+        margin-bottom: 11px;
+        border: 1px solid rgba(0,0,0,.3);
+        border-top: 0px transparent;
+    }
+
+    .dz-progress {
+        display: none !important;
+    }
+</style>
+<link rel="stylesheet" href="~/Assets/plugins/Autocomplete/styles.css">
+<link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Index", "Ticket")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i>Back to Complaint</a>
+        </div>
+    </div>
+    <form id="credit-form">
+        @Html.HiddenFor(x => x.Id)
+        @Html.Hidden("DetailId", Detail.Id)
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group defaultDropdown">
+                    @Html.LabelFor(x => x.LocationId, "Location")
+                    @Html.DropDownList("LocationId", null, "--- Select Location ---", htmlAttributes: new { @class = "form-control", @required = "required" })
+                    @Html.ValidationMessageFor(x => x.LocationId)
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Code, "Code")
+                    @Html.TextBoxFor(x => x.Code, htmlAttributes: new { @class = "form-control pull-right", autocomplete = "off", @disabled = "disabled" })
+
+
+                </div>
+            </div>
+
+
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Name, "Subject")
+                    @Html.TextBoxFor(x => x.Name, htmlAttributes: new { @class = "form-control pull-right", placeholder = "Subject", autocomplete = "off" })
+                    @Html.ValidationMessageFor(x => x.Name)
+
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.PeriorityId, "Priority")
+                    @Html.DropDownList("PeriorityId", null, "--- Select Priority ---", htmlAttributes: new { @class = "form-control select ", @required = "required" })
+                    @Html.ValidationMessageFor(x => x.PeriorityId)
+
+                </div>
+            </div>
+
+        </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.TypeId, "Type")
+                    <div>
+
+                        <input type="radio" id="Resident" class="IssueType" value="1" name="TypeId" @(Model.TypeId == 1 ? "checked" : "") checked />
+                        <label for="Resident"> Resident</label>
+                        &nbsp; &nbsp; &nbsp;
+                        <input type="radio" id="Staff" class="IssueType" value="2" name="TypeId" @(Model.TypeId == 2 ? "checked" : "") />
+                        <label for="Staff"> Staff</label>
+                        &nbsp; &nbsp; &nbsp;
+                        <input type="radio" id="Email" class="IssueType" value="3" name="TypeId" @(Model.TypeId == 3 ? "checked" : "") />
+                        <label for="Non Resident"> Non Resident</label>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-6" id="IssueByResidentDiv">
+                <div class="form-group defaultDropdown">
+                    @Html.LabelFor(x => x.IssueBy, "Resident")
+                    @Html.DropDownList("IssueBy", null, "--- Select Resident ---", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                    @Html.ValidationMessageFor(x => x.IssueBy)
+
+                </div>
+            </div>
+            <div class="col-md-6" style="display:none;" id="IssueByStaffDiv">
+                <div class="form-group defaultDropdown">
+                    @Html.LabelFor(x => x.IssueByStaff, "Staff")
+                    @Html.DropDownList("IssueByStaff", null, "--- Select Staff ---", htmlAttributes: new { @class = "form-control select2" })
+                    @Html.ValidationMessageFor(x => x.IssueByStaff)
+
+                </div>
+            </div>
+            <div class="row" style="display: none; margin-bottom: 15px;" id="NonResidentDiv">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.FullName, "Name")
+                        @Html.TextBoxFor(x => x.FullName, htmlAttributes: new { @class = "form-control", placeholder = "Enter Name", autocomplete = "off" })
+                        @Html.ValidationMessageFor(x => x.FullName)
+
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Phone, "Phone")
+                        @Html.TextBoxFor(x => x.Phone, htmlAttributes: new { @class = "form-control", placeholder = "Enter Phone", autocomplete = "off" })
+                        @Html.ValidationMessageFor(x => x.Phone)
+
+                    </div>
+                </div>
+                <div class="col-md-6" style="visibility:hidden">
+
+                </div>
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.IssueByEmail, "Email")
+                        @Html.TextBoxFor(x => x.IssueByEmail, htmlAttributes: new
+                        {
+                            type = "text",
+                            placeholder = "Enter Email",
+                            @class = "form-control pull-right",
+                            autocomplete = "off"
+                        })
+                        @Html.ValidationMessageFor(x => x.IssueByEmail)
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.StatusId, "Status")
+                        @Html.DropDownList("StatusId", null, "--- Select Status ---", htmlAttributes: new { @class = "form-control select ", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.StatusId)
+
+                    </div>
+                </div>
+
+                @{
+                    var DueDate = "";
+                    if (Model.DueDate.HasValue)
+                    {
+                        DueDate = Model.DueDate.Value.ToString("yyyy-MM-dd");
+                    }
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.DueDate, "Due Date")
+                            @Html.TextBoxFor(x => x.DueDate, htmlAttributes: new { type = "date", @Value = DueDate, @class = "form-control pull-right", autocomplete = "off" })
+                            @Html.ValidationMessageFor(x => x.DueDate)
+
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.GroupId, "Group")
+                        @Html.DropDownList("GroupId", null, "--- Select Group ---", htmlAttributes: new { @class = "form-control", @rows = 5 })
+                        @Html.ValidationMessageFor(x => x.GroupId)
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssignTo, "Assign To")
+                        @Html.DropDownList("AssignTo", null, "--- Select Agent ---", htmlAttributes: new { @class = "form-control select2 ", @rows = 5 })
+                        @Html.ValidationMessageFor(x => x.AssignTo)
+
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Description, "Reason")
+                    <div class="clsbox-1" runat="server">
+                        <div class="dropzone clsbox" id="mydropzone">
+                            <textarea type="text" name="description" id="description" placeholder=" Description" rows="4">@(Detail.Description)</textarea>
+                            <div class="dz-default dz-message" style="display: block;">
+                                <button class="dz-button" type="button">
+                                    Drop or Click here To Add File
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+            <div class="box-footer">
+                <button class="btn btn-themyriad savebtn" type="button" onclick="Submit()">Create</button>
+            </div>
+    </form>
+
+</div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script src="~/Assets/plugins/Autocomplete/jquery.autocomplete.js"></script>
+<script src="~/Assets/plugins/Autocomplete/jquery.mockjax.js"></script>
+<script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/datepicker/Js")
+
+    <script>
+        var ExistingFile = [];
+        $('#LocationId').on('change', function () {
+            var LocationId = $('#LocationId').val()
+            var url = GetFormatedUrl("/Ticket/GetResidanceByLocation")
+            $.ajax({
+                type: "Get",
+                url: url,
+                data: {
+                    LocationId: LocationId
+                },
+                success: function (data) {
+                    var data = data;
+                    if (data.Success) {
+                        $('#IssueBy').html('');
+                        $('#IssueByStaff').html('');
+                        $("#Code").val(data.Code);
+                        var html = "<option value=''>--- Select Resident ---</option>";
+                        $.each(data.Persons, function (key, value) {
+                            html = html + "<option Value='" + value.PersonID + "'>" + value.FullName + "</option>"
+                        })
+                        $('#IssueBy').html(html);
+
+                        var html2 = "<option value=''>--- Select Staff ---</option>";
+                        $.each(data.Users, function (key, value) {
+                            html2 = html2 + "<option Value='" + value.ID + "'>" + value.FullName + "</option>"
+                        })
+                        $('#IssueByStaff').html(html2);
+
+                    }
+                }
+            });
+        });
+        $('.IssueType').on('change', function () {
+            var value = $(this).val();
+            ShowResidentDiv(value);
+
+        });
+
+        function ShowResidentDiv(value) {
+
+            if (value == 1) {
+                $("#IssueByResidentDiv").show();
+                $("#IssueByStaffDiv").hide();
+                $("#NonResidentDiv").hide();
+                $("#IssueByStaff").val('').change();
+                $("#IssueByEmail").val('');
+                $("#FullName").val('');
+                $("#Phone").val('');
+
+            }
+            else if (value == 2) {
+                $("#IssueByStaffDiv").show();
+                $("#IssueByResidentDiv").hide();
+                $("#NonResidentDiv").hide();
+                $("#IssueBy").val('').change();
+                $("#IssueByEmail").val('');
+                $("#FullName").val('');
+                $("#Phone").val('');
+
+
+
+            }
+            else {
+                $("#NonResidentDiv").show();
+                $("#IssueByResidentDiv").hide();
+                $("#IssueByStaffDiv").hide();
+                $("#IssueBy").val('').change();
+                $("#IssueByStaff").val('').change();
+
+            }
+        }
+        Dropzone.autoDiscover = false;
+
+        // Dropzone class:
+        var myDropzone = new Dropzone("div#mydropzone", {
+            addRemoveLinks: true,
+            url: "#",
+            maxFiles: 4, //change limit as per your requirements
+            dictMaxFilesExceeded: "Maximum upload limit reached",
+            dictInvalidFileType: "upload only JPG/PNG",
+            dictDefaultMessage: "Drop or Click here To Add File",
+            autoProcessQueue: false,
+            init: function () {
+                // Hack: Add the dropzone class to the element
+                $(this.element).addClass("dropzone");
+                this.on("removedfile", function (file) {
+                    if (file.hasOwnProperty("serverID")) {
+
+                        ExistingFile = $.grep(ExistingFile, function (e) {
+                            return e.serverID != file.serverID;
+                        });
+                    }
+                });
+            }
+        });
+        $(document).ready(function () {
+            if ($("#Id").val() != "") {
+                var typeId = $("input[name='TypeId']:checked").val();
+                ShowResidentDiv(typeId);
+
+            }
+            var detailId = $("#DetailId").val();
+            if (detailId != "" && detailId != undefined && detailId != null) {
+                $.ajax({
+                    url: "/Ticket/GetAttachementById",
+                    method: "Get",
+                    data: { id: detailId },
+                    success: function (data) {
+                        if (data.success) {
+                            $.each(data.data, function (index, value) {
+
+                                var mockFile = {
+                                    name: value.FileName,
+                                    size: value.FileSize,
+                                    serverID: value.Id
+                                };
+
+                                myDropzone.emit("addedfile", mockFile);
+                                myDropzone.emit("thumbnail", mockFile, value.FileUrl);
+                                myDropzone.emit("complete", mockFile);
+
+                                ExistingFile.push(mockFile);
+                            });
+
+                        }
+                    }
+                });
+            }
+        });
+        function Submit() {
+            Loaderbtn(true);
+            if (validate()) {
+                $('.savebtn')
+                    .prop("disabled", true)
+                    .html('<i class="fa fa-2x fa-sync-alt fa-spin  fa-refresh loading "></i>')
+                    .css('background', '#016891 !important');
+                var locationId = $("#LocationId").val();
+                var subject = $("#Name").val();
+                var issueBy = "0";
+                var IssueByEmail = "0";
+                var FullName = $("#FullName").val();
+                var Phone = $("#Phone").val();
+                var periorty = $("#PeriorityId").val();
+                var status = $("#StatusId").val();
+                var AssingTo = $("#AssignTo").val();
+                var DueDate = $("#DueDate").val();
+                var description = $("#description").val();
+                var TypeId = $("input[name='TypeId']:checked").val();
+                var IssueByStaff = "0";
+                if (TypeId == "1") {
+                    issueBy = $("#IssueBy").val();
+                }
+                else if (TypeId == "2") {
+                    IssueByStaff = $("#IssueByStaff").val();
+                }
+                else {
+                    IssueByEmail = $("#IssueByEmail").val();
+                }
+                var groupId = $("#GroupId").val()
+                var Id = $("#Id").val();
+                var ticket = {
+                    Id: Id,
+                    LocationId: locationId,
+                    Name: subject,
+                    IssueBy: issueBy,
+                    IssuebyEmail: IssueByEmail,
+                    FullName: FullName,
+                    Phone: Phone,
+                    PeriorityId: periorty,
+                    StatusId: status,
+                    AssignTo: AssingTo,
+                    DueDate: DueDate,
+                    Description: description,
+                    TypeId: TypeId,
+                    IssueByStaff: IssueByStaff,
+                    GroupId: groupId
+                };
+
+                var formdata = new FormData();
+                var model = JSON.stringify(ticket);
+
+                var files = myDropzone.getAcceptedFiles();
+
+                $.each(files, function (index, value) {
+
+
+                    formdata.append(value.name, value, value.name);
+                });
+
+                formdata.append("detail", model);
+                formdata.append("ExistingFiles", JSON.stringify(ExistingFile));
+                $.ajax({
+                    url: "/Ticket/Add",
+                    method: "Post",
+                    processData: false,
+                    contentType: false,
+                    data: formdata,
+                    success: function (data) {
+                        if (data.success) {
+                            window.location.replace(GetFormatedUrl('/Ticket/Index'));
+                        } else {
+                            Toast.show(data.message, "error");
+                        }
+                    }
+                });
+
+            } else {
+                Loaderbtn(false);
+            }
+        }
+        // If you use jQuery, you can use the jQuery plugin Dropzone ships with:
+
+
+        function SaveDetail(id) {
+            var formdata = new FormData();
+            var description = $("#description").val();
+
+            var files = myDropzone.getAcceptedFiles();
+
+            $.each(files, function (index, value) {
+                formdata.append(value.name, value, value.name);
+            });
+
+            formdata.append("id", id);
+            formdata.append("description", description);
+            $.ajax({
+                url: "/Ticket/AddDetail",
+                method: "Post",
+                data: formdata,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    Loaderbtn(false);
+                    if (response.success) {
+                        window.location.replace(GetFormatedUrl('/Ticket/Index'))
+
+                    } else {
+                        Toast.show("some error occoured!", 'danger');
+                    }
+                }
+            });
+        }
+        function validate() {
+            var locationId = $("#LocationId").val();
+            var subject = $("#Name").val();
+            var issueBy = $("#IssueBy").val();
+            var periorty = $("#PeriorityId").val();
+            var status = $("#StatusId").val();
+            var AssingTo = $("#AssignTo").val();
+            var description = $("#description").val();
+            var group = $("#GroupId").val();
+            var type = $("input[name='TypeId']:checked").val();
+            var issuebyStaff = $("#IssueByStaff").val();
+            var issueByEmail = $("#IssueByEmail").val();
+            var FullName = $("#FullName").val();
+            var phone = $("#Phone").val();
+            var phoneReg = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/;
+
+            var emailReg = /^([a-zA-Z0-9_.+-])+\@@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+
+            if (locationId == null || locationId == '' || locationId == undefined) {
+                showMessage('Please select Location!');
+                return false;
+            }
+            if (subject == null || subject == '' || subject == undefined) {
+                showMessage('Please Enter Subject!');
+                return false;
+            }
+            if (type == "1") {
+                if (issueBy == null || issueBy == '' || issueBy == undefined) {
+                    showMessage('Please select Resident!');
+                    return false;
+                }
+            } if (type == "2") {
+                if (issuebyStaff == null || issuebyStaff == '' || issuebyStaff == undefined) {
+                    showMessage('Please Select Staff!');
+                    return false;
+                }
+            }
+            if (type == "3") {
+                //if (issueByEmail == null || issueByEmail == '' || issueByEmail == undefined) {
+                //    showMessage('Please enter Email!');
+                //    return false;
+                //}
+                if (FullName == null || FullName == '' || FullName == undefined) {
+                    showMessage('Please Enter Name');
+                    return false;
+                }
+                if (phone == null || phone == '' || phone == undefined) {
+                    showMessage('Please Enter Phone');
+                    return false;
+                }
+
+            }
+            if (type == "3" && !phoneReg.test(phone)) {
+                showMessage('Please Enter Valid Phone Number!')
+                return false;
+            }
+            if (type == "3" && issueByEmail != '' && !emailReg.test(issueByEmail)) {
+                showMessage('Please enter Valid Email!');
+                return false;
+            }
+            if (periorty == null || periorty == '' || periorty == undefined) {
+                showMessage('Please Select Periorty!');
+                return false;
+            }
+            if (status == null || status == '' || status == undefined) {
+                showMessage('Please Select Status!');
+                return false;
+            }
+            if (group == null || group == '' || group == undefined) {
+                showMessage('Please Select A Group!');
+                return false;
+            }
+            if (AssingTo == null || AssingTo == '' || AssingTo == undefined) {
+                showMessage('Please Assign To SomeOne!');
+                return false;
+            } if (description == null || description == '' || description == undefined) {
+                showMessage('Please Add Description!');
+                return false;
+            }
+
+
+            return true;
+        }
+        function Loaderbtn(show) {
+            if (!show) {
+                $('.savebtn')
+                    .prop("disabled", false)
+                    .html('')
+                    .text('Save');
+            }
+            else {
+                $('.savebtn')
+                    .prop("disabled", true)
+                    .html('<i class="fa fa-2x fa-sync-alt fa-spin  fa-refresh loading "></i>')
+                    .css('background', '#016891 !important');
+            }
+        }
+
+//        $("#GroupId").change(function () {
+//            var GroupId = $('#GroupId').val()
+//            var url = GetFormatedUrl("/Ticket/GetStaffByGroup")
+//            $.ajax({
+//                type: "Get",
+//                url: url,
+//                data: {
+//                    GroupId: GroupId
+//                },
+//                success: function (data) {
+//                    var data = data;
+//                    if (data.Success) {
+//                        $('#AssignTo').html('');
+//                        var html = "<option value=''>--- Select Agent ---</option>";
+//                        $.each(data.data, function (key, value) {
+//                            html = html + "<option Value='" + value.Id + "'>" + value.Name + "</option>"
+//                        })
+//                        $('#AssignTo').html(html);
+//                    }
+//                }
+//            });
+//});
+    </script>
+}
+

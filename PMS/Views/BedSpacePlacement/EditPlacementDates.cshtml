@@ -1,0 +1,223 @@
+﻿@model PMS.DTO.ViewModels.BedSpacePlacementViewModels.AddBedSpacePlacementVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Update Dates of Placements";
+    ViewBag.HeaderDescription = "Update Dates";
+    ViewBag.Title = "Update Dates of Placements | PMS";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+    <link href="~/Assets/plugins/bootstrap-datetimepicker-0.0.11/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+
+}
+
+
+
+<div class="box box-danger">
+
+    @{
+        if (Model.BedSpacePlacementID == 0)
+        {
+            <div class="box-header with-border">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("BookingList", "Booking")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Bookings</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="box-header with-border">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("PlacementsList", "BedSpacePlacement")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Placements</a>
+                </div>
+            </div>
+        }
+
+    }
+
+    <!-- form start -->
+    @using (Html.BeginForm("EditPlacementDates", "BedSpacePlacement", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.BedSpacePlacementID)
+        @Html.HiddenFor(x => x.BookingID)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.MoveIn)
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(x => x.MoveIn, new
+                            {
+                               @Value = Model.MoveIn.ToString("dd/MMM/yyyy"),
+                               @class = "form-control pull-right From_Date",
+                               autocomplete = "off",
+                               placeholder = "Select Move In Date"
+                            })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.MoveOut)
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(x => x.MoveOut, new
+                            {
+                                @Value = Model.MoveOut.ToString("dd/MMM/yyyy"),
+                                @class = "form-control pull-right To_Date",
+                                autocomplete = "off",
+                                placeholder = "Select Move Out Date"
+                            })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.CheckIn)
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(x => x.CheckIn, new
+ {
+     @Value = Model.CheckIn != DateTime.MinValue ? Model.CheckIn.ToString("dd-MMM-yyyy HH:mm:ss") : "",
+     @class = "form-control datetimepicker checkin",
+     autocomplete = "off",
+     placeholder = "Select CheckIn Date",
+     @disabled = Model.CheckIn == DateTime.MinValue ? "disabled" : null // Disable only if CheckIn is null
+ })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.CheckOut)
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(x => x.CheckOut, new
+ {
+     @Value = Model.CheckOut != DateTime.MinValue ? Model.CheckOut.ToString("dd-MMM-yyyy HH:mm:ss") : "",
+     @class = "form-control datetimepicker checkout",
+     autocomplete = "off",
+     placeholder = "Select CheckOut Date",
+     @disabled = Model.CheckOut == DateTime.MinValue ? "disabled" : null // Disable only if CheckOut is null
+ })
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <!-- /.box-body -->
+
+            <div class="box-footer">
+                <input type="submit" class="btn btn-themyriad" value="Save">
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts
+{
+
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+    <script src="~/Assets/plugins/bootstrap-datetimepicker-0.0.11/js/bootstrap-datetimepicker.js"></script>
+
+
+
+    <script>
+
+        $(function () {
+            $('.From_Date').datepicker({
+                format: 'dd/MMM/yyyy',
+                autoclose: true
+            }).datepicker('setStartDate', null); // Allow past dates
+
+            $('.From_Date').on('changeDate', function (selected) {
+                var moveInDate = new Date(selected.date.valueOf());
+                $('.To_Date').datepicker('setStartDate', moveInDate).datepicker('show');
+            });
+
+            $('.To_Date').datepicker({
+                format: 'dd/MMM/yyyy',
+                autoclose: true
+            });
+
+            $('.datetimepicker').datetimepicker({
+                autoclose: true,
+                format: 'dd-M-yyyy hh:ii:ss',
+                todayBtn: true,
+                showMeridian: true,
+                startView: 2,
+                startDate: null
+            });
+
+            function toggleCheckFields() {
+                var checkinValue = $('.checkin').val().trim();
+                var checkoutValue = $('.checkout').val().trim();
+
+                if (checkinValue === "" && checkoutValue === "") {
+                    // Both Check-In & Check-Out are empty -> Disable both
+                    $('.checkin, .checkout').prop('disabled', true);
+                } else if (checkinValue !== "" && checkoutValue === "") {
+                    // Check-In has a value, but Check-Out is empty -> Enable Check-In, Disable Check-Out
+                    $('.checkin').prop('disabled', false);
+                    $('.checkout').prop('disabled', true);
+                } else {
+                    // Both have values -> Enable both
+                    $('.checkin, .checkout').prop('disabled', false);
+                }
+            }
+
+            // Run on page load
+            toggleCheckFields();
+
+            // Check when values change
+            $('.checkin, .checkout').on('change', function () {
+                toggleCheckFields();
+            });
+        });
+
+
+
+
+
+
+    </script>
+
+}

@@ -1,0 +1,165 @@
+﻿@model PMS.DTO.ViewModels.BedSpacePlacementViewModels.GuestCountVm
+@{
+    ViewBag.Header = "Add GuestCount";
+    ViewBag.HeaderDescription = "";
+    ViewBag.Title = "Add GuestCount | PMS";
+}
+
+@section styles{
+    <style>
+        .guest-detail {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+}
+
+<div class="box box-danger">
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("PersonGuest", "Booking")" class="btn btn-themyriad">
+                <i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> HeadCountList List
+            </a>
+        </div>
+    </div>
+
+    <form action="@Url.Action("AddGuestCount", "Booking")" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Students</label>
+                    @Html.DropDownList("StudentId", null, "-- All Users --", htmlAttributes: new { @class = "form-control select2", @id = "headcount" })
+                </div>
+
+                <div id="PlaceDetailDiv"></div>
+            </div>
+
+            <div id="guestDetails" style="padding:13px;">
+                <div class="guest-detail" id="guestDetailTemplate">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="GuestCount">Guest Count</label>
+                                <input type="number" name="Guests[0].GuestCount" class="form-control" placeholder="Guest Count" required />
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="IDNumber">ID Number</label>
+                                <input type="text" name="Guests[0].IDNumber" class="form-control" placeholder="Valid ID number (emirates ID, Passport number, etc)" required />
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="GuestName">Guest Name</label>
+                                <input type="text" name="Guests[0].GuestName" class="form-control" placeholder="Guest Name" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="CurrentDateTime">Current Date Time</label>
+                                <input type="datetime-local" name="Guests[0].CurrentDateTime" class="form-control" placeholder="Current Date Time" required />
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="VisitorCardNumber">Visitor Card Number</label>
+                                <input type="text" name="Guests[0].VisitorCardNumber" class="form-control" placeholder="Visitor Card Number" required />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="Description">Description</label>
+                                <input type="text" name="Guests[0].Description" class="form-control" placeholder="Description" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ImageUrl">Image</label>
+                                <input type="file" name="Guests[0].ImageSource" class="form-control" required />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group remove-button-container">
+                                <button type="button" class="btn btn-themyriad remove-guest-detail">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @*<button type="button" class="btn btn-primary" id="addGuestDetail">Add Guest</button>*@
+            <a href="#Line" class="fa fa-plus-circle" id="addGuestDetail">Add Guest</a>
+
+        </div>
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    </form>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            var guestIndex = 0;
+
+            // Hide the remove button for the first guest detail by default
+            $(".remove-button-container:first").hide();
+
+            $("#addGuestDetail").on("click", function () {
+                guestIndex++;
+                var newGuestDetail = $("#guestDetailTemplate").clone();
+                newGuestDetail.removeAttr("id");
+                newGuestDetail.find("input, select").each(function () {
+                    var name = $(this).attr("name").replace("[0]", "[" + guestIndex + "]");
+                    $(this).attr("name", name);
+                    $(this).val(''); // Clear the input fields
+                });
+                newGuestDetail.find(".remove-button-container").show(); // Show the remove button for new guest detail
+                $("#guestDetails").append(newGuestDetail);
+            });
+
+            $(document).on("click", ".remove-guest-detail", function () {
+                $(this).closest(".guest-detail").remove();
+            });
+
+            $("#headcount").on("change", function () {
+                if ($(this).val() == "") {
+                    $("#PlaceDetailDiv").html("");
+                    return;
+                }
+                $.ajax({
+                    url: GetFormatedUrl('/Booking/GetPlacementDetail?id=') + $(this).val(),
+                    type: 'GET',
+                    data: "",
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        $("#PlaceDetailDiv").html(data);
+                    },
+                    error: function () {
+                        $("#PlaceDetailDiv").html("");
+                        Toast.show("error", "error");
+                    }
+                });
+            });
+        });
+    </script>
+}

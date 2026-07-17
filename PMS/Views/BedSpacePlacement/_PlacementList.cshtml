@@ -1,0 +1,586 @@
+﻿@model PMS.DTO.ViewModels.PersonManageViewModels.ImportFromExcelVM
+
+@using PMS.Common.Classes
+
+<input name="aud" id="aud" value="@ViewBag.id" hidden />
+<input name="pid" id="pid" value="@ViewBag.personId" hidden />
+
+<div class="page-container">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"></h3>
+        </div>
+        <div class="box box-danger">
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+            </div>
+            <div class="box-body">
+
+                @if (ViewBag.error != null)
+                {
+                    <div class="alert alert-danger alert-dismissible" style="white-space: normal;">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                        @Html.Raw(ViewBag.error)
+                    </div>
+                }
+
+                @if (ViewBag.success != null)
+                {
+                    <div class="alert alert-success alert-dismissible" style="white-space: normal;">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                        @Html.Raw(ViewBag.success)
+                    </div>
+                }
+
+                @{
+                    var query = Request.Params["queryby"];
+                }
+
+
+                @if (query == null || query == "NoContract")
+                {
+                    <div class="">
+                        <div class="row">
+
+                            <div class="col-md-3">
+                                <label>From Date</label>
+                                <input name="daterange" id="FromDate" class="form-control from_date" value="@ViewBag.FromDate" placeholder="From Date" autocomplete="off" />
+                            </div>
+                            <div class="col-md-3">
+                                <label>To Date</label>
+                                <input name="daterange" id="ToDate" class="form-control to_date" value="@ViewBag.ToDate" placeholder="To Date" autocomplete="off" />
+                            </div>
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <label>InHouse</label>
+                                    <div>
+                                        <label class="switch">
+                                            <input type="checkbox" name="inHouse" id="inHouse" value="" checked>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Commitments</label>
+
+                                    @Html.DropDownList("Terms", null, "--- Select Commitment ---", htmlAttributes: new { @class = "form-control select2", @rows = 5 })
+
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label>&nbsp;</label>
+                                <br />
+                                <button type="button" onclick="GetPlacements();" class="btn btn-themyriad btn-bordered waves-effect w-md button-effect">
+                                    <i class="fa fa-search"></i> <span>Search</span>
+                                </button>
+                                @if (query == null)
+                                {
+                                    <button type="button" onclick="GetExcel()" class="btn btn-success btn-bordered waves-effect w-md button-effect" style="margin-left: 5px;">
+                                        <i class="fa fa-download"></i> <span>Export Report</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" onclick="GetExcel()" class="btn btn-success btn-bordered waves-effect w-md button-effect" style="margin-left: 5px;">
+                                        <i class="fa fa-download"></i> <span>Export Report</span>
+                                    </button>
+                                }
+
+                            </div>
+
+
+                       
+                        </div>
+                        <br />
+                    </div>
+                }
+
+                @*<div class="col-sm-12 " style="margin-bottom:30px ; padding:0px;">
+
+                        <a href="javascript:void(0)" data-toggle="modal" data-target="#import-from-excel-modal" class="btn btn-themyriad">
+                            <i class="fa  fa-file-excel-o" style="padding-right: 5px;"></i>
+                            Import Placements From Excel
+                        </a>
+                        <a href="http://localhost:54589//Upload/Files/ExcelImportFormats/ImportPlacement.xlsx" class="btn btn-themyriad">
+                            <i class="fa  fa-file-excel-o" style="padding-right: 5px;"></i>
+                            Import Placement Format
+                        </a>
+
+
+                    </div>*@
+
+
+
+
+                @if (User.IsInRole(AppUserRoles.Run_A_Fee_Assessment))
+                {
+                    <div class="">
+                        <div class="row">
+                            <div class="col-md-3  hide" id="invoice-buttons-container" style="margin-bottom:20px;">
+                                <button type="button" id="generateInvoicesBtn" class="btn btn-themyriad hide waves-effect button-effect">
+                                    Fee Assessment
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+
+                }
+                <div class="row" style="margin-bottom: 30px">
+                    <div class="col-md-3">
+                        <label>Search By Column:</label>
+                        <select class="form-control" id="column-filter">
+                            <option value="">All Columns</option>
+                            <option value="LocationName">Location</option>
+                            <option value="Title">Title</option>
+                            <option value="FullName">Full Name</option>
+                            <option value="Block">Block</option>
+                            <option value="Gender">Gender</option>
+                            <option value="BedSpace">Bed Space</option>
+                            <option value="Room">Room</option>
+                            <option value="RoomType">Room Type</option>
+                            <option value="Commitment">Rate Code</option>
+                            <option value="Price">Rate Amount</option>
+                            <option value="BilledUpto">BilledUpto</option>
+                            <option value="Email">Email</option>
+                            <option value="Phone">Phone</option>
+                            <option value="DOB">DOB</option>
+                            <option value="University">University</option>
+                            <option value="Requests">Requests</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3" style="width: 200px;">
+                        <label>Column Visibilty:</label>
+                        <select multiple class="form-control" id="columnvisibilty-filter">
+                            <option selected value="LocationName">Location</option>
+                            <option selected value="Title">Title</option>
+                            <option value="FullName">Full Name</option>
+                            <option value="Gender">Gender</option>
+                            <option value="Block">Block</option>
+                            <option value="BedSpace">Bed Space</option>
+                            <option value="Room">Room</option>
+                            <option value="RoomType">Room Type</option>
+                            <option value="Occupancy">Rate Code</option>
+                            <option value="Price">Rate Amount</option>
+                            <option value="BilledUpto">BilledUpto</option>
+                            <option value="MoveIn">Move In</option>
+                            <option value="MoveOut">Move Out</option>
+                            <option value="CheckIn">Check In</option>
+                            <option value="CheckOut">Check Out</option>
+                            <option selected value="Email">Email</option>
+                            <option selected value="Phone">Phone</option>
+                            <option selected value="DOB">DOB</option>
+                            <option value="University">University</option>
+                            <option selected value="Requests">Requests</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <table id="tblGrid" class="table table-bordered table-striped data-table TestExcel">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="select-all-checkbox" title="Select All" style="cursor: pointer;"></th>
+                            <th style="color:black !important">Action</th>
+                            <th>Location</th>
+                            <th>Title</th>
+                            <th>Full Name</th>
+                            <th>Gender</th>
+                            <th>Block</th>
+                            <th>Bed Space</th>
+                            <th>Room</th>
+                            <th>Room Type</th>
+                            <th>Rate Code</th>
+                            <th>Rate Amount</th>
+                            <th>BilledUpto</th>
+                            <th>Move In</th>
+                            <th>Move Out</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>DOB</th>
+                            <th>University</th>
+                            <th>Requests</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /.modal-dialog Check In -->
+
+<div class="modal" id="CheckInBtnConfirm">
+    <form method="post" action="@Url.Action("CheckIn", "BedSpacePlacement")">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">Check In</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <p>Please select date and time to CheckIn</p>
+                        <div class="col-lg-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>CheckIn</label>
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="hidden" name="id" id="id" class="CheckInHiddenId" />
+                                        <input type="datetime" id="checkInForm" name="checkIntime" class="form-control datetimepicker" readonly placeholder="Select Date Time">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6" id="cardNumberContainer">
+                                <div class="form-group">
+                                    <label>Card Number</label>
+                                    <input type="text" name="cardNumber" id="cardNumber" class="form-control" placeholder="Enter Card Number" required />
+                                </div>
+                            </div>
+                            <div class="col-sm-6" id="encoderNumberContainer" style="display: none;">
+                                <div class="form-group">
+                                    <label>Encoder Number</label>
+                                    <input type="text" name="encoderNumber" id="encoderNumber" class="form-control" placeholder="Enter Encoder Number" required />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-themyriad btn-ok" type="submit"> Yes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </form>
+</div>
+
+
+<!-- /.modal-dialog Check out -->
+
+<div class="modal" id="CheckOutBtnConfirm">
+    <form method="post" action="@Url.Action("CheckOut", "BedSpacePlacement")">
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">Check Out</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <p>Please select date and time to CheckOut</p>
+                        <div class="col-lg-12">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>CheckOut</label>
+                                    <div class="input-group date ">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="hidden" name="id" id="id" class="CheckOutHiddenId" />
+                                        <input type="datetime" id="checkOutForm" name="checkOuttime" class="form-control datetimepicker autocomplete = off" readonly placeholder="Select Date Time">
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="custom-spinner-container" style="display: none;">
+                        <i class="fa fa-spinner fa-spin custom-spinner" style="color: #c20e1a;"></i>
+                        <span class="loading-text"> Loading...</span>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-themyriad btn-ok" type="submit"> Yes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </form>
+
+</div>
+
+<!-- /.modal-dialog Contract -->
+
+<div class="modal" id="GenerateContractModel">
+    <form id="GenerateContractModelForm">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">Generate Contract</h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+
+                        <div class="row col-md-12">
+                            <div class="form-group">
+                                <label for="ContractId">Contract</label>
+                                @Html.DropDownList("ContractId", null, "Select...", htmlAttributes: new { @class = "form-control", @required = "required" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Gross Rent</label>
+                                <input type="number" id="GrossRent" name="GrossRent" class="form-control" readonly />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Net Rent Payable</label>
+                                <input type="number" id="NetAmount" name="NetAmount" class="form-control" readonly />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Registration Fee</label>
+                                <input type="number" id="RegistrationFee" name="RegistrationFee" class="form-control" readonly />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Security Fee</label>
+                                <input type="number" id="SecurityFee" name="SecurityFee" class="form-control" readonly />
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-themyriad btn-ok" onclick="PostGenerateContract()">Generate</a>
+                </div>
+
+            </div>
+            <!-- /.modal-content -->
+        </div>
+    </form>
+    <!-- /.modal-dialog -->
+</div>
+
+<!-- /.modal-dialog FeeAssesment -->
+
+<div class="modal" id="FeeAssesmentModal">
+    <form id="FeeAssesmentForm">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">Fee Assessment</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row col-md-12" style="padding-bottom: 32px">
+
+                        <div class="col-md-6">
+                            <label>From Date</label>
+                            <input name="daterange" id="FromDates" class="form-control assessment_from_dates" value="" placeholder="From Date" autocomplete="off" />
+                        </div>
+                        <div class="col-md-6">
+                            <label>To Date</label>
+                            <input name="daterange" id="ToDates" class="form-control assessment_to_dates" value="" placeholder="To Date" autocomplete="off" />
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-themyriad btn-ok" onclick="generateInvoices()">Generate</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- /.modal-dialog Inspection -->
+
+<div class="modal" id="InspectionConfirm">
+    <form id="InspectionConfirmForm">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">Generate Inspection</h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row col-sm-12">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="Inspection">Inspections</label>
+                                @Html.DropDownList("Inspection", null, "Select...", htmlAttributes: new { @class = "Dropdown form-control", @required = "required", style = "width:100% !important" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="Remarks">Any Remarks:</label>
+                                <input type="text" name="Remarks" id="Remarks" placeholder="Enter Your Remarks" style="min-height:125px" />
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-themyriad btn-ok" onclick="GenerateInspection()">Generate</a>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Confirm Delete</h4>
+            </div>
+            <div class="modal-body">
+                <p>You are about to delete this record. This process is irreversible.</p>
+                <p> Are you sure?</p>
+                <p class="debug-url"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                <button onclick="DeletePlacement()" class="btn btn-themyriad btn-ok">Delete</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- /.modal-dialog ImportPlacement -->
+<div class="modal fade" id="import-from-excel-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+    @using (Html.BeginForm("ImportPlacementFromExcel", "BedSpacePlacement", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken();
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Import placements from excel file</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Excel File</label>
+
+                        @Html.TextBoxFor(x => x.fileBase, new { @class = "form-control", type = "file" })
+
+                        @Html.ValidationMessageFor(x => x.fileBase)
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-themyriad">Save</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- /.modal-dialog ReIssue Card -->
+
+<div class="modal" id="ReIssueCardBtnConfirm">
+    <form method="post" action="@Url.Action("ReissueMSCHcard", "BedSpacePlacement")">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">Re-Issue Card</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <p>Please add encoder number to re-issue card</p>
+                        <div class="col-lg-12">
+                            <div hidden class="col-sm-6">
+                                <div class="form-group">
+                                    <input type="hidden" name="id" id="id" class="NewActionHiddenId" />
+                                </div>
+                            </div>
+                            <div class="col-sm-6" id="cardNumberContainerN">
+                                <div class="form-group">
+                                    <label>Card Number</label>
+                                    <input type="text" name="cardNumber" id="cardNumberN" class="form-control" placeholder="Enter Card Number" required />
+                                </div>
+                            </div>
+                            <div class="col-sm-6" id="encoderNumberContainerN" style="display: none;">
+                                <div class="form-group">
+                                    <label>Encoder Number</label>
+                                    <input type="text" name="encoderNumber" id="encoderNumberN" class="form-control" placeholder="Enter Encoder Number" required />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="custom-spinner-container" style="display: none;">
+                        <i class="fa fa-spinner fa-spin custom-spinner" style="color: #c20e1a;"></i>
+                        <span class="loading-text"> Loading...</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-themyriad btn-ok" type="submit"> Yes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </form>
+</div>

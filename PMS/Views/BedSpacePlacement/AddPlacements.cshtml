@@ -1,0 +1,243 @@
+﻿@model PMS.DTO.ViewModels.BedSpacePlacementViewModels.AddBedSpacePlacementVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Bed Space Placements";
+    ViewBag.HeaderDescription = "Add/Edit Placements";
+    ViewBag.Title = "Add/Edit Placements | PMS";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+
+
+
+<div class="box box-danger">
+
+    @{
+        if (Model.BedSpacePlacementID == 0)
+        {
+            <div class="box-header with-border">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("BookingList", "Booking")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Bookings</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="box-header with-border">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("PlacementsList", "BedSpacePlacement")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Placements</a>
+                </div>
+            </div>
+        }
+
+    }
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddPlacements", "BedSpacePlacement", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.BedSpacePlacementID)
+        @Html.HiddenFor(x => x.BookingID)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.MoveIn)
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(x => x.MoveIn, new { @Value = Model.MoveIn.ToString("dd/MMM/yyyy"), @class = "form-control pull-right From_Date", autocomplete = "off", placeholder = "Select Move In Date" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.MoveOut)
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(x => x.MoveOut, new { @Value = Model.MoveOut.ToString("dd/MMM/yyyy"), @class = "form-control pull-right To_Date", autocomplete = "off", placeholder = "Select Move Out Date" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+                @if (Model.BedSpacePlacementID == 0)
+                {
+                    <!-- Add Case -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.BedSpaceID)
+                            @Html.DropDownListFor(model => model.BedSpaceID,
+                                new SelectList(Model.BedSpacesList, "Value", "Text"),
+                                "-- Bed Space --",
+                                new { @class = "form-control select2", @id = "ddlBedSpaces" })  <!-- Editable dropdown -->
+                            @Html.ValidationMessageFor(x => x.BedSpaceID)
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top: 29px;">
+                            <label>
+                                <input type="checkbox" id="toggleBedSpaces" />
+                                Force Upgrade
+                            </label>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- Edit Case -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.BedSpaceID)
+                            @Html.DropDownListFor(
+                                model => model.BedSpaceID,
+                                new SelectList(Model.BedSpacesList, "Value", "Text"),
+                                "-- Bed Space --",
+                                new { @class = "form-control select2", @id = "ddlBedSpaces", @disabled = "disabled" }
+                            )
+                            @Html.ValidationMessageFor(x => x.BedSpaceID)
+
+                            <!-- Hidden field to capture the selected value -->
+                            @Html.HiddenFor(x => x.BedSpaceID, new { @id = "hdnBedSpaceID" })
+                        </div>
+                    </div>
+                }
+
+                <div class="row">
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(x => x.Requests)
+                        @Html.TextAreaFor(x => x.Requests, new { @class = "form-control", placeholder = "Special Request" })
+                        @Html.ValidationMessageFor(x => x.Requests)
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+    <script>
+
+           $(document).ready(function() {
+        $('#toggleBedSpaces').change(function() {
+            if ($(this).is(':checked')) {
+                // If checked, toggle to AllBedSpacesList
+                var allBedSpaceList = @Html.Raw(Json.Encode(Model.AllBedSpacesList));
+                $('#ddlBedSpaces').empty();
+                $('#ddlBedSpaces').append('<option value="">-- Bed Space --</option>');
+
+                $.each(allBedSpaceList, function(index, item) {
+                    $('#ddlBedSpaces').append($('<option>', {
+                        value: item.Value,
+                        text: item.Text
+                    }));
+                });
+            } else {
+                // If unchecked, refresh the page
+                location.reload();
+            }
+        });
+           });
+
+        $('.from_date, .to_date').keydown(function (event) {
+
+            var key = event.keyCode || event.charCode;
+            if (key == 8 || key == 46) {
+                event.preventDefault();
+                return false;
+            }
+        });
+
+        $(function () {
+
+            $('.select2').select2()
+        })
+
+
+
+        $(function () {
+            var duration = @Model.Duration; // Ensure this is correctly set in your model
+            var placementId = @Model.BedSpacePlacementID;
+            var moveInDate = placementId !== 0 ? new Date('@Model.MoveIn') : new Date();
+            var moveOutDate = new Date(moveInDate);
+            moveOutDate.setDate(moveInDate.getDate() + duration);
+
+            $('.From_Date').datepicker({
+                format: 'dd/MM/yyyy',
+                autoclose: true
+            }).on('changeDate', function (e) {
+                moveInDate = e.date;
+                moveOutDate = new Date(moveInDate);
+                moveOutDate.setDate(moveInDate.getDate() + duration);
+
+                $('.To_Date').datepicker('update', moveOutDate); // Update Move Out date picker
+            });
+
+            $('.To_Date').datepicker({
+                format: 'dd/MM/yyyy',
+                autoclose: true
+            }).datepicker('update', moveOutDate); // Set initial value of Move Out date
+        });
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // For the edit case, disable the dropdown and style it as read-only
+            if ($('#ddlBedSpaces').is(':disabled')) {
+                $('#ddlBedSpaces').css({
+                    'background-color': '#f5f5f5', // Light gray background
+                    'color': '#495057' // Darker text color
+                });
+                // Set the hidden field value based on the dropdown's selected value
+                $('#hdnBedSpaceID').val($('#ddlBedSpaces').val());
+            }
+        });
+
+    </script>
+
+}

@@ -1,0 +1,166 @@
+﻿@model List<PMS.DTO.ViewModels.InspectionViewModels.MaintenanceVM>
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Maintanance Requests";
+    ViewBag.HeaderDescription = "All Maintanance Requests";
+    ViewBag.Title = "Maintanance Requests | PMS";
+
+    //var placements = ViewBag.Placements as List<PMS.DTO.ViewModels.BedSpacePlacementViewModels.PlacementsListVM>;
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }@if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+
+
+
+            <div style="overflow: auto; width:100%;white-space:nowrap;">
+
+                <table class="table table-bordered table-striped data-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Generated InspectionID</th>
+                            <th>InspectionName</th>
+                            <th>Note</th>
+                            <th>Image</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                        <tr>
+                            <td>@item.GeneratedInspectionID</td>
+                            <td>@item.InspectionName</td>
+                            <td>@item.Note</td>
+                            @if (item.Image != null)
+                            {
+                                <td><img src="@item.Image" alt="InspectionImage" width="200" height="100"></td>
+                            }
+                            else
+                            {
+                                <td>Not Exists</td>
+                            }
+
+                        </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Generated InspectionID</th>
+                            <th>InspectionName</th>
+                            <th>Note</th>
+                            <th>Image</th>
+
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Confirm Delete</h4>
+            </div>
+            <div class="modal-body">
+                <p>You are about to delete this record. This process is irreversible.</p>
+                <p> Are you sure?</p>
+                <p class="debug-url"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                <button onclick="DeleteInspection()" class="btn btn-themyriad btn-ok">Delete</button>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+@section scripts{
+
+    <script src="~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.11/sorting/date-eu.js" type="text/javascript"></script>
+
+    <script>
+        $(function () {
+            $('.data-table').DataTable({});
+        })
+
+
+        var id = "";
+        function OpenConfirmDeleteModal(ID) {
+
+            id = ID;
+
+            $('#confirm-delete').modal('show');
+
+        }
+
+        function DeleteInspection() {
+
+            $.ajax({
+
+                url: GetFormatedUrl("/Inspection/DeleteInspection?id=" + id),
+                type: "GET",
+
+                dataType: "json",
+                contentType: "application/json;charset=UTF-8",
+
+                success: function (data) {
+                    if (data.Success != 'true' && data.Code == 404) {
+
+                        return;
+                    }
+                    if (data.success != 'false') {
+                        window.location.href = GetFormatedUrl("/Inspection/Inspection");
+
+                    }
+                }
+            })
+
+
+        }
+
+    </script>
+}

@@ -1,0 +1,68 @@
+@model IEnumerable<PMS.DTO.ViewModels.ReportingViewModels.DetailLiabilityBalanceVM>
+
+<div style="overflow-x:auto;">
+<table id="DetailLiabilityTable" class="table table-bordered table-striped display now" style="width:100%">
+    <thead>
+        <tr>
+            <th>MyriadID</th>
+            <th>Invoice Date</th>
+            <th>Deposit Memo No</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Running Balance</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.MyriadID</td>
+            <td>@item.InvoiceDate.ToString("dd/M/yyyy")</td>
+            <td>@item.DepositMemoNo</td>
+            <td>@item.Description</td>
+            @{
+                if (item.Amount < 0)
+                {
+                    <td class="right">(@Math.Abs(item.Amount).ToString("0.00"))</td>
+                }
+                else
+                {
+                    <td class="right">@item.Amount.ToString("0.00")</td>
+                }
+                if (item.RunningBalance < 0)
+                {
+                    <td class="right">(@Math.Abs(item.RunningBalance).ToString("0.00"))</td>
+                }
+                else
+                {
+                    <td class="right">@item.RunningBalance.ToString("0.00")</td>
+                }
+            }
+        </tr>
+    }
+    </tbody>
+</table>
+</div>
+
+<style>
+    /* Column widths and numeric alignment */
+    #DetailLiabilityTable th:nth-child(2),
+    #DetailLiabilityTable td:nth-child(2) {
+        width: 110px;
+        text-align: left;
+    }
+    #DetailLiabilityTable th:nth-child(3),
+    #DetailLiabilityTable td:nth-child(3) {
+        width: 160px;
+        text-align: left;
+    }
+    #DetailLiabilityTable th:nth-child(5),
+    #DetailLiabilityTable td:nth-child(5),
+    #DetailLiabilityTable th:nth-child(6),
+    #DetailLiabilityTable td:nth-child(6) {
+        width: 120px;
+        text-align: right;
+    }
+</style>
+
+

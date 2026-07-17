@@ -1,0 +1,466 @@
+﻿@model PMS.DTO.ViewModels.InspectionViewModels.AddInspectionsVM
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Inspection";
+    ViewBag.HeaderDescription = "Add/Edit inspection";
+    ViewBag.Title = "Add/Edit inspection | PMS";
+    var fields = ViewBag.InspectionFields;
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+
+
+
+<div class="box box-danger">
+
+    @if (User.IsInRole(AppUserRoles.view_users))
+    {
+        <div class="box-header with-border">
+            <div class="input-group-btn">
+                <a href="@Url.Action("inspection", "Inspection")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Inspections</a>
+            </div>
+        </div>
+    }
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddNewInspection", "Inspection", FormMethod.Post, new { enctype = "multipart/form-data", id = "inspection_fields_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.InspectionID)
+        @Html.HiddenFor(x => x.CreatedBy)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            <div class="row col-md-12">
+                <div class="col-md-12">
+                    <a href="#" id="btn"><i class="fa fa-plus chnge"></i></a>
+                </div>
+                <div class="col-md-3" style="margin-bottom:20px;">
+                    <div class="form-group">
+
+                        <label>Inspection Name</label>
+                        @Html.TextBoxFor(x => x.InspectionName, new { @class = "form-control", placeholder = "Enter Inspection name" })
+                        @Html.ValidationMessageFor(x => x.InspectionName)
+
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <a href="#" id="btn3"> Configure Inspection business rules</a>
+                    </div>
+                </div>
+                <div class="row col-md-12" id="create3" style="display:none">
+                    <div class="col-md-12">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Inspection type</label>
+                                @Html.DropDownListFor(x => x.InspectionTypeInt, (IEnumerable<SelectListItem>)ViewBag.InspectionTypes as SelectList, "-- Select Inspection Type --", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.InspectionTypeInt)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Inspection to compare against</label>
+                                @Html.DropDownListFor(x => x.CompareToInt, (IEnumerable<SelectListItem>)ViewBag.InspectionComparison as SelectList, "-- Select Inspection Compare Against --", new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label style="display:inline !important;">Inspections generated from this definition will be valid for</label>
+                                @Html.TextBoxFor(x => x.InspectionValidDays, new { @class = "form-control", placeholder = "Enter valid days" })
+                                @Html.ValidationMessageFor(x => x.InspectionValidDays)
+                                <label style="display:inline !important;">days</label>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+                <div class="col-md-12" id="Create" style="display:none">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Active</label>
+                            <div>
+                                <label class="switch">
+                                    <input type="checkbox" checked="checked" name="IsActive" id="IsActive" value="true">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            @*@Html.ValidationMessageFor(x => x.IsActive)*@
+                        </div>
+                    </div>
+
+                    <div class="col-md-7">
+                        <div class="form-group">
+                            <label>Description</label>
+                            @Html.TextBoxFor(x => x.InspectionDescription, new { @class = "form-control", placeholder = "Enter Description" })
+                            @Html.ValidationMessageFor(x => x.InspectionDescription)
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
+            <div class="row col-md-12">
+                <div class="col-md-10" style="margin-bottom:5px;">
+                    <div class="form-group">
+                        <a href="#" id="btn2"><i class="fa fa-plus chngee"></i></a>
+
+                        <label>Configure Fields for the Bed</label>
+                    </div>
+                </div>
+
+
+                <div class="col-md-12" id="Create2" style="display:none">
+                    <div class="field_wrapper">
+                        @{
+
+                            <div class="myslf row col-md-12" style="margin-top:5px;">
+                                @*<a href="javascript:void(0);" class="add_button" style="padding-right:10px;"><i class="fa fa-plus"></i> Add Group</a>*@
+                                <a href="javascript:void(0);" class="add_field_button"><i class="fa fa-plus"></i> Add Field</a>
+                            </div>
+                            if (Model.InspectionFieldForSlect.Count > 0)
+                            {
+                                foreach (var item in Model.InspectionFieldForSlect)
+                                {
+                                    string index = Guid.NewGuid().ToString();
+                                    <div class="col-md-7">
+                                        <a href="javascript:void(0);" class="remove_button">
+                                            <i class="fa fa-minus"></i>
+                                        </a>
+                                        <div class="col-md-7">
+                                            <div class="form-group">
+                                                <input type="hidden" name="InspectionFieldForSlect[@index].InspectionFieldSelctID" value="@item.InspectionFieldSelctID" />
+                                                <input type="hidden" name="InspectionFieldForSlect.Index" value="@index" />
+                                                <select class="form-control" name="InspectionFieldForSlect[@index].InspectionFieldSelectedValue" id="exampleFormControlSelect1">
+                                                    @foreach (var item2 in fields)
+                                                    {
+                                                        if (item.InspectionFieldSelectedValue == item2.INspectionFieldID)
+                                                        {
+                                                            <option value="@item2.INspectionFieldID">@item2.ShortLabel</option>
+                                                        }
+                                                    }
+                                                    @foreach (var item3 in fields)
+                                                    {
+                                                        <option value="@item3.INspectionFieldID">@item3.ShortLabel</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        }
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+    <script>
+        //$("#exampleFormControlSelect1").change(function () {
+        //    alert("ok");
+        //    var newfilds = fields;
+
+        //    var selected = $('#exampleFormControlSelect1 option:selected').val();
+
+
+        //    newfilds = newfilds.remove(selected);
+        //});
+
+        $(function () {
+            //Date picker
+            $('.datepicker').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy",
+                startDate: new Date()
+            })
+
+            $('.select2').select2()
+        })
+
+        $(document).ready(function () {
+
+        });
+
+
+
+       
+    </script>
+
+
+    <script>
+        var count = 0;
+        $("#btn").click(function () {
+            $("#Create").toggle(500);
+            if (count == 0) {
+                $(".chnge").removeClass("fa fa-plus");
+                $(".chnge").addClass("fa fa-minus");
+                count = 1;
+            }
+            else {
+                $(".chnge").removeClass("fa fa-minus");
+                $(".chnge").addClass("fa fa-plus");
+                count = 0;
+            }
+
+        });
+    </script>
+
+    <script>
+        var count2 = 0;
+        $("#btn2").click(function () {
+            $("#Create2").toggle(500);
+            if (count2 == 0) {
+                $(".chngee").removeClass("fa fa-plus");
+                $(".chngee").addClass("fa fa-minus");
+                count2 = 1;
+            }
+            else {
+                $(".chngee").removeClass("fa fa-minus");
+                $(".chngee").addClass("fa fa-plus");
+                count2 = 0;
+            }
+
+        });
+    </script>
+
+    <script>
+        var count = 0;
+        $("#btn3").click(function () {
+            $("#create3").toggle(500);
+        });
+    </script>
+
+
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var counterr = 2;
+
+            $("#addButton2").click(function () {
+
+                if (counterr > 10) {
+                    alert("Only 10 textboxes allow");
+                    return false;
+                }
+
+                var newTextBoxDiv = $(document.createElement('div'))
+                    .attr("id", 'TextBoxDiv2' + counterr);
+
+                newTextBoxDiv.after().html('<div class="col-md-12"><div class= "col-md-7"><div class="form-group"><select class="form-control" id="exampleFormControlSelect1"><option>Select</option></select></div></div></div>');
+
+                newTextBoxDiv.appendTo("#TextBoxesGroup");
+
+
+                counterr++;
+            });
+
+            $("#removeButton2").click(function () {
+                if (counterr == 1) {
+                    alert("No more textbox to remove");
+                    return false;
+                }
+
+                counterr--;
+
+                $("#TextBoxDiv2" + counterr).remove();
+
+            });
+
+            $("#getButtonValue").click(function () {
+
+                var msg = '';
+                for (i = 1; i < counterr; i++) {
+                    msg += "\n Textbox #" + i + " : " + $('#textbox' + i).val();
+                }
+                alert(msg);
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+
+        function makeid() {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for (var i = 0; i < 5; i++)
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            return text;
+        }
+
+
+        $(document).ready(function () {
+            $(".btnSave").click(function () {
+                //$("#add_contracts_form").data("validator").settings.ignore = "";
+                var validator = $("#inspection_fields_form").validate();
+                var isValid = $("#inspection_fields_form").valid();
+                if (!isValid) {
+
+                }
+                else {
+
+                }
+
+            });
+
+            var maxField = 10; //Input fields increment limitation
+            var addButton = $('.add_button'); //Add button selector
+            var wrapper = $('.field_wrapper'); //Input field wrapper
+            var index = makeid();
+            var fieldHTML = '<div class="col-md-12">' +
+                '<a href = "javascript:void(0);" class="remove_button" >' +
+                '<i class="fa fa-minus" ></i >' +
+                '</a >' +
+                '<div class="col-md-3" style="margin-bottom:10px!important">' +
+                '<input type="hidden" name="InspectionGroup.Index" value="' + index + '" />' +
+                '<div class="form-group"><input type="text" name="InspectionGroup[' + index + '].GroupName" class="form-control pull-right" autocomplete="off" placeholder="Group name"  />' +
+                '</div >' +
+                '</div >' +
+                '</div > '
+
+            var x = 1; //Initial field counter is 1
+
+            //Once add button is clicked
+            $(addButton).click(function () {
+                //Check maximum number of input fields
+                if (x < maxField) {
+                    x++; //Increment field counter
+                    $(wrapper).append(fieldHTML); //Add field html
+                }
+            });
+
+            //Once remove button is clicked
+            $(wrapper).on('click', '.remove_button', function (e) {
+                e.preventDefault();
+                $(this).parent('div').remove(); //Remove field html
+                x--; //Decrement field counter
+            });
+        });
+    </script>
+
+
+    <script type="text/javascript">
+
+        function makeid() {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for (var i = 0; i < 5; i++)
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            return text;
+        }
+
+
+        $(document).ready(function () {
+            $(".btnSave").click(function () {
+                //$("#add_contracts_form").data("validator").settings.ignore = "";
+                var validator = $("#inspection_fields_form").validate();
+                var isValid = $("#inspection_fields_form").valid();
+                if (!isValid) {
+
+                }
+                else {
+
+                }
+
+            });
+
+            var maxField = 10; //Input fields increment limitation
+            var addFieldButton = $('.add_field_button'); //Add button selector
+            var wrapper = $('.field_wrapper'); //Input field wrapper
+            var index = makeid();
+            var HTML_FIELD = '<div class="col-md-7">' +
+                '<a href = "javascript:void(0);" class="remove_button" >' +
+                '<i class="fa fa-minus" ></i >' +
+                '</a >' +
+                '<div class="col-md-7">' +
+                '<div class="form-group">' +
+                '<input type="hidden" name="InspectionFieldForSlect.Index" value="' + index + '" />' +
+                '<select class="form-control" name="InspectionFieldForSlect[' + index + '].InspectionFieldSelectedValue" id="exampleFormControlSelect1">' +
+                '<option> -- Select Inspection Field -- </option>@foreach (var item in fields){<option value="@item.INspectionFieldID">@item.ShortLabel</option>} ' +
+                '</select>' +
+                '</div>' +
+                '</div>' +
+                '</div> '
+
+            var x = 1; //Initial field counter is 1
+
+            //Once add button is clicked
+            $(addFieldButton).click(function () {
+                //Check maximum number of input fields
+                if (x < maxField) {
+                    x++; //Increment field counter
+                    $(wrapper).append(HTML_FIELD); //Add field html
+                }
+            });
+
+            //Once remove button is clicked
+            $(wrapper).on('click', '.remove_button', function (e) {
+                e.preventDefault();
+                $(this).parent('div').remove(); //Remove field html
+                x--; //Decrement field counter
+            });
+
+          
+        });
+
+        
+    </script>
+
+}

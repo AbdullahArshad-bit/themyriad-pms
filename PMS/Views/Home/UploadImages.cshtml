@@ -1,0 +1,99 @@
+﻿@model PMS.DTO.ViewModels.ImageUploadVM
+@{
+    ViewBag.Header = "Image Upload";
+    ViewBag.Title = "Image Upload | PMS";
+}
+
+@section styles{
+    <style>
+        table img {
+            height: 40px;
+
+            -moz-transition: height 0.5s;
+            -o-transition: height 0.5s;
+            -webkit-transition: height 0.5s;
+            transition: height 0.5s;
+        }
+
+            table img:hover {
+                height: 130px;
+            }
+    </style>
+}
+
+
+<div class="box box-danger">
+    <div class="box-body">
+
+        <table class="table">
+            <tbody>
+                <tr>
+
+                    <th>Image</th>
+                    <th>URL</th>
+                    <th>Action</th>
+
+                </tr>
+
+            </tbody>
+
+            <tbody>
+
+                @foreach (var item in Model.SavedImages)
+                {
+                    <tr>
+                        <td>
+                            <img src="@item">
+                        </td>
+
+                        <td>
+                            @item
+                        </td>
+
+                        <td class="menu-icons">
+                            <a onclick="copyToClipboard('@item')" title="copy path to clipboard"><i class="fa fa-copy"></i></a>
+                        </td>
+                    </tr>
+
+                    @*<div class="col-sm-6" style="padding:10px;">
+                            <div style="border: 1px solid #c20e1a;border-radius: 5px;padding:5px;">
+                                <img class="img-responsive" src="@item" />
+                                <span class="help-block" style="word-break: break-all;">
+                                    @item
+                                    <a class="pull-right" onclick="copyToClipboard('@item')" style="cursor: pointer; margin-right:5px;" title="copy path to clipboard"><i class="fa fa-clipboard"></i></a>
+                                </span>
+                            </div>
+                        </div>*@
+                }
+
+            </tbody>
+        </table>
+
+
+    </div>
+    <!-- /.box-body -->
+</div>
+
+
+
+@section scripts{
+    <script>
+        function copyToClipboard(text) {
+
+            var $temp = $("<input>");
+            $("body").append($temp);
+            $temp.val(text).select();
+            document.execCommand("copy");
+            $temp.remove();
+
+            var x = document.getElementById("snackbar");
+            x.innerHTML = "Copied to clipboard"
+            x.className = "show";
+            setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
+        }
+        $(document).ready(function () {
+
+        });
+
+    </script>
+}

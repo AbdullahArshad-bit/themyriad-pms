@@ -1,0 +1,151 @@
+﻿@model PMS.EF.StudentLedger
+@using PMS.Common.Classes;
+
+@Html.HiddenFor(x => x.CreatedDate)
+@Html.HiddenFor(x => x.CreatedBy)
+@Html.HiddenFor(x => x.IsApproved)
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "PaymentForm" }))
+{
+    <div class="">
+        <div class="box box-danger">
+
+            <div class="box-header with-border">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("Index", "Payments")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i>Back to Payments</a>
+                </div>
+            </div>
+            <div class="row crd-dv" style="padding-bottom: 10px;">
+            </div>
+            <div class="row out-dv" style="padding-bottom: 10px;">
+            </div>
+            @Html.HiddenFor(x => x.CreditNoteId)
+            @Html.Hidden("CreditNotePaymentTypeId")
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocationId, "Location")
+                        @Html.DropDownList("LocationId", null, "-- Location --", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.LocationId)
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Code, "Code")
+                        @Html.TextBoxFor(x => x.Code, htmlAttributes: new { @class = "form-control pull-right", autocomplete = "off", @readonly = "required", })
+                        @Html.ValidationMessageFor(x => x.Code)
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.PaymentDate, "Payment Date")
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(x => x.PaymentDate, new { id = "datepicker", @Value = Model.PaymentDate.ToString("dd/MMM/yyyy"), type = "datetime", @class = "form-control pull-right", autocomplete = "off", @readonly = "required", placeholder = "Select Date" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.StudentId, "Resident ID")
+                        @Html.DropDownList("StudentId", null, "-- Resident ID --", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.StudentId)
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.InvoiceId, "Invoice")
+                        @if (ViewBag.LastLocation == (int)Enumeration.LocationEnum.Muscat)
+                        {
+                            @Html.DropDownList("InvoiceId", null, "-- Invoice --", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                            @Html.ValidationMessageFor(x => x.InvoiceId)
+                        }
+                        else
+                        {
+                            @Html.DropDownList("InvoiceId", null, "-- Invoice --", htmlAttributes: new { @class = "form-control select2" })
+                        }
+
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @if (Model.LookupId != (int)Enumeration.PaymentLookup.PaymentRefund)
+                        {
+                            @Html.LabelFor(x => x.CreditAmount, "Amount Received", new { @class = "CreditAmountLabel" })
+                            @Html.TextBoxFor(x => x.CreditAmount, new { @class = "form-control", placeholder = "Amount", @required = "required", @id = "CreditAmount", onkeyup = "CheckAmount()" })
+
+                        }
+                        else if (Model.LookupId == (int)Enumeration.PaymentLookup.PaymentRefund)
+                        {
+                            @Html.LabelFor(x => x.DebitAmount, "Amount Received", new { @class = "DebitAmountLabel" })
+                            @Html.TextBoxFor(x => x.DebitAmount, new { @class = "form-control", placeholder = "Amount", @required = "required", @id = "DebitAmount", onkeyup = "RestrictAmount()" })
+
+                        }
+                        @Html.ValidationMessageFor(x => x.CreditAmount)
+                        <span hidden class="text-danger" style="color: #c20e1a;" id="InvAmountValidation">Amount Received should be less than invoice payable amount</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.PaymentTypeId, "Payment Method")
+                        @Html.DropDownList("PaymentTypeId", null, "-- Payment Method --", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.PaymentTypeId)
+                        @Html.HiddenFor(x => x.PaymentTypeId, htmlAttributes: new { @disabled = "disabled", id = "PaymentTypeId2" })
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.PaymentReferenceNumber, "Payment Reference Number")
+                        @Html.TextBoxFor(x => x.PaymentReferenceNumber, htmlAttributes: new { @class = "form-control pull-right", autocomplete = "off", placeholder = "Enter Reference Number", @required = "required" })
+                        <div>
+                            @Html.ValidationMessageFor(x => x.PaymentReferenceNumber)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Remarks)
+
+                        @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", placeholder = "Remarks" })
+
+                        @Html.ValidationMessageFor(x => x.Remarks)
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-footer">
+                <button class="btn btn-themyriad SubmitWithOutApprove" type="submit">Save</button>
+
+                @if (User.IsInRole(AppUserRoles.Approve_acc_PaymentTransection))
+                {
+                    <button class="btn btn-themyriad SubmitWithApprove" type="button">Save & Approve</button>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+
+
+

@@ -1,0 +1,37 @@
+﻿@{
+    var buildings = ViewBag.Buildings as List<PMS.EF.Building>;
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Building</th>
+            <th>Allocated Gender</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @for (int i = 0; i < buildings.Count; i++)
+        {
+            <tr>
+                <td>
+                    <div class="form-group">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="building" value="@buildings[i].BuildingID" @(i == 0 ? "checked" : "")>
+                                @buildings[i].BuildingName
+                            </label>
+                        </div>
+                    </div>
+                </td>
+                <td>@buildings[i].BuildingDescription</td>
+                <td class="menu-icons" style="text-align:inherit">
+                    <a title="Edit" href="#" class="form_modal" data-id="@buildings[i].BuildingID" data-view="building"><i class="fa fa-edit"></i></a>
+                    <a title="Delete" href="#" data-view="building" data-href="@Url.Action("DeleteBuilding" ,"Setup", new { id = buildings[i].BuildingID })" data-toggle="modal" data-target="#confirm-delete-async"><i class="fa fa-remove"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

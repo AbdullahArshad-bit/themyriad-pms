@@ -1,0 +1,105 @@
+﻿
+@{
+    ViewBag.Title = "Welcome to PMS";
+}
+
+<style>
+    .welcome-container {
+        text-align: center;
+        padding-top: 250px;
+    }
+
+    .welcome-text {
+        font-weight: bold;
+        font-size: 50px;
+        color: #222d32;
+        opacity: 0;
+        animation: fadeIn 2s ease-in-out forwards;
+    }
+    .pms-text {
+        font-weight: bold;
+        font-size: 50px;
+        color: #c20e1a;
+        opacity: 0;
+        animation: fadeIn 2s ease-in-out forwards;
+    }
+    .secondary-text {
+        color: #222d32;
+    }
+
+    .brand-line {
+        width: 140px;
+        height: 4px;
+        background: #c20e1a;
+        margin: 18px auto 8px auto;
+        border-radius: 8px;
+        opacity: 0;
+        animation: fadeIn 1.2s ease-in-out forwards;
+    }
+
+    .typewriter {
+        overflow: hidden;
+        white-space: nowrap;
+        margin: 0 auto;
+        border-right: 2px solid #c20e1a; /* caret */
+        animation: fadeIn 1s ease-in-out forwards, blinkCaret .8s step-end infinite;
+        letter-spacing: .3px;
+    }
+    .underline-text { text-decoration: underline; }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @@keyframes blinkCaret {
+        from, to { border-color: transparent; }
+        50% { border-color: #c20e1a; }
+    }
+</style>
+
+
+<div class="container welcome-container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="display-4">
+                <span class="font-weight-bold welcome-text">Welcome to</span>
+                <span class="font-weight-bold pms-text">The Myriad</span>
+            </h1>
+            <div class="brand-line"></div>
+            <p class="lead secondary-text">
+                <span class="typewriter underline-text"></span>
+
+
+            </p>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+
+            function typeWriterEffect() {
+                var text = "Property Management System";
+                var speed = 50; // Typing speed in milliseconds
+                var i = 0;
+
+                function type() {
+                    if (i < text.length) {
+                        document.querySelector(".typewriter").innerHTML += text.charAt(i);
+                        i++;
+                        setTimeout(type, speed);
+                    }
+                }
+
+                type(); // Start typing when the document is ready
+            }
+
+            typeWriterEffect(); // Call the typewriter effect function
+        });
+    </script>
+}
+
+

@@ -1,0 +1,187 @@
+﻿@model PMS.EF.StudentLedger
+@using PMS.DTO.ViewModels;
+@using PMS.Common.Classes;
+@{
+    var invocieCode = ViewBag.Invoice as OutputInvoicingVM;
+}
+<section class="invoice" id="Pdf2">
+    <!-- title row -->
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="page-header">
+                @*<span class="logo-lg"><img src="@Url.Content("~/Assets/Images/logo.png")" alt="logo"></span>*@
+                <span class="logo-lg"><img src="https://themyriad.com/Assets/images/logo.png" alt="logo"></span>
+            </h2>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- info row -->
+    <div class="row invoice-info">
+        <div class="col-sm-4 invoice-col">
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead"><b>Transaction #:</b> @Model.Code</p>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4">
+                    @if (invocieCode != null && !string.IsNullOrEmpty(invocieCode.Code))
+                    {
+                        <p class="lead"><b>Invoice #:</b> @invocieCode.Code</p>
+                    }
+                    else
+                    {
+                        <span><b>Invoice #:</b> Advance Payment</span><br>
+                    }
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead"><b>Location:</b> @Model.Location.LocationName</p>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead"><b>Myriad ID:</b> @Model.Person.Code:  @Model.Person.FullName</p>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead"><b>Phone Number:</b> @Model.Person.Phone</p>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead"><b>Payment Date:</b> @Model.PaymentDate.ToString("dd/MM/yyyy")</p>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead"><b>Currency:</b> @Model.Location.Currencies.Select(x => x.Name).FirstOrDefault()</p>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-4" style="">
+                    <p class="lead">
+                        <b>Status:</b>
+                        @if (Model.IsApproved)
+                        {
+                            <span class="label label-success">Approved</span>
+                        }
+                        else
+                        {
+                            <span class="label label-primary">Pending</span>
+                        }
+                    </p>
+                </div>
+            </div>
+
+
+            @*<p><b>Transaction #: @Model.Code </b><br></p>
+            <p><b>Invoice #: </b> @invocieCode.Code<br></p>
+            <p><b>Location: </b> @Model.Location.LocationName<br></p>
+
+            <p><b>Myriad ID: </b>@Model.Person.Code:  @Model.Person.FullName <b /><br></p>
+            <p><b>Phone Number: </b> @Model.Person.Phone<br></p>
+            <p><b>Payment Date: </b>  @Model.PaymentDate.ToString("dd/MM/yyyy")<br></p>
+            <p><b>Currency: </b> @Model.Location.Currencies.Select(x => x.Name).FirstOrDefault()<br></p>
+
+
+            <p>
+                <b>Status:</b> @{
+                    if (Model.IsApproved)
+                    {
+                        <span class="label label-success">Approved</span>
+                    }
+                    else
+                    {
+                        <span class="label label-primary">Pending</span>
+
+                    }
+
+                } <br>
+            </p>*@
+            @*<b>Account:</b> @Model.NetAmount
+        <br />*@
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+    <!-- Table row -->
+    <div class="row">
+        <div class="col-xs-12 table-responsive">
+            <table class="table table-striped" style=" border-collapse: collapse; border:solid">
+                <thead style=" border-collapse: collapse; border:solid">
+                    <tr style=" border-collapse: collapse; border:solid">
+                        <th style=" border-collapse: collapse; border:solid;padding: 10px;">Sr#</th>
+                        <th style=" border-collapse: collapse; border:solid;padding: 10px;">Payment Method</th>
+                        <th style=" border-collapse: collapse; border:solid;padding: 10px;">Amount</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1; }
+
+
+                    <tr style=" border-collapse: collapse; border:solid">
+                        <td style=" border-collapse: collapse; border:solid;padding: 10px;">@count</td>
+                        <td style=" border-collapse: collapse; border:solid;padding: 10px;">@Model.PaymentTypeName</td>
+                        <td style=" border-collapse: collapse; border:solid;padding: 10px;">@Model.CreditAmount</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+    <div class="row">
+        <!-- accepted payments column -->
+        <div class="col-xs-8" style="">
+            <p class="lead"><b>Remarks:</b> @Model.Remarks</p>
+        </div>
+    </div>
+    <div class="row">
+        <!-- accepted payments column -->
+        <div class="col-xs-4" style="">
+            <p class="lead"><b>Amount:</b> @Model.CreditAmount</p>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12" style="margin-top: 10px;">
+            <p class="lead"><b><i>This is a system-generated notification; for any questions, please contact the Resident Support Team in person or via email at care@dxb.themyriad.com.</i></b></p>
+        </div>
+    </div>
+    <!-- this row will not appear when printing -->
+
+</section>
+@section scripts
+{
+
+}

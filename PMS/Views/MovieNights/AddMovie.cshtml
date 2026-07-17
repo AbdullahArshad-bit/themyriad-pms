@@ -1,0 +1,157 @@
+﻿@model PMS.DTO.ViewModels.MovieNightsViewModels.MoviesVM
+
+@using PMS.Common.Classes
+
+@{
+    /**/
+
+    ViewBag.Header = "Movies";
+    ViewBag.HeaderDescription = "Add New Movie";
+    ViewBag.Title = "Add Movies | PMS";
+}
+
+
+
+<div class="box box-danger">
+
+    @if (User.IsInRole(AppUserRoles.view_movies))
+    {
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Movies", "MovieNights")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Movies</a>
+        </div>
+    </div>
+    }
+
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddNewMovie", "MovieNights", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_movie_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.MovieID)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            <div class="col-md-6">
+
+                <div class="form-group">
+                    <label for="Title">Title</label>
+
+                    @Html.TextBoxFor(x => x.MovieTitle, new { @class = "form-control", placeholder = "Enter Title" })
+
+                    @Html.ValidationMessageFor(x => x.MovieTitle)
+
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Movie Details</label>
+                    @Html.TextAreaFor(x => x.MovieDetails, new { @class = "form-control", placeholder = "Enter Movie Details", style = "min-height:125px" })
+                    @Html.ValidationMessageFor(x => x.MovieDetails)
+                </div>
+
+
+
+
+                <div class="form-group ">
+                    <label for="exampleInputFile">Banner Image</label>
+                    @{
+                        if (Model.MovieID > 0)
+                        {
+                            Html.EnableClientValidation(false);
+                        }
+                    }
+                    @Html.TextBoxFor(x => x.BannerImage, new { @class = "form-control", type = "file", accept = "image/*" })
+                    @*<p class="help-block ">image size should be 570x403 pixels</p>*@
+
+                    @Html.ValidationMessageFor(x => x.BannerImage)
+
+                    <img id="bannerUpload" src="@(!string.IsNullOrEmpty(Model.BannerImageUrl) ? Model.BannerImageUrl : "")" class="img-responsive" />
+
+                    @{ Html.EnableClientValidation(true);}
+                </div>
+
+
+                <div class="form-group ">
+                    <label for="exampleInputFile">Month Image</label>
+                    @{
+                        if (Model.MovieID > 0)
+                        {
+                            Html.EnableClientValidation(false);
+                        }
+                    }
+                    @Html.TextBoxFor(x => x.MonthImage, new { @class = "form-control", type = "file", accept = "image/*" })
+                    @*<p class="help-block ">image size should be 570x403 pixels</p>*@
+
+                    @Html.ValidationMessageFor(x => x.MonthImage)
+
+                    <img id="monthUpload" src="@(!string.IsNullOrEmpty(Model.MonthImageUrl) ? Model.MonthImageUrl : "")" class="img-responsive" />
+
+                    @{ Html.EnableClientValidation(true);}
+                </div>
+
+
+                <div class="form-group ">
+                    <label for="exampleInputFile">Voting Image</label>
+                    @{
+                        if (Model.MovieID > 0)
+                        {
+                            Html.EnableClientValidation(false);
+                        }
+                    }
+                    @Html.TextBoxFor(x => x.VoteImage, new { @class = "form-control", type = "file", accept = "image/*" })
+                    @*<p class="help-block ">image size should be 570x403 pixels</p>*@
+
+                    @Html.ValidationMessageFor(x => x.VoteImage)
+
+                    <img id="voteUpload" src="@(!string.IsNullOrEmpty(Model.VoteImageUrl) ? Model.VoteImageUrl : "")" class="img-responsive" />
+
+                    @{ Html.EnableClientValidation(true);}
+                </div>
+
+
+            </div>
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+
+            $("#BannerImage").change(function () {
+                readImageURL(this, "#bannerUpload", "#BannerImage");
+            });
+            $("#MonthImage").change(function () {
+                readImageURL(this, "#monthUpload", "#MonthImage");
+            });
+            $("#VoteImage").change(function () {
+                readImageURL(this, "#voteUpload", "#VoteImage");
+            });
+
+        });
+    </script>
+}
+
+

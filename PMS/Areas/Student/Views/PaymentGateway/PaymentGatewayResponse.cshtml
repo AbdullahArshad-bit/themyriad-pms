@@ -1,0 +1,35 @@
+﻿
+
+@{
+    Layout = null;
+
+    var data = (PMS.DTO.ViewModels.PaymentGatewayViewModel.PaymentResponseVM)ViewBag.Data;
+}
+
+
+<div>
+    @if (data.Success != true)
+    {
+        <div class="5-B row no-l-padding min-width">
+            <p style="color:#c20e1a">@data.Message</p>
+            <p>
+                Something went wrong. Your transaction failed due to some reasons.
+                Please try again after some time.
+            </p>
+        </div>
+    }
+    else {
+<div class="5-B row no-l-padding min-width">
+    @*<p style="color:#15ab43">@Model.Message</p>*@
+    <p>
+        Your Payment Has Successfuly Made!
+    </p>
+    <p>Your payment reference number is <span class="Booking-Number">@data.Reference</span>.</p>
+    <button type="button" class="btn btn-primary">Go Back</button>
+</div>
+    }
+</div>
+ 
+
+
+

@@ -1,0 +1,663 @@
+﻿@model PMS.DTO.ViewModels.BookingViewModels.AddBookingVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Add Booking";
+    ViewBag.HeaderDescription = "";
+    ViewBag.Title = "Add Booking | PMS";
+}
+
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+
+    <style>
+        table .form-group {
+            margin-bottom: 0px;
+        }
+
+            table .form-group .radio {
+                margin-bottom: 0px;
+                margin-top: 0px;
+            }
+
+        #BookingConfirmationModal .well {
+            background-color: #f5f5f5;
+            border: 1px solid #e3e3e3;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 0;
+            min-height: 20px;
+        }
+    </style>
+}
+
+<div class="box box-danger">
+
+    @{
+        if (Model.BookingID == 0)
+        {
+            <div class="box-header with-border">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("Persons", "PersonManage")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> Person List</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="box-header with-border">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("BookingList", "Booking")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Bookings</a>
+                </div>
+            </div>
+        }
+    }
+
+    <!-- Display Only Form (No Submission) -->
+    <div id="bookingDisplayForm">
+        @{
+            if (Model.PersonID > 0)
+            {
+                @Html.HiddenFor(x => x.PersonID, new { id = "PersonID" })
+            }
+            @Html.HiddenFor(x => x.BookingID)
+
+            <div class="box-body">
+                @if (ViewBag.error != null)
+                {
+                    <div class="alert alert-danger alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                        @ViewBag.error
+                    </div>
+                }
+                @if (ViewBag.success != null)
+                {
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                        @ViewBag.success
+                    </div>
+                }
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Student</label>
+                                @if (Model.PersonID > 0)
+                                {
+                                    @Html.DropDownListFor(model => model.PersonID, (SelectList)ViewBag.StudentId, "-- All Users --", new { @class = "form-control select2", @required = "required", @disabled = "disabled" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownList("PersonID", (SelectList)ViewBag.StudentId, "-- All Users --", new { @class = "form-control select2", @required = "required" })
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.PriceConfigID)
+
+                                @Html.DropDownListFor(model => model.PriceConfigID,
+                                    new SelectList(Model.PriceConfigList, "Value", "Text"),
+                                    "-- Commitment --",
+                                    new { @Class = "form-control select2", @id = "ddlCommitment" })
+
+                                @Html.ValidationMessageFor(x => x.PriceConfigID)
+                                @Html.HiddenFor(model => model.MinDuration)
+                                @Html.HiddenFor(model => model.TermEndDate)
+                                @Html.HiddenFor(model => model.FrequencyId)
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Check In Date</label>
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input name="CheckInDate" id="CheckInDate" type="text" class="CheckIn form-control pull-right from_date"
+                                           autocomplete="off" readonly style="background-color:white" value="@Model.CheckInDate.ToString("dd/MMM/yyyy")">
+                                    @Html.ValidationMessageFor(x => x.CheckInDate)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="Duration">Duration</label>
+                                @Html.DropDownList(
+                                    "Duration",
+                                    new SelectList(new List<SelectListItem>
+                                    {
+                                        new SelectListItem { Value = "", Text = "Select duration" },
+                                        new SelectListItem { Value = "1", Text = "1 Month" },
+                                        new SelectListItem { Value = "2", Text = "2 Months" },
+                                        new SelectListItem { Value = "3", Text = "3 Months" },
+                                        new SelectListItem { Value = "4", Text = "4 Months" },
+                                        new SelectListItem { Value = "5", Text = "5 Months" },
+                                        new SelectListItem { Value = "6", Text = "6 Months" },
+                                        new SelectListItem { Value = "7", Text = "7 Months" },
+                                        new SelectListItem { Value = "8", Text = "8 Months" },
+                                        new SelectListItem { Value = "9", Text = "9 Months" },
+                                        new SelectListItem { Value = "10", Text = "10 Months" },
+                                        new SelectListItem { Value = "11", Text = "11 Months" },
+                                        new SelectListItem { Value = "12", Text = "12 Months" }
+                                    }, "Value", "Text"),
+                                    new { @class = "form-control", id = "durationss" }
+                                )
+                                @Html.ValidationMessage("Duration")
+                                @*@Html.HiddenFor(model => model., new { id = "hdnDuration" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Check Out Date</label>
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input name="CheckOut" id="CheckOut" type="text" class="CheckOut form-control pull-right to_date"
+                                           autocomplete="off" readonly style="background-color:white" value="@Model.CheckOut.GetValueOrDefault().ToString("dd/MMM/yyyy")">
+                                    @Html.ValidationMessageFor(x => x.CheckOut)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 form-group">
+                            @Html.LabelFor(x => x.Requests)
+                            @Html.TextAreaFor(x => x.Requests, new { @class = "form-control", placeholder = "Special Request" })
+                            @Html.ValidationMessageFor(x => x.Requests)
+                        </div>
+                    </div>
+                </div>
+
+                <div id="commitDetailDiv"></div>
+            </div>
+
+            <div class="box-footer">
+                <button type="button" class="btn btn-themyriad" onclick="OpenBookingModal()">Save</button>
+            </div>
+        }
+    </div>
+</div>
+
+<!--Confirm Booking Modal-->
+<div class="modal" id="BookingConfirmationModal">
+    <form method="post" id="BookingModalForm" action="@Url.Action("AddBooking", "Booking")">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="PersonID" id="modal_PersonID" />
+        <input type="hidden" name="BookingID" id="modal_BookingID" value="@Model.BookingID" />
+        <input type="hidden" name="PriceConfigID" id="modal_PriceConfigID" />
+        <input type="hidden" name="CheckInDate" id="modal_CheckInDate" />
+        <input type="hidden" name="CheckOut" id="modal_CheckOut" />
+        <input type="hidden" name="Duration" id="modal_Duration" />
+        <input type="hidden" name="Requests" id="modal_Requests" />
+        <input type="hidden" name="MinDuration" id="modal_MinDuration" />
+        <input type="hidden" name="TermEndDate" id="modal_TermEndDate" />
+        <input type="hidden" name="FrequencyId" id="modal_FrequencyId" />
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Confirm Booking Details</h4>
+                </div>
+
+                <div class="modal-body">
+                    <p style="color: #c20e1a">* Please review the booking details before confirming.</p>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Student:</label>
+                                @Html.DropDownListFor(model => model.PersonID, (SelectList)ViewBag.StudentId, "-- All Users --", new { @class = "form-control select2", @required = "required", @disabled = "disabled" })
+                                @*<div class="well" id="confirmStudent"></div>*@
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Commitment:</label>
+                                <div class="well" id="confirmCommitment"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Check In Date:</label>
+                                <div class="well" id="confirmCheckIn"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Check Out Date:</label>
+                                <div class="well" id="confirmCheckOut"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Duration:</label>
+                                <div class="well" id="confirmDuration"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Term:</label>
+                                <div class="well" id="confirmTerm"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Room Type:</label>
+                                <div class="well" id="confirmRoomType"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Price:</label>
+                                <div class="well" id="confirmPrice"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Special Requests:</label>
+                                <div class="well" id="confirmRequests"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel & Edit</button>
+                    <button type="submit" class="btn btn-themyriad" id="confirmBookingBtn">Confirm & Save</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@section scripts
+{
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+    <script>
+        function test() {
+            var perosnid = $("#PersonID").val();
+            var person = $("#PersonID").text();
+
+        }
+        $("#PersonID").change(function () {
+            var perosnid = $("#PersonID").val();
+            var person = $("#PersonID").text();
+        })
+        $(".toggle-password").click(function () {
+
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            //var input = $($(this).attr("toggle"));
+            var input = $($(this).data('element'));
+            console.log(input);
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
+            }
+        });
+
+        $(document).ready(function () {
+            $("#ddlCommitment").on("change", function () {
+                updateEnddate();
+
+                if ($(this).val() == "") {
+                    $("#commitDetailDiv").html("");
+                    return;
+                }
+
+                $.ajax({
+                    url: GetFormatedUrl('/Booking/GetCommitDetail?id=') + $(this).val(),
+                    type: 'GET',
+                    data: "",
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        $("#commitDetailDiv").html(data);
+                        updateDurationOptions();
+                        updateCheckoutDate();
+                        var date = new Date($('#TermEndDate').val());
+                        updateCheckInDatePicker(date);
+                    },
+                    error: function () {
+                        $("#commitDetailDiv").html("");
+                        Toast.show("error", "error");
+                    }
+                });
+            });
+            var bookingId = $('#BookingID').val();
+            var priceConfigId = $('#ddlCommitment').val();
+            if (bookingId && bookingId != '0' && priceConfigId) {
+                $("#ddlCommitment").trigger('change');
+            }
+        });
+
+        function OpenBookingModal() {
+            // Validate required fields before opening modal
+            var personId = $('#PersonID').val();
+            var commitmentId = $('#ddlCommitment').val();
+            var checkInDate = $('#CheckInDate').val();
+            var checkOutDate = $('#CheckOut').val();
+            var duration = $('#durationss').val();
+
+
+
+            // Transfer data from display form to modal hidden fields
+            $('#modal_PersonID').val(personId);
+            $('#modal_BookingID').val($('#BookingID').val());
+            $('#modal_PriceConfigID').val(commitmentId);
+            $('#modal_CheckInDate').val(checkInDate);
+            $('#modal_CheckOut').val(checkOutDate);
+            $('#modal_Duration').val(duration);
+            $('#modal_Requests').val($('textarea[name="Requests"]').val());
+            $('#modal_MinDuration').val($('#MinDuration').val());
+            $('#modal_TermEndDate').val($('#TermEndDate').val());
+            $('#modal_FrequencyId').val($('#FrequencyId').val());
+
+            // Get selected student text
+            var studentText = $('#PersonID option:selected').text();
+            $('#confirmStudent').text(studentText);
+
+            // Get selected commitment text
+            var commitmentText = $('#ddlCommitment option:selected').text();
+            $('#confirmCommitment').text(commitmentText);
+
+            // Get check-in date
+            $('#confirmCheckIn').text(checkInDate);
+
+            // Get check-out date
+            $('#confirmCheckOut').text(checkOutDate);
+
+            // Get duration
+            var durationText = $('#durationss option:selected').text();
+            $('#confirmDuration').text(durationText);
+
+            // Get Term, Room Type, and Price from the commitment detail div
+            var termText = '';
+            var roomTypeText = '';
+            var priceText = '';
+
+            $('#commitDetailDiv').find('label').each(function () {
+                var labelText = $(this).text().trim();
+                var inputValue = $(this).next('input').val();
+
+                if (labelText === 'Term') {
+                    termText = inputValue;
+                } else if (labelText === 'Room Type') {
+                    roomTypeText = inputValue;
+                } else if (labelText === 'Price') {
+                    priceText = inputValue;
+                }
+            });
+
+            $('#confirmTerm').text(termText || 'Not selected');
+            $('#confirmRoomType').text(roomTypeText || 'Not selected');
+            $('#confirmPrice').text(priceText || 'Not selected');
+
+            // Get special requests
+            var requests = $('textarea[name="Requests"]').val();
+            $('#confirmRequests').text(requests || 'No special requests');
+
+            // Show the modal
+            $('#BookingConfirmationModal').modal('show');
+        }
+
+        $('.from_date, .to_date').keydown(function (event) {
+            var key = event.keyCode || event.charCode;
+            if (key == 8 || key == 46) {
+                event.preventDefault();
+                return false;
+            }
+        });
+
+        var startDate = new Date();
+        var FromEndDate = new Date();
+        var ToEndDate = new Date();
+        ToEndDate.setDate(ToEndDate.getDate() + 365);
+        var termEndDate = new Date($('#TermEndDate').val());
+
+        // Helper function to parse date from "dd/MMM/yyyy" format
+        function parseDateFromInput(dateString) {
+            if (!dateString) return new Date();
+            var months = {
+                'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+                'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+            };
+            var parts = dateString.split('/');
+            if (parts.length === 3) {
+                var day = parseInt(parts[0], 10);
+                var month = months[parts[1]];
+                var year = parseInt(parts[2], 10);
+                return new Date(year, month, day);
+            }
+            return new Date(dateString);
+        }
+
+        function updateCheckInDatePicker(termEndDate) {
+            $('.from_date').datepicker('setEndDate', termEndDate);
+            $('.from_date').datepicker('update');
+        }
+
+        // Get initial check-in date from input field value
+        var checkInInputValue = $('#CheckInDate').val();
+        var initialCheckInDate = checkInInputValue ? parseDateFromInput(checkInInputValue) : new Date();
+        startDate = initialCheckInDate;
+
+        $('.from_date').datepicker({
+            weekStart: 1,
+            format: " dd/M/yyyy",
+            autoclose: true,
+            orientation: "bottom",
+            startDate: startDate
+        }).on('changeDate', function (selected) {
+            startDate = new Date(selected.date.valueOf());
+            $('.to_date').datepicker('setStartDate', startDate);
+            var termEndDate = new Date($('#TermEndDate').val());
+            $('.to_date').datepicker('setEndDate', termEndDate);
+            $('.from_date').datepicker('hide');
+        });
+
+        $('.to_date').datepicker({
+            weekStart: 1,
+            format: " dd/M/yyyy",
+            autoclose: true,
+            orientation: "bottom",
+            startDate: initialCheckInDate
+        });
+
+        $('.to_date').datepicker('setStartDate', initialCheckInDate);
+
+        function updateEnddate() {
+            var selectedValue = $("#ddlCommitment").val();
+            var selectedItem = @Html.Raw(Json.Encode(Model.PriceConfigList));
+            var selectedConfig = selectedItem.find(item => item.Value == selectedValue);
+            var termEndDateValue = selectedConfig.TermEndDate;
+            var frequencyValue = selectedConfig.FrequencyId;
+
+            function extractTimestamp(dateString) {
+                if (dateString) {
+                    var matches = dateString.match(/\/Date\((\d+)\)\//);
+                    return matches ? parseInt(matches[1], 10) : null;
+                }
+                return null;
+            }
+
+            function timestampToDate(timestamp) {
+                return new Date(timestamp);
+            }
+
+            function formatDateTime(date) {
+                var year = date.getFullYear();
+                var month = String(date.getMonth() + 1).padStart(2, '0');
+                var day = String(date.getDate()).padStart(2, '0');
+                var hours = String(date.getHours()).padStart(2, '0');
+                var minutes = String(date.getMinutes()).padStart(2, '0');
+                var seconds = String(date.getSeconds()).padStart(2, '0');
+                return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+            }
+
+            var timestamp = extractTimestamp(termEndDateValue);
+            var date = timestampToDate(timestamp);
+
+            if (selectedConfig) {
+                $('#MinDuration').val(selectedConfig.MinDuration);
+                $('#FrequencyId').val(selectedConfig.FrequencyId);
+                $('#TermEndDate').val(formatDateTime(date));
+            }
+            updateCheckInDatePicker(date);
+        }
+
+        function updateDurationOptions() {
+            var minDuration = parseInt($('#MinDuration').val());
+            var checkInDate = new Date($("#CheckInDate").val());
+            var Commitment_EndDate = new Date($('#TermEndDate').val());
+
+            var isDaily = 0;
+            var isWeekly = 0;
+            frequencyID = $('#FrequencyId').val()
+            if (frequencyID == 1) {
+                isDaily = $('#FrequencyId').val()
+            }
+            if (frequencyID == 3) {
+                isWeekly = $('#FrequencyId').val()
+            }
+
+            var maxDuration;
+            if (isWeekly) {
+                maxDuration = Math.floor((Commitment_EndDate - checkInDate) / (1000 * 60 * 60 * 24 * 7));
+            } else if (isDaily) {
+                maxDuration = Math.floor((Commitment_EndDate - checkInDate) / (1000 * 60 * 60 * 24));
+            } else {
+                maxDuration = Math.floor((Commitment_EndDate - checkInDate) / (1000 * 60 * 60 * 24 * 30));
+            }
+
+            var $durationSelect = $("#durationss");
+            $durationSelect.empty();
+            $durationSelect.append('<option value="">Please select duration</option>');
+            for (var i = minDuration; i <= maxDuration; i++) {
+                if (isWeekly) {
+                    $durationSelect.append('<option value="' + i + '">' + i + ' Week' + (i > 1 ? 's' : '') + '</option>');
+                } else if (isDaily) {
+                    $durationSelect.append('<option value="' + i + '">' + i + ' Day' + (i > 1 ? 's' : '') + '</option>');
+                } else {
+                    $durationSelect.append('<option value="' + i + '">' + i + ' Month' + (i > 1 ? 's' : '') + '</option>');
+                }
+            }
+            $durationSelect.val(minDuration);
+        }
+
+        function updateCheckoutDate() {
+            updateEnddate();
+            var selectedDuration = parseInt($("#durationss").val());
+            var checkInDate = $("#CheckInDate").val();
+            var checkInDateObj = checkInDate ? moment(checkInDate, "DD/MMM/YYYY").toDate() : new Date();
+
+            var isDaily = 0;
+            var isWeekly = 0;
+            frequencyID = $('#FrequencyId').val()
+            if (frequencyID == 1) {
+                isDaily = $('#FrequencyId').val()
+            }
+            if (frequencyID == 3) {
+                isWeekly = $('#FrequencyId').val()
+            }
+
+            if (!isNaN(checkInDateObj.getTime()) && selectedDuration > 0) {
+                var checkOutDate = new Date(checkInDateObj.getTime());
+                if (isWeekly) {
+                    checkOutDate.setDate(checkOutDate.getDate() + selectedDuration * 7);
+                } else if (isDaily) {
+                    checkOutDate.setDate(checkOutDate.getDate() + selectedDuration);
+                } else {
+
+                    var startDay = checkInDateObj.getDate();
+                    var startMonth = checkInDateObj.getMonth();
+                    var startYear = checkInDateObj.getFullYear();
+
+                    var targetMonth = startMonth + selectedDuration;
+                    var targetYear = startYear + Math.floor(targetMonth / 12);
+                    targetMonth = targetMonth % 12;
+
+                    var lastDayOfTargetMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+                    var targetDay = Math.min(startDay, lastDayOfTargetMonth);
+
+                    checkOutDate = new Date(targetYear, targetMonth, targetDay);
+
+                }
+
+                var Commitment_EndDate = $('#TermEndDate').val();
+                var CommitmentEndDateObj = Commitment_EndDate ? moment(Commitment_EndDate, "MM/DD/YYYY HH:mm:ss").toDate() : new Date();
+
+                if (checkOutDate > CommitmentEndDateObj) {
+                    checkOutDate = CommitmentEndDateObj;
+                }
+                if (isDaily && checkOutDate > CommitmentEndDateObj) {
+                    checkOutDate = CommitmentEndDateObj;
+                }
+
+                var checkOutDateString = formatDate(checkOutDate);
+                $("#CheckOut").val(checkOutDateString);
+
+                if (!isDaily) {
+                    $("#CheckOut").off();
+                    $("#CheckOut").prop('readonly', true);
+                    if ($("#CheckOut").data('datepicker')) {
+                        $('#CheckOut').datepicker('remove');
+                    }
+                }
+            }
+        }
+
+        function parseDate(dateString) {
+            var parts = dateString.split("/");
+            return new Date(parts[2], parts[1] - 1, parts[0]);
+        }
+
+        function formatDate(date) {
+            var day = ("0" + date.getDate()).slice(-2);
+            var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            var month = monthNames[date.getMonth()];
+            var year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        $("#durationss").change(updateCheckoutDate);
+        $("#CheckInDate").change(updateCheckoutDate);
+    </script>
+}

@@ -1,0 +1,74 @@
+﻿@model List<PMS.DTO.ViewModels.ContractViewModels.ContractsListVM>
+
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">Contract Versions</h4>
+        </div>
+
+        <div class="modal-body">
+            <div style="overflow: auto; width:100%">
+
+                <table class="table table-bordered table-striped data-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Number</th>
+                            <th>Name</th>
+                            <th>Version</th>
+                            <th>Ref #</th>
+                            <th>Type</th>
+                            <th>Active</th>
+                            <th>Published</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var contract in Model)
+                        {
+                            <tr>
+                                <td>@contract.ContractNumber</td>
+                                <td>@contract.ContractName</td>
+                                <td>@contract.ContractVersion</td>
+                                <td>@contract.ContractReferenceNumber</td>
+                                <td>@contract.ContractType</td>
+                                <td>@(contract.IsActive ? Html.Raw("<span class='label label-success'>Yes</span>") : Html.Raw("<span class='label label-danger'>No</span>"))</td>
+                                <td>@(contract.IsPublish ? Html.Raw("<span class='label label-success'>Yes</span>") : Html.Raw("<span class='label label-danger'>No</span>"))</td>
+                                <td class="menu-icons" style="text-align:inherit">
+                                    <a title="Edit Contract" href="@Url.Action("AddContracts", "ContractsManage", new { id = contract.ContractID })"><i class="fa fa-edit"></i></a>
+                                    <a title="View documnets associated with this contract" href="@(!string.IsNullOrEmpty(contract.ContentValue) ? contract.ContentValue : "javascript:Toast.show('No document associated with this contract.', 'error', 3500);")" @(!string.IsNullOrEmpty(contract.ContentValue) ? "target=_blank" : "")><i class="fa fa-paperclip"></i></a>
+
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Number</th>
+                            <th>Name</th>
+                            <th>Version</th>
+                            <th>Ref #</th>
+                            <th>Type</th>
+                            <th>Active</th>
+                            <th>Published</th>
+                            <th>Action</th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-themyriad" data-dismiss="modal" style="min-width:80px">OK</button>
+        </div>
+    </div>
+</div>
+
+
+

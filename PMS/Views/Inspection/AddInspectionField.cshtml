@@ -1,0 +1,190 @@
+﻿@model PMS.DTO.ViewModels.InspectionViewModels.AddInspectionFieldsVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Inspections";
+    ViewBag.HeaderDescription = "Add/Edit Inspection Field";
+    ViewBag.Title = "Add/Edit Inspection Field | PMS";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("inspectionField", "Inspection")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Inspection Fields</a>
+        </div>
+    </div>
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddInspectionField", "Inspection", FormMethod.Post, new { enctype = "multipart/form-data", id = "inspection_fields_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.INspectionFieldID)
+
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label>Active</label>
+                    <div>
+                        <label class="switch">
+                            <input type="checkbox" name="IsActive" id="IsActive" value="@Model.IsActive" @(Model.IsActive ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Model Name</label>
+                        @Html.TextBoxFor(x => x.ModelName, new { @class = "form-control ", placeholder = "Enter Model name" })
+                        @*<input type="text" name="ModelName" class="form-control pull-right" autocomplete="off" placeholder="Enter Model name" value="@Model.ModelName" />*@
+                        @Html.ValidationMessageFor(x => x.ModelName)
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Short Label</label>
+                        @Html.TextBoxFor(x => x.ShortLabel, new { @class = "form-control", placeholder = "Enter Short Label" })
+                        @*<input type="text" name="ShortLabel" class="form-control pull-right" autocomplete="off" placeholder="Short Label" value="@Model.ShortLabel" />*@
+                        @Html.ValidationMessageFor(x => x.ShortLabel)
+
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class=" row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Long Label</label>
+                        @Html.TextBoxFor(x => x.LongLabel, new { @class = "form-control", placeholder = "Enter Long Label" })
+                        @*<input type="text" name="ShortLabel" class="form-control pull-right" autocomplete="off" placeholder="Short Label" value="@Model.ShortLabel" />*@
+                        @Html.ValidationMessageFor(x => x.LongLabel)
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Rating List</label>
+                        @Html.DropDownListFor(model => model.ratingListItemID, (IEnumerable<SelectListItem>)ViewBag.RatingList as SelectList, "-- Select Rating List --", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.ratingListItemID)
+                    </div>
+                </div>
+            </div>
+
+            <div class=" row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label style="font-weight:normal">
+                            @Html.CheckBoxFor(model => model.AllowNotes)
+                            This field allows notes to be attached
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label style="font-weight:normal">
+                            @Html.CheckBoxFor(model => model.AllowImages)
+                            This field allows image to be attached
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label style="font-weight:normal">
+                            @Html.CheckBoxFor(model => model.AllowExternalIdentifier)
+                            This field allows an external identifier to be attached
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label style="font-weight:normal">
+                            @Html.CheckBoxFor(model => model.AssociatedWithMonetary)
+                            This field is associated with monetary value
+
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+    <script>
+        $('document').ready(function () {
+            $(".btnSave").click(function () {
+                //$("#add_contracts_form").data("validator").settings.ignore = "";
+                var validator = $("#inspection_fields_form").validate();
+                var isValid = $("#inspection_fields_form").valid();
+                if (!isValid) {
+
+                }
+                else {
+                }
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            //Date picker
+            $('.datepicker').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy",
+                startDate: new Date()
+            })
+
+            $('.select2').select2()
+        })
+
+        $(document).ready(function () {
+
+        });
+    </script>
+}

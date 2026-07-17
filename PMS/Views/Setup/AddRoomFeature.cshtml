@@ -1,0 +1,114 @@
+﻿@model PMS.DTO.ViewModels.SetupViewModels.AddAllRoomFeatureVM
+@{ 
+    var filePath = System.Configuration.ConfigurationManager.AppSettings["UploadedImages"];
+}
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Room Features";
+    ViewBag.HeaderDescription = "Add/Update New Room Feature";
+    ViewBag.Title = "Add Room Features | PMS";
+}
+
+@section styles
+{
+
+}
+
+<div class="box box-danger">
+    @if (User.IsInRole(AppUserRoles.view_room_feaure))
+    {
+        <div class="box-header with-border">
+            <div class="input-group-btn">
+                <a href="@Url.Action("RoomFeatures", "Setup")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Room Features</a>
+            </div>
+        </div>
+    }
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddRoomFeature", "Setup", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.AllRoomFeatureID)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+        <div class="row">
+            <div class="col-md-6">
+
+                <div class="form-group">
+                    @Html.LabelFor(Model => Model.FeatureName)
+
+                    @Html.TextBoxFor(x => x.FeatureName, new { @class = "form-control", placeholder = "Enter Feature Name" })
+
+                    @Html.ValidationMessageFor(x => x.FeatureName)
+
+                </div>
+
+            </div>
+            <div class="col-md-6">
+
+                <div class="form-group">
+                    @Html.LabelFor(Model => Model.Ar_FeatureName)
+
+                    @Html.TextBoxFor(x => x.Ar_FeatureName, new { @class = "form-control", placeholder = "Enter Feature Name in Arabic" })
+
+                    @Html.ValidationMessageFor(x => x.Ar_FeatureName)
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group ">
+                    <label for="ImageSource">Feature Icon</label>
+                    @Html.TextBoxFor(x => x.ImageSource, new { @class = "form-control", type = "file", @Required = "required" })
+                    <p class="help-block ">image size should be 811x350 pixels</p>
+
+                    @Html.ValidationMessageFor(x => x.ImageSource)
+
+                    @if (Model.ImageUrl != null)
+                    {
+                        <img id="ImageSource" src="@filePath@(!string.IsNullOrEmpty(Model.ImageUrl) ? Model.ImageUrl : " ")" class="img-responsive" />
+
+                    }
+                </div>
+            </div>
+        </div>
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+
+}

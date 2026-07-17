@@ -1,0 +1,85 @@
+﻿
+@model PMS.DTO.ViewModels.FeedbackViewModels.FeedbackViewModels
+@{
+    ViewBag.Title = "Feedback | The Myriad";
+
+    Layout = null;
+
+    var rating = ViewBag.Rating as List<PMS.DTO.ViewModels.FeedbackViewModels.FeedbackDetailVM>;
+
+}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@ViewBag.Title</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <!-- Ionicons -->
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/Assets/dist/css/AdminLTE.min.css">
+    <!-- iCheck -->
+
+    <link href="~/Assets/css/custom.css" rel="stylesheet" />
+
+    
+</head>
+<div class="login-box" style="margin-top:30px">
+    <div class="login-logo" style=" margin-bottom: -33px; padding-left: 70px;">
+        <a href="#">
+            @*<b>The Myriad</b>*@
+            <img src="https://www.themyriad.com/Assets/images/logo.png" alt="logo">
+        </a>
+    </div>
+    <div style="width:445px !important" class="login-box-danger">
+        <div class="box-body">
+            <div class="row col-md-12">
+                <div id="dialog"></div>
+                <br />
+                <br />
+                <br />
+
+            </div>
+
+            @foreach (var item in rating)
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="form-control" style="text-align:center">
+                                @item.Question
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div style="padding-top:10px; padding-bottom:17px; text-align:center; font-size:x-large">
+
+                                @for (int i = 0; i < item.rating; i++)
+                                {
+                                    <span class="glyphicon glyphicon-star"></span>
+                                }
+                                @for (int i = item.rating; i < 5; i++)
+                                {
+                                    <span class="glyphicon glyphicon-star-empty"></span>
+                                }
+                            </div>
+                            <textarea style="width: 395px; height: 75px; padding-left:10px" readonly> @item.description</textarea>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+
+
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,156 @@
+﻿@model PMS.DTO.ViewModels.MovieNightsViewModels.MovieShowsVM
+
+@using PMS.Common.Classes
+
+@{
+    /**/
+
+    ViewBag.Header = "Movie Shows";
+    ViewBag.HeaderDescription = "Add New Movie Show";
+    ViewBag.Title = "Add Movie Shows | PMS";
+}
+
+@section styles{
+    <!-- bootstrap datepicker -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Bootstrap time Picker -->
+    <link rel="stylesheet" href="~/Assets/plugins/timepicker/bootstrap-timepicker.css">
+}
+
+
+
+    <div class="box box-danger">
+        @if (User.IsInRole(AppUserRoles.view_movies))
+        {
+            <div class="box-header with-border">
+                <div class="input-group-btn">
+                    <a href="@Url.Action("MovieShows", "MovieNights")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Movie Shows</a>
+                </div>
+            </div>
+        }
+
+        <!-- form start -->
+        @using (Html.BeginForm("AddNewMovieShows", "MovieNights", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_movie_show_form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(x => x.MovieShowID)
+
+            <div class="box-body">
+                @if (ViewBag.error != null)
+                {
+                    <div class="alert alert-danger alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                        @ViewBag.error
+                    </div>
+                }
+                @if (ViewBag.success != null)
+                {
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                        @ViewBag.success
+                    </div>
+                }
+
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <label>Select Movie</label>
+
+                        @Html.DropDownListFor(model => model.MovieID,
+                        new SelectList(Model.MoviesList, "MovieID", "MovieTitle"),
+                        "-- Movie --",
+                        new { @Class = "form-control" })
+
+                        @Html.ValidationMessageFor(x => x.MovieID)
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="HallNo">Hall No</label>
+
+                        @Html.TextBoxFor(x => x.HallNo, new { @class = "form-control", placeholder = "Enter Hall #" })
+
+                        @Html.ValidationMessageFor(x => x.HallNo)
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Movie Show Details</label>
+                        @Html.TextAreaFor(x => x.ShowDetails, new { @class = "form-control", placeholder = "Enter Movie Show Details", style = "min-height:125px" })
+                        @Html.ValidationMessageFor(x => x.ShowDetails)
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="form-group ">
+                        <label>Show Date</label>
+
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(x => x.ShowDate, new { id = "show_date", @Value = Model.ShowDate.ToString("dd/MMM/yyyy"), type = "datetime", @class = "form-control pull-right", autocomplete = "off", @readonly = "", placeholder = "Select Date" })
+
+
+                        </div>
+
+                        @Html.ValidationMessageFor(x => x.ShowDate)
+                    </div>
+
+                    <div class="form-group">
+                        <label>Show Time</label>
+
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-clock-o"></i>
+                            </div>
+
+                            @Html.TextBoxFor(x => x.ShowTime, new { @id = "show_time", @readonly = "", type = "text", @class = "form-control timepicker" })
+
+                            @Html.ValidationMessageFor(x => x.ShowTime)
+                        </div>
+                        <!-- /.input group -->
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- /.box-body -->
+
+            <div class="box-footer">
+                <input type="submit" class="btn btn-themyriad" value="Save">
+            </div>
+        }
+    </div>
+
+@section scripts
+{
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- bootstrap time picker -->
+    <script src="~/Assets/plugins/timepicker/bootstrap-timepicker.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+
+        });
+        $(function () {
+            //Date picker
+            $('#show_date').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy"
+            });
+            $('#show_time').timepicker({
+                showInputs: false
+            })
+        })
+    </script>
+}
+
+

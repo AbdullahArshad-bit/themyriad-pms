@@ -1,0 +1,45 @@
+﻿@model PMS.DTO.ViewModels.UserManageViewModels.LocatonRightsVM
+
+@{
+    ViewBag.Header = "Location Rights";
+    ViewBag.HeaderDescription = "Location Rights";
+    ViewBag.Title = "Location Rights | PMS";
+    var locationDto = ViewBag.res as List<PMS.EF.Location>;
+ }
+
+@using (Html.BeginForm("AddLocationRights", "UserManage", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_location_rights_form" }))
+{
+    <input value="@ViewBag.UserID" name="ID" hidden />
+    <table class="table table-bordered table-striped">
+        <tbody>
+
+            <tr>
+                @{ 
+                        int[] assignedLocations = {-1};
+                        if (!string.IsNullOrEmpty(Model.AssignedLocations))
+                        {
+                            assignedLocations = Array.ConvertAll(Model.AssignedLocations.Split(',').ToArray(), Int32.Parse);
+                        }
+
+                    }
+
+                    @for (int i = 0; i < ViewBag.res.Count; i++)
+                    {
+                        var selected = assignedLocations.Where(x => x == locationDto[i].LocationID).FirstOrDefault();
+
+                    <td style="white-space:nowrap;padding-right:30px;">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="AssignedLocation" value="@locationDto[i].LocationID" class="checkAll" @((assignedLocations.Where(x => x == locationDto[i].LocationID).FirstOrDefault() != 0) ? "checked" : "")/>
+                                @locationDto[i].LocationName
+                            </label>
+                        </div>
+                    </td>
+                }
+            </tr>
+        <tbody>
+    </table>
+    <div class="box-footer">
+        <input type="submit" class="btn btn-themyriad" value="Save">
+    </div>
+}

@@ -1,0 +1,701 @@
+﻿@model PMS.EF.Voucher
+@using PMS.Common.Classes;
+@using PMS.DTO.ViewModels;
+@using PMS.DTO.ViewModels.SetupViewModels
+
+@{
+    ViewBag.Header = "Voucher";
+    ViewBag.HeaderDescription = "Payment Voucher";
+    ViewBag.Title = "Payment Voucher | PMS";
+
+    var statementUrl = Url.Action("PartnerLedger", "Payments", new { personId = Model.StudentId });
+    var Details = (List<VoucherDetailVM>)ViewBag.VoucherDetail;
+    var locationSetting = (LocationSettingsVM)ViewBag.LocationSetting;
+    var totalDebit = Details.Sum(x => x.DebitAmount ?? 0);
+    var totalCredit = Details.Sum(x => x.CreditAmount ?? 0);
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8fafc;
+        color: #334155;
+        line-height: 1.6;
+    }
+
+    .container {
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .no-print {
+        margin-bottom: 30px;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+        transition: all 0.3s ease;
+    }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, #1e40af, #1e3a8a);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -8px rgba(59, 130, 246, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+    .voucher {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .voucher-header {
+        background: linear-gradient(135deg, #ffffff, #1e40af);
+        padding: 30px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .voucher-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+        }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .logo img {
+        max-height: 60px;
+        /*background: white;*/
+        padding: 10px;
+        border-radius: 8px;
+        /*box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);*/
+    }
+
+    .voucher-title {
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .voucher-body {
+        padding: 40px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 40px;
+    }
+
+    .info-section h3 {
+        color: #1e40af;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .info-item {
+        display: flex;
+        margin-bottom: 12px;
+        align-items: flex-start;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #64748b;
+        min-width: 120px;
+        margin-right: 10px;
+    }
+
+    .info-value {
+        color: #1e293b;
+        font-weight: 500;
+        flex: 1;
+    }
+
+        .info-value a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            .info-value a:hover {
+                color: #1e40af;
+                text-decoration: underline;
+            }
+
+    .company-info {
+        text-align: center;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        padding: 30px;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+    }
+
+    .company-name {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 10px;
+    }
+
+    .company-details {
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .details-table {
+        margin-bottom: 40px;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+        .table thead {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+        }
+
+        .table th {
+            padding: 20px 16px;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+        }
+
+        .table td {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    .credit-amount {
+        font-weight: 700;
+        font-family: 'Courier New', monospace;
+        color: #c20e1a;
+    }
+
+    .debit-amount {
+        font-weight: 700;
+        font-family: 'Courier New', monospace;
+        color: #059669;
+    }
+
+    .summary-section {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 40px;
+        margin-bottom: 40px;
+    }
+
+    .remarks-section {
+        background: #f8fafc;
+        padding: 30px;
+        border-radius: 12px;
+        border-left: 4px solid #3b82f6;
+    }
+
+    .remarks-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 15px;
+    }
+
+    .remarks-content {
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+    .totals-section {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        padding-top: 15px
+    }
+
+    .totals-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .totals-table tr {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+            .totals-table tr:last-child {
+                border-bottom: none;
+                background: linear-gradient(135deg, #1e40af, #3b82f6);
+                color: white;
+            }
+
+        .totals-table td {
+            padding: 16px 20px;
+            font-weight: 600;
+        }
+
+        .totals-table .total-label {
+            font-size: 16px;
+        }
+
+        .totals-table .total-amount {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        padding: 30px 40px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .btn-print {
+        background: linear-gradient(135deg, #059669, #047857);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.3);
+    }
+
+        .btn-print:hover {
+            background: linear-gradient(135deg, #047857, #065f46);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -8px rgba(5, 150, 105, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+    .btn-download {
+        background: linear-gradient(135deg, #7c3aed, #6d28d9);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.3);
+    }
+
+        .btn-download:hover {
+            background: linear-gradient(135deg, #6d28d9, #5b21b6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -8px rgba(124, 58, 237, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+    .btn-email {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3);
+    }
+
+        .btn-email:hover {
+            background: linear-gradient(135deg, #b91c1c, #991b1b);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -8px rgba(220, 38, 38, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+    @@media print {
+        body {
+            background: white;
+        }
+
+        .container {
+            max-width: none;
+            padding: 0;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .voucher {
+            box-shadow: none;
+            border-radius: 0;
+        }
+
+        .action-buttons {
+            display: none;
+        }
+    }
+
+    @@media (min-width: 1200px) {
+        .container {
+            width: auto !important;
+        }
+
+        @@media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .summary-section {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .voucher-title {
+                font-size: 24px;
+            }
+
+            .table {
+                font-size: 14px;
+            }
+
+                .table th,
+                .table td {
+                    padding: 12px 8px;
+                }
+
+            .action-buttons {
+                padding: 20px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+</style>
+
+<div class="container">
+    <!-- Back Button -->
+    <div class="no-print">
+        <a href="@Url.Action("Index", "Payments")" class="back-btn">
+            <i class="fa fa-arrow-left"></i>
+            Back to Payments
+        </a>
+    </div>
+
+    <!-- Voucher -->
+    <section class="voucher" id="Pdf2">
+        <!-- Header -->
+        <div class="voucher-header">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="https://themyriad.com/Assets/images/logo.png" alt="The Myriad Logo">
+                </div>
+                <div class="voucher-title">Payment Voucher</div>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="voucher-body">
+            <!-- Information Grid -->
+            <div class="info-grid">
+                <!-- Voucher Details -->
+                <div class="info-section">
+                    <h3>Voucher Information</h3>
+                    <div class="info-item">
+                        <span class="info-label">Voucher #:</span>
+                        <span class="info-value">@Model.Code</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Location:</span>
+                        <span class="info-value">@Model.Location.LocationName</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Voucher Date:</span>
+                        <span class="info-value">@Model.VoucherDate.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Currency:</span>
+                        <span class="info-value">@Model.Location.Currencies.Select(x => x.Name).FirstOrDefault()</span>
+                    </div>
+                </div>
+
+                <!-- Client Details -->
+                <div class="info-section">
+                    <h3>Client Information</h3>
+                    <div class="info-item">
+                        <span class="info-label">Myriad ID:</span>
+                        <span class="info-value">
+                            <a href="#" onclick="window.open('@statementUrl');">@Model.Person.Code: @Model.Person.FullName</a>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Phone:</span>
+                        <span class="info-value">@Model.Person.Phone</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">@Model.Person.Email</span>
+                    </div>
+                </div>
+
+                <!-- Company Details -->
+                <div class="info-section no-print">
+                    <div class="company-info">
+                        <div class="company-name">@locationSetting.CompanyName</div>
+                        <div class="company-details">
+                            @if (Model.LocationId == ((int)Enumeration.LocationEnum.Muscat))
+                            {
+                                <strong>VATIN:</strong> @locationSetting.VATNo
+                            }
+                            else if (Model.LocationId == ((int)Enumeration.LocationEnum.Dubai))
+                            {
+                                <strong>TRN:</strong> @locationSetting.VATNo
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Table -->
+            <div class="details-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%;">Sr#</th>
+                            <th style="width: 20%;">Account</th>
+                            <th style="width: 25%; text-align: right;">Debit Amount</th>
+                            <th style="width: 25%; text-align: right;">Credit Amount</th>
+                            <th style="width: 30%;">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ int count = 1; }
+                        @foreach (var item in Details)
+                        {
+                            <tr>
+                                <td>@count</td>
+                                <td>@item.AccountName</td>
+                                <td style="text-align: right;"><span class="debit-amount">@(item.DebitAmount?.ToString("N2") ?? "0.00")</span></td>
+                                <td style="text-align: right;"><span class="credit-amount">@(item.CreditAmount?.ToString("N2") ?? "0.00")</span></td>
+
+                                <td>@item.Remarks</td>
+                            </tr>
+                            count++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="summary-section">
+                <!-- Remarks -->
+                <div class="remarks-section">
+                    <div class="remarks-title">Remarks</div>
+                    <div class="remarks-content">
+                        @Model.Remarks
+                    </div>
+                </div>
+
+                <!-- Totals -->
+                <div class="totals-section">
+                    <table class="totals-table">
+                        <tr>
+                            <td class="total-label">Total Debit:</td>
+                            <td class="total-amount">@totalDebit.ToString("N2")</td>
+                        </tr>
+                        <tr>
+                            <td class="total-label">Total Credit:</td>
+                            <td class="total-amount">@totalCredit.ToString("N2")</td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons no-print">
+            <a href="#" onclick="window.print();" id="btnPrint" class="btn btn-print">
+                <i class="fa fa-print"></i>
+                Print
+            </a>
+            <a href="#" onclick="Print()" class="btn btn-download">
+                <i class="fa fa-download"></i>
+                Download Report (not now)
+            </a>
+            @if (Model.Location.LocationName == "Dubai")
+            {
+                <a href="#" onclick="GetHtml('#Pdf2')" id="printBtn" class="btn btn-email">
+                    <i class="fa fa-envelope"></i>
+                    Email Voucher (not now)
+                </a>
+            }
+        </div>
+    </section>
+</div>
+
+@section scripts
+{
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="/PMS/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+    <script src="~/Scripts/Common.js"></script>
+    <script>
+        $(document).ready(function () {
+            var printable = GetQueryStringValue("prnt");
+            if (printable == 1) {
+                $('#btnPrint').click();
+            }
+        });
+
+        function Print() {
+            window.open('/Reporting/GenerateVoucherDetailReport?Id=' + @Model.VoucherId, '_blank');
+        }
+
+        function GetHtml(selector) {
+            var ht = '';
+            $('.Customoverlay, .Customloader').show();
+
+            $.ajax({
+                type: "Get",
+                url: GetFormatedUrl('/Voucher/VoucherHtml/') + '@Model.VoucherId',
+                dataType: 'html',
+                async: false,
+                success: function (response) {
+                    ht = jQuery(response).find(selector).html();
+                }
+            });
+
+            $.ajax({
+                type: "Post",
+                url: GetFormatedUrl('/Voucher/SendVoucherByEmail'),
+                async: true,
+                data: {
+                    subject: 'The Myriad ' + '@Model.Location.LocationName ' + 'Voucher - ' + '@Model.Code',
+                    body: ht,
+                    isBodyHtml: true,
+                    to: '@Model.Person.Email',
+                    locationId: @Model.LocationId
+                },
+                success: function (data) {
+                    $('.Customoverlay, .Customloader').hide();
+                    swal("Email Sent Successfully!", "", "success");
+                },
+                error: function (data) {
+                    $('.Customoverlay, .Customloader').hide();
+                    $('#Piechartdiv').text('Some error occurred!', 'error');
+                }
+            });
+        }
+
+        function getElementChildrenAndStyles(selector) {
+            var test = $(selector).clone();
+            var html = test[0].outerHTML;
+
+            selector = selector.split(",").map(function (subselector) {
+                return subselector + "," + subselector + " *";
+            }).join(",");
+            elts = $(selector);
+
+            var rulesUsed = [];
+            Stylesheets = document.styleSheets;
+            var sheets = [];
+            $(Stylesheets).each(function (i, e) {
+                if (e.href != null && !e.href.includes('font')) {
+                    sheets.push(e);
+                }
+            });
+            for (var c = 0; c < sheets.length; c++) {
+                var url = sheets[c].href;
+                var rules = sheets[c].rules || sheets[c].cssRules;
+                for (var r = 0; r < rules.length; r++) {
+                    var selectorText = rules[r].selectorText;
+                    var matchedElts = $(selectorText);
+                    for (var i = 0; i < elts.length; i++) {
+                        if (matchedElts.index(elts[i]) != -1) {
+                            rulesUsed.push(rules[r]);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            var style = rulesUsed.map(function (cssRule) {
+                if (cssRule.style) {
+                    var cssText = cssRule.style.cssText.toLowerCase();
+                } else {
+                    var cssText = cssRule.cssText;
+                }
+                return cssText.replace(/(\{|;)\s+/g, "\$1\n  ").replace(/\A\s+}/, "}");
+            }).join("\n");
+            var htt = '';
+            $(sheets).each(function (i, e) {
+                htt = htt + '<link rel="stylesheet" href="' + e.href + '">';
+            });
+            var css = '<style> table, th, td {border: 1px solid black;} </style>';
+            return htt + css + html;
+        }
+    </script>
+}

@@ -1,0 +1,152 @@
+﻿@using PMS.Common.Classes
+@{
+    var editAction = User.IsInRole(AppUserRoles.Add_BedSpacePlacement);
+    var checkInAction = User.IsInRole(AppUserRoles.Checkin_BedSpacePlacement);
+    var checkOutAction = User.IsInRole(AppUserRoles.CheckOut_BedSpacePlacement);
+    var editProfileAction = User.IsInRole(AppUserRoles.Add_Profile);
+    var inspectionAction = User.IsInRole(AppUserRoles.Generate_Contract);
+    var stdContractAction = User.IsInRole(AppUserRoles.view_GenerateStudentContracts);
+    var viewTransactionAction = User.IsInRole(AppUserRoles.view_acc_PartnetLedger);
+    var roomSwapAction = User.IsInRole(AppUserRoles.Migrate_BedSpacePlacement);
+    var viewFeedbackAction = User.IsInRole(AppUserRoles.View_Feedback);
+    var deletePlacementAction = User.IsInRole(AppUserRoles.Delete_BedSpacePlacement);
+    var reIssueCardlacementAction = User.IsInRole(AppUserRoles.ReIssue_Card);
+    var updatePlacementDateAction = User.IsInRole(AppUserRoles.Update_Placement_Dates);
+    var RunAFeeAssessment = User.IsInRole(AppUserRoles.Run_A_Fee_Assessment);
+}
+
+@{
+    var query = Request.Params["queryby"];
+
+    if (query == "TodayCheck")
+    {
+        ViewBag.Header = "Today's Check In(s) - Completed";
+        ViewBag.HeaderDescription = "Today's Check In(s) - Completed";
+        ViewBag.Title = "All Bed Space Placements | PMS";
+    }
+    else if (query == "TodayCheckOut")
+    {
+        ViewBag.Header = "Today's Check out(s) - Completed";
+        ViewBag.HeaderDescription = "Today's Check out(s) - Completed";
+        ViewBag.Title = "All Bed Space Placements | PMS";
+    }
+    else if (query == "TodayCheckinpending")
+    {
+        ViewBag.Header = "Today's Check In(s) - Pending";
+        ViewBag.HeaderDescription = "Today's Check In(s) - Pending";
+        ViewBag.Title = "All Bed Space Placements | PMS";
+    }
+    else if (query == "TodayCheckoutpending")
+    {
+        ViewBag.Header = "Today's Check Out(s) - Pending";
+        ViewBag.HeaderDescription = "Today's Check Out(s) - Pending";
+        ViewBag.Title = "All Bed Space Placements | PMS";
+    }
+    else if (query == "TodayCheckoutpending")
+    {
+        ViewBag.Header = "Today's Check Out(s) - Pending";
+        ViewBag.HeaderDescription = "Today's Check Out(s) - Pending";
+        ViewBag.Title = "All Bed Space Placements | PMS";
+    }
+    else if (query == "NoContract")
+    {
+        ViewBag.Header = "Contracts to be Generated";
+        ViewBag.HeaderDescription = "Contracts to be Generated";
+        ViewBag.Title = "All Bed Space Placements | PMS";
+    }
+    else if (query == "NotCheckedIn")
+    {
+        ViewBag.Header = "Waiting for checkin";
+        ViewBag.HeaderDescription = "Waiting for checkin";
+        ViewBag.Title = "All Bed Space Placements | PMS";
+    }
+    else
+    {
+        ViewBag.Header = "PlacementsList";
+        ViewBag.HeaderDescription = "PlacementsList list";
+        ViewBag.Title = "All Bed Space Placements | PMS";
+
+    }
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link href="~/Assets/plugins/bootstrap-datetimepicker-0.0.11/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+
+    <style>
+        .Dropdown {
+            min-width: 110px !important;
+        }
+
+        .fa {
+            font-size: 12px;
+        }
+
+        .custom-spinner-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 65px; /* Adjust this value as needed */
+        }
+
+        .loading-text {
+            color: #c20e1a;
+            font-size: 1.2em;
+            margin-left: 5px;
+        }
+
+        .custom-spinner {
+            font-size: 2.5em;
+        }
+
+        .reIssueCardDisable {
+            pointer-events: none; /* Prevents clicks */
+        }
+
+        .alert-dismissible {
+            white-space: pre-line;
+        }
+
+    </style>
+}
+
+@Html.Partial("_PlacementList")
+
+
+@section scripts{
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.min.js"></script>
+    <script src="~/Assets/plugins/bootstrap-datetimepicker-0.0.11/js/bootstrap-datetimepicker.js"></script>
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/Content/Js/PlacementList/PlacementList.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+    <script>
+        function PlacementAction() {
+            var actions = new Array();
+            if ('@RunAFeeAssessment' == 'True') actions.push("runAFeeAssessment-action");
+            if ('@editAction' == 'True') actions.push("edit-action");
+            if ('@checkInAction' == 'True') actions.push("checkIn-action");
+            if ('@checkOutAction' == 'True') actions.push("checkOut-action");
+            if ('@editProfileAction' == 'True') actions.push("editProfile-action");
+            if ('@inspectionAction' == 'True') actions.push("inspection-action");
+            if ('@stdContractAction' == 'True') actions.push("stdContract-action");
+            if ('@viewTransactionAction' == 'True') actions.push("viewTransaction-action");
+            if ('@roomSwapAction' == 'True') actions.push("roomSwap-action");
+            if ('@viewFeedbackAction' == 'True') actions.push("viewFeedback-action");
+            if ('@deletePlacementAction' == 'True') actions.push("deletePlacement-action");
+            if ('@reIssueCardlacementAction' == 'True') actions.push("reIssueCardlacement-action");
+            if ('@updatePlacementDateAction' == 'True') actions.push("updatePlacementDate-action");
+            return actions;
+        }
+    </script>
+}

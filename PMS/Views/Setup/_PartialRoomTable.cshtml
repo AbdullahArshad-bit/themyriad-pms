@@ -1,0 +1,40 @@
+﻿@{
+    var rooms = ViewBag.Rooms as List<PMS.EF.Room>;
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Room</th>
+            <th>Room Gender</th>
+            <th>Description</th>
+            <th>Room LockId</th>
+            <th>Action</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @for (int i = 0; i < rooms.Count; i++)
+        {
+            <tr>
+                <td>
+                    <div class="form-group">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="room" value="@rooms[i].RoomID" @(i == 0 ? "checked" : "")>
+                                @rooms[i].RoomName
+                            </label>
+                        </div>
+                    </div>
+                </td>
+                <td>@rooms[i].RoomGender</td>
+                <td>@rooms[i].RoomDescription</td>
+                <td>@rooms[i].RoomLockId</td>
+                <td class="menu-icons" style="text-align:inherit">
+                    <a title="Edit" href="#" class="form_modal" data-id="@rooms[i].RoomID" data-view="room"><i class="fa fa-edit"></i></a>
+                    <a title="Delete" href="#" data-view="room" data-href="@Url.Action("DeleteRoom" ,"Setup", new { id = rooms[i].RoomID })" data-toggle="modal" data-target="#confirm-delete-async"><i class="fa fa-remove"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

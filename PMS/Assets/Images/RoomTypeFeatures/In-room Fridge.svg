@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <g id="In-room_Fridge" data-name="In-room Fridge" transform="translate(-432 -96)">
+    <rect id="Rectangle_480" data-name="Rectangle 480" width="40" height="40" transform="translate(432 96)" fill="none"/>
+    <g id="In-room_Fridge-2" data-name="In-room Fridge" transform="translate(345.732 -259.688)">
+      <g id="Rectangle_74" data-name="Rectangle 74" transform="translate(98.268 392.688)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="16" height="3" stroke="none"/>
+        <rect x="0.5" y="0.5" width="15" height="2" fill="none"/>
+      </g>
+      <g id="Rectangle_72" data-name="Rectangle 72" transform="translate(96.268 360.688)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="21" height="33" stroke="none"/>
+        <rect x="0.5" y="0.5" width="20" height="32" fill="none"/>
+      </g>
+      <g id="Rectangle_73" data-name="Rectangle 73" transform="translate(96.268 360.688)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="21" height="12" stroke="none"/>
+        <rect x="0.5" y="0.5" width="20" height="11" fill="none"/>
+      </g>
+      <path id="Path_99" data-name="Path 99" d="M2649.358,580.061V584" transform="translate(-2549.496 -214.753)" fill="none" stroke="#c20e1a" stroke-width="1"/>
+      <path id="Path_100" data-name="Path 100" d="M2649.358,580.061v7.4" transform="translate(-2549.496 -204.804)" fill="none" stroke="#c20e1a" stroke-width="1"/>
+    </g>
+  </g>
+</svg>

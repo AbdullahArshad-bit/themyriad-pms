@@ -1,0 +1,531 @@
+﻿@model PMS.DTO.ViewModels.PersonManageViewModels.AddPersonVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Persons";
+    ViewBag.HeaderDescription = "Add/Update New Person";
+    ViewBag.Title = "Add Person | PMS";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+    <link rel="stylesheet" href="~/Assets/css/autocompletecustom.css">
+}
+
+<style>
+    .required::after {
+        content: "*";
+        color: red;
+        margin-left: 2px;
+    }
+
+    /* ── Elegant Avatar Zone (matches Profile page) ── */
+    .pp-col-admin {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        padding-top: 8px;
+    }
+
+    .pp-avatar-zone-admin {
+        position: relative;
+        width: 160px;
+        height: 160px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .pp-img-ring-admin {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        padding: 3px;
+        background: #ddd;
+        transition: background .35s ease;
+    }
+
+    .pp-avatar-zone-admin:hover .pp-img-ring-admin {
+        background: linear-gradient(135deg, #c20e1a 0%, #ff7b7b 50%, #c20e1a 100%);
+    }
+
+    .pp-img-inner-admin {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #f0f0f0;
+    }
+
+        .pp-img-inner-admin img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform .4s ease, filter .35s ease;
+        }
+
+    .pp-avatar-zone-admin:hover .pp-img-inner-admin img {
+        transform: scale(1.05);
+        filter: brightness(.65);
+    }
+
+    .pp-overlay-admin {
+        position: absolute;
+        inset: 3px;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        opacity: 0;
+        transition: opacity .25s ease;
+        pointer-events: none;
+    }
+
+    .pp-avatar-zone-admin:hover .pp-overlay-admin {
+        opacity: 1;
+    }
+
+    .pp-overlay-admin span {
+        font-size: 11px;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+    }
+
+    .pp-hint-admin {
+        font-size: 12px;
+        color: #aaa;
+        margin: 0;
+        padding-left: 2px;
+    }
+</style>
+
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Persons", "PersonManage")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Persons</a>
+        </div>
+    </div>
+
+    @using (Html.BeginForm("AddPerson", "PersonManage", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.PersonID)
+        if (Model.PersonID > 0)
+        {
+            @Html.HiddenFor(x => x.LocationId)
+        }
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            <!-- ── Profile Photo ── -->
+            <div class="col-md-12" style="padding-bottom: 20px;">
+                <div class="col-sm-3">
+                    <div class="form-group"></div>
+                    @Html.LabelFor(x => x.ProfilePhoto, "Profile Photo", new { @class = "control-label required" })
+
+                    <div class="pp-col-admin">
+                        <!-- label wraps the avatar — clicking anywhere on it opens the file picker natively, no JS needed -->
+                        <label for="imgfile" style="margin:0; cursor:pointer; display:block;">
+                            <div class="pp-avatar-zone-admin" id="ppZoneAdmin" title="Change profile photo">
+                                <div class="pp-img-ring-admin">
+                                    <div class="pp-img-inner-admin">
+                                        @{
+                                            var path = Url.Content("~/Assets/dist/img/profile.png");
+                                            if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                            {
+                                                path = Url.Content(Model.ImageUrl);
+                                            }
+                                            <img src="@path" id="ppPreviewAdmin" alt="Profile photo" />
+                                        }
+                                    </div>
+                                </div>
+                                <div class="pp-overlay-admin">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;">
+                                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                        <circle cx="12" cy="13" r="4" />
+                                    </svg>
+                                    <span>Edit photo</span>
+                                </div>
+                            </div>
+                        </label>
+
+
+                        <!-- Hidden file input — named "file" so the form posts correctly -->
+                        <input type="file" class="file-upload" name="file" id="imgfile" accept="image/*" style="display:none;"
+                               onchange="(function(input){ if(input.files&&input.files[0]){ var r=new FileReader(); r.onload=function(e){ document.getElementById('ppPreviewAdmin').src=e.target.result; }; r.readAsDataURL(input.files[0]); } })(this)" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Location & Code ── -->
+            <div class="col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocationId, "Location", new { @class = "control-label required" })
+                        @Html.DropDownList("LocationId", null, "-- Location --", htmlAttributes: new { @class = "form-control LocationId", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.LocationId)
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Code, "Code")
+                        @Html.TextBoxFor(x => x.Code, new { @class = "form-control pull-right", autocomplete = "off", @readonly = "" })
+                        @Html.ValidationMessageFor(x => x.Code)
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 mercury-div" style="display: none;">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.MercuryID, "MercuryID", new { @class = "control-label" })
+                        @Html.TextBoxFor(x => x.MercuryID, new { @class = "form-control", placeholder = "Enter MercuryID", aria_required = "true" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Title / Full Name / Email / Secondary Email ── -->
+            <div class="col-md-12">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Title, "Title", new { @class = "control-label required" })
+                        @Html.DropDownListFor(model => model.Title,
+                              new SelectList(PMS.Common.Globals.Titles, "", ""),
+                             "-- Title --",
+                             new { @class = "form-control", aria_required = "true" })
+                        @Html.ValidationMessageFor(x => x.Title)
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.FullName, "Full Name", new { @class = "control-label required" })
+                        @Html.TextBoxFor(x => x.FullName, new { @class = "form-control", placeholder = "Enter full name", aria_required = "true" })
+                        @Html.ValidationMessageFor(x => x.FullName)
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Email, "Email", new { @class = "control-label required" })
+                        @Html.TextBoxFor(x => x.Email, new { @class = "form-control Email", placeholder = "Enter email" })
+                        @Html.ValidationMessageFor(x => x.Email)
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.SecondaryEmail, "Secondary Email (CC Email)", new { @class = "control-label" })
+                        @Html.TextBoxFor(x => x.SecondaryEmail, new { @class = "form-control SecondaryEmail", placeholder = "Enter Secondary Email" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Phone / Religion / ResidentID / Whatsapp ── -->
+            <div class="row col-md-12">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Phone, "Phone", new { @class = "control-label required" })
+                        @Html.TextBoxFor(x => x.Phone, new { @class = "form-control", placeholder = "Enter phone" })
+                        @Html.ValidationMessageFor(x => x.Phone)
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Religion, "Religion", new { @class = "control-label" })
+                        @Html.TextBoxFor(x => x.Religion, new { @class = "form-control", placeholder = "Enter Religion" })
+                        @Html.ValidationMessageFor(x => x.Religion)
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.ResidentID, "ResidentID Number", new { @class = "control-label" })
+                        @Html.TextBoxFor(x => x.ResidentID, new { @class = "form-control", placeholder = "Enter ResidentID Number" })
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.ResidentWhatsappNumber, "Resident Whatsapp Number", new { @class = "control-label" })
+                        @Html.TextBoxFor(x => x.ResidentWhatsappNumber, new { @class = "form-control", placeholder = "Enter Resident Whatsapp Number" })
+                        @Html.ValidationMessageFor(x => x.ResidentWhatsappNumber)
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Passport / Gender / Vehicle / Referral ── -->
+            <div class="row col-md-12">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.PassportNumber, "Passport Number", new { @class = "control-label required" })
+                        @Html.TextBoxFor(x => x.PassportNumber, new { @class = "form-control", placeholder = "Enter Passport Number" })
+                        @Html.ValidationMessageFor(x => x.PassportNumber)
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Gender, "Gender", new { @class = "control-label required" })
+                        @Html.DropDownListFor(model => model.Gender,
+                                              new SelectList(PMS.Common.Globals.Genders, "", ""),
+                                              "-- Gender --",
+                                              new { @class = "form-control select2" })
+                        @Html.ValidationMessageFor(model => model.Gender)
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.VehicleNumber)
+                        @Html.TextBoxFor(x => x.VehicleNumber, new { @class = "form-control", placeholder = "Enter Vehicle Plate Number" })
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.ReferralCode, "Referral Code", new { @class = "control-label" })
+                        @Html.TextBoxFor(x => x.ReferralCode, new { @class = "form-control", placeholder = "Enter Referral Code" })
+                        @Html.ValidationMessageFor(x => x.ReferralCode)
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── DOB / University / StudentID / Nationality / Notes ── -->
+            <div class="row col-md-12">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.DOB)
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            @Html.TextBoxFor(x => x.DOB, new { id = "datepicker", @Value = Model.DOB.ToString("dd/MMM/yyyy"), type = "datetime", @class = "form-control pull-right", autocomplete = "off", @readonly = "", placeholder = "Select Date" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.University, "University", new { @class = "control-label required" })
+                        @Html.DropDownList("UniversityId", null, "-- Institute / Organization --", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.UniversityId)
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.UniversityStudentID)
+                        @Html.TextBoxFor(x => x.UniversityStudentID, new { @class = "form-control", placeholder = "Enter University StudentID" })
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Nationality, "Nationality", new { @class = "control-label required" })
+                        @Html.DropDownListFor(model => model.Nationality,
+                               new SelectList(PMS.Common.Globals.CountryList, "", ""),
+                                    "-- Nationality --",
+                                     new { @class = "form-control select select2", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.Nationality)
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Profile Notes</label>
+                        @Html.TextAreaFor(x => x.ProfileNotes, new { @class = "form-control", placeholder = "Enter Term Details", style = "min-height:125px" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Guardian / Guarantor ── -->
+        <div class="col-md-12">
+            <div class="box box-danger">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Guardian/Guarantor</h3>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.GuardianFullName, "Guardian Full Name", new { @class = "control-label required" })
+                                @Html.TextBoxFor(x => x.GuardianFullName, new { @class = "form-control", placeholder = "Enter guardian's full name", aria_required = "true" })
+                                @Html.ValidationMessageFor(x => x.GuardianFullName)
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.GuardianPhone, "Guardian Phone No", new { @class = "control-label required" })
+                                @Html.TextBoxFor(x => x.GuardianPhone, new { @class = "form-control", placeholder = "Enter guardian's phone number", aria_required = "true" })
+                                @Html.ValidationMessageFor(x => x.GuardianPhone)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.GuardianOtherEmail, "Guardian Email", new { @class = "control-label Email required" })
+                                @Html.TextBoxFor(x => x.GuardianOtherEmail, new { @class = "form-control", placeholder = "Enter Guardian email" })
+                                @Html.ValidationMessageFor(x => x.GuardianOtherEmail)
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.GuardianRelation, "Relation", new { @class = "control-label required" })
+                                @Html.TextBoxFor(x => x.GuardianRelation, new { @class = "form-control", placeholder = "Enter relation", aria_required = "true" })
+                                @Html.ValidationMessageFor(x => x.GuardianRelation)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+    <script src="~/Assets/js/AutoComplete.js"></script>
+
+    <script>
+        $(function () {
+            $('#Title').val('@Model.Title');
+
+            $('#datepicker').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy",
+                endDate: '+0d'
+            });
+
+            if ('@Model.LocationId' > 0 && '@Model.PersonID' > 0) {
+                $('.Locationid').attr('disabled', true);
+            }
+        });
+
+        $(".toggle-password").click(function () {
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            var input = $($(this).data('element'));
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
+            }
+        });
+
+        $('#LocationId').on('change', function () {
+            var LocationId = $(this).val();
+            var url = GetFormatedUrl("/personmanage/GetPersonCodeByLocationId");
+            $.ajax({
+                type: "Get",
+                url: url,
+                data: { Id: LocationId },
+                success: function (data) {
+                    $('#Code').val(data.Code);
+                    GetUniversitiesListByLocId(LocationId);
+                }
+            });
+        });
+
+        function updateVisibility() {
+            let selectedLocation = parseInt(localStorage.getItem("selectedLocation")) || 0;
+            if (selectedLocation === 17) {
+                $('.mercury-div').show();
+            } else {
+                $('.mercury-div').hide();
+            }
+            $('.mercury-column').toggle(selectedLocation === 17);
+            $('#columnvisibilty-filter').multiselect('refresh');
+        }
+
+        function setInitialLocation(isPersonAdded) {
+            var initialLocation = localStorage.getItem("selectedLocation");
+            if (initialLocation) {
+                $('#LocationId').val(initialLocation);
+                $("#LocationId").prop('disabled', true);
+                if (isPersonAdded) {
+                    $('#LocationId').change();
+                }
+            }
+            updateVisibility();
+        }
+
+        function updateLocationDisable() {
+            if ('@Model.LocationId' > 0 && '@Model.PersonID' > 0) {
+                $('.LocationId').prop('disabled', true);
+            }
+        }
+
+        function GetUniversitiesListByLocId(Id) {
+            $.ajax({
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                url: GetFormatedUrl('/Setup/GetUniversitiesByLocId'),
+                type: "Get",
+                data: { Id: Id },
+                dataType: "json",
+                contentType: "application/json;charset=UTF-8",
+                success: function (data) {
+                    if (data.Success == true) {
+                        $('#UniversityId').html('');
+                        var html = "<option value=''>-- Institute / Organization --</option>";
+                        $.each(data.Data, function (key, value) {
+                            html += "<option Value='" + value.Id + "'>" + value.UniversityName + "</option>";
+                        });
+                        $('#UniversityId').html(html);
+                    }
+                }
+            });
+        }
+
+        $('form').submit(function () {
+            var locationId = $('#LocationId').val();
+            $('<input>').attr({ type: 'hidden', name: 'LocationId', value: locationId }).appendTo('form');
+            return true;
+        });
+
+        $(document).ready(function () {
+            var isPersonAdded = @Html.Raw(Json.Encode(ViewBag.IsPersonAdded));
+            updateLocationDisable(isPersonAdded);
+            setInitialLocation(isPersonAdded);
+
+            // ── Elegant avatar interaction ──
+            $('#imgfile').on('change', function () {
+                if (!this.files || !this.files[0]) return;
+                var file = this.files[0];
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#ppPreviewAdmin').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function ClickFile() {
+            $("#imgfile").click();
+        }
+    </script>
+}

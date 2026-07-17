@@ -1,0 +1,257 @@
+﻿@model PMS.DTO.ViewModels.FeedbackViewModels.FeedbackViewModels
+@{
+    ViewBag.Title = "Add Feedback | The Myriad";
+    Layout = null;
+    var questions = ViewBag.QuestionId as List<PMS.DTO.ViewModels.FeedbackViewModels.FeedbackViewModels>;
+
+}
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@ViewBag.Title</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/Assets/bower_components/font-awesome/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="~/Assets/bower_components/Ionicons/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/Assets/dist/css/AdminLTE.min.css">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="~/Assets/plugins/iCheck/square/_all.css">
+
+    <link href="~/Assets/css/custom.css" rel="stylesheet" />
+    <link href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.9/themes/blitzer/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <link href="~/Assets/css/custom.css?v=1.0.3" rel="stylesheet" />
+    <link rel="shortcut icon" type="image/png" href="http://themyriad.com/Assets/images/favicon.png">
+    <link href="~/Assets/css/toast.css" rel="stylesheet" />
+    <link href="~/Content/Css/Common.css" rel="stylesheet" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-viewport-checker/1.8.8/jquery.viewportchecker.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/additional-methods.min.js"></script>
+</head>
+<style>
+    .highlight {
+        border-color: red;
+    }
+</style>
+
+<div class="login-box">
+    <div class="login-logo" style=" margin-bottom: -33px; padding-left: 70px;">
+        <a href="#">
+            @*<b>The Myriad</b>*@
+            <img src="https://www.themyriad.com/Assets/images/logo.png" alt="logo">
+        </a>
+    </div>
+    <div style="width:445px !important" class="login-box-danger">
+        <div class="box-body">
+
+            <div class="row col-md-12">
+                <div id="dialog"></div>
+                <br />
+                <br />
+                <br />
+
+            </div>
+            @foreach (var item in questions)
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="form-control" style="text-align:center">
+                                @item.Question
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group parentDiv">
+                            <input type="hidden" class="QuestionRating" id="Rating-@item.QuestionId" />
+                            <input type="hidden" class="QuestionId" value="@item.QuestionId" />
+                            <input type="hidden" class="personId" value="@ViewBag.PersonID" />
+                            <input type="hidden" class="placementId" value="@ViewBag.PlacementId" />
+                            <div style="padding-top:10px; padding-bottom:17px; text-align:center" id="type" onmouseout="CRateSelected()">
+                                <span id="span1-@item.QuestionId" onmouseout="CRateOut(1,@item.QuestionId)" onmouseover="CRateOver(1,@item.QuestionId)" onclick="CRateClick(1,@item.QuestionId)" class="glyphicon glyphicon-star-empty" style="font-size:25px;"></span>
+                                <span id="span2-@item.QuestionId" onmouseout="CRateOut(2,@item.QuestionId)" onmouseover="CRateOver(2,@item.QuestionId)" onclick="CRateClick(2,@item.QuestionId)" class="glyphicon glyphicon-star-empty" style="font-size:25px;"></span>
+                                <span id="span3-@item.QuestionId" onmouseout="CRateOut(3,@item.QuestionId)" onmouseover="CRateOver(3,@item.QuestionId)" onclick="CRateClick(3,@item.QuestionId)" class="glyphicon glyphicon-star-empty" style="font-size:25px;"></span>
+                                <span id="span4-@item.QuestionId" onmouseout="CRateOut(4,@item.QuestionId)" onmouseover="CRateOver(4,@item.QuestionId)" onclick="CRateClick(4,@item.QuestionId)" class="glyphicon glyphicon-star-empty" style="font-size:25px;"></span>
+                                <span id="span5-@item.QuestionId" onmouseout="CRateOut(5,@item.QuestionId)" onmouseover="CRateOver(5,@item.QuestionId)" onclick="CRateClick(5,@item.QuestionId)" class="glyphicon glyphicon-star-empty" style="font-size:25px;"></span>
+                            </div>
+                            
+                            @Html.TextArea("description", null, new { @class = "description", style = "width: 395px; height: 75px;", required = "",placeholder="Please Add Comment" })
+
+                            <div>
+                                @*<input hidden id="lblRating" />*@
+                                @*@Html.TextBoxFor(x => x.rating, new { @class = "form-control hidden rating" })*@
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            }
+            <div class="row">
+                <div class="col-md-12 text-center">
+
+                    @*<input type="submit" class="btn btn-themyriad" name="Save" value="Save" />*@
+                    <button class="btn btn-themyriad btn-block btn-flat btn-submit" type="button" onclick="Save()">Submit</button>
+                </div>
+
+            </div>
+            <div class="modal fade" id="message_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel">Information</h4>
+                        </div>
+
+                        <div class="modal-body">
+                            <p class="message_modal_text"></p>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-themyriad" data-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*}*@
+
+<!-- ./wrapper -->
+<!-- REQUIRED JS SCRIPTS -->
+<!-- jQuery 3 -->
+<script src="~/Assets/bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="~/Assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- AdminLTE App -->
+<script src="~/Assets/dist/js/adminlte.min.js"></script>
+<!-- Optionally, you can add Slimscroll and FastClick plugins.
+     Both of these plugins are recommended to enhance the
+     user experience. -->
+<!-- PACE -->
+<script src="~/Assets/bower_components/PACE/pace.min.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+<!-- Select2 -->
+<script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+<script src="~/Scripts/Common.js?v=@DateTime.Now.ToString("hhmmsstt")"></script>
+
+
+<script src="~/Assets/js/toast.js"></script>
+
+<script>
+    function showMessage(msg) {
+        $('.message_modal_text').text(msg);
+        $('#message_modal').modal('show');
+    }
+    $(document).ready(function () {
+        //$.fn.datepicker.defaults.format = "dd/mm/yyyy";
+        $('#confirm-delete').on('show.bs.modal', function (e) {
+            $('#delete_form').attr('action', $(e.relatedTarget).data('href'));
+        });
+
+        $('#message_modal').on('show.bs.hide', function (e) {
+            $('.message_modal_text').text('');
+        });
+    });
+
+    function CRateOut(rating) {
+
+        for (var i = 1; i <= rating; i++) {
+            $("#span" + i).attr('class', 'glyphicon glyphicon-star-empty');
+        }
+    }
+    function CRateOver(rating/*,QuestionId*/) {
+        for (var i = 1; i <= rating; i++) {
+            $("#span" + i /*+ "-"+ QuestionId*/).attr('class', 'glyphicon glyphicon-star');
+        }
+    }
+    function CRateClick(rating, QuestionId) {
+        for (var i = 1; i <= rating; i++) {
+            $("#span" + i + "-" + QuestionId).attr('class', 'glyphicon glyphicon-star');
+        }
+        for (var i = rating + 1; i <= 5; i++) {
+            $("#span" + i + "-" + QuestionId).attr('class', 'glyphicon glyphicon-star-empty');
+        }
+        $("#Rating-" + QuestionId).val(rating);
+    }
+    function CRateSelected() {
+        var rating = $(".rating").val();
+        for (var i = 1; i <= rating; i++) {
+            $("#span" + i).attr('class', 'glyphicon glyphicon-star');
+        }
+
+    }
+    function Save() {
+        if (Validate()) {
+            var List = [];
+            $(".parentDiv").each(function (index, element) {
+                
+                var description = $(element).find(".description").val();
+                var rating = $(element).find(".QuestionRating").val();
+                var QuestionId = $(element).find(".QuestionId").val();
+                var PersonID = $(element).find(".personId").val();
+                var PlacementId = $(element).find(".placementId").val();
+                var FeedbackDetailVM = {
+                    description: description,
+                    rating: rating,
+                    QuestionId: QuestionId,
+                    PersonId: PersonID,
+                    PlacementId: PlacementId
+                };
+                List.push(FeedbackDetailVM);
+            });
+            var Feedback = {
+                FeedbackDetailVM: List
+            };
+            $.ajax({
+                url: "/Feedback/FeedbackSetting/AddFeedback",
+                method: "Post",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(Feedback),
+                success: function (result) {
+                    
+                    if (result.status) {
+                        window.location.href = "/Feedback/FeedbackSetting/FeedbackSubmitted";
+                    }
+                }
+
+            });
+        }
+    }
+
+    function Validate() {
+        var isvalid = true;
+        $(".parentDiv").each(function (index, value) {
+            var rating = $(value).find(".QuestionRating").val();
+            if (rating == null || rating == '' || rating == undefined) {
+                showMessage("please give rating to all questions");
+                $(rating).addClass("highlight");
+                isvalid = false;
+            }
+
+        });
+        return isvalid;
+
+    }
+</script>
+
+

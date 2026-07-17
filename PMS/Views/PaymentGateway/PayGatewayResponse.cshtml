@@ -1,0 +1,153 @@
+﻿@model PMS.DTO.ViewModels.PaymentGatewayViewModel.PayGatewayOutput
+@{
+    Layout = null;
+    ViewBag.Title = "PaymentGatewayResponse";
+}
+<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="shortcut icon" type="image/png" href="https://themyriad.com/Assets/images/favicon.png" />
+<style type="text/css">
+
+    body {
+        background: #f2f2f2;
+    }
+
+    .payment {
+        border: 1px solid #f2f2f2;
+        border-radius: 20px;
+        background: #fff;
+    }
+
+    .payment_header {
+        background: rgb(216 216 216);
+        padding: 12px;
+        border-radius: 20px 20px 0px 0px;
+    }
+
+    .check {
+        margin: 0px auto;
+        width: 50px;
+        height: 50px;
+        border-radius: 100%;
+        background: #fff;
+        text-align: center;
+    }
+
+        .check i {
+            vertical-align: middle;
+            line-height: 50px;
+            font-size: 30px;
+        }
+
+    .content {
+        text-align: center;
+    }
+
+        .content h1 {
+            font-size: 25px;
+            padding-top: 25px;
+        }
+
+        .content a {
+            width: 200px;
+            height: 35px;
+            color: #fff;
+            border-radius: 30px;
+            padding: 5px 10px;
+            background: rgba(255,102,0,1);
+            transition: all ease-in-out 0.3s;
+        }
+
+            .content a:hover {
+                text-decoration: none;
+                background: #000;
+            }
+
+    .bold-font {
+        font-weight: bold;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mx-auto mt-5">
+            <div class="payment">
+                <div class="payment_header">
+
+                    @if (ViewBag.success != null)
+                    {
+                        <div class="check">
+                            <i class="fa fa-check" aria-hidden="true"></i>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-12" style="text-align:center">
+                            <i class="fa fa-exclamation-triangle" style="font-size: 83px; color: #d40808"></i>
+                        </div>
+                    }
+
+                </div>
+                @if (ViewBag.success != null)
+                {
+                    <div class="content col-md-12">
+                        <h1>Payment Success !</h1>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p>InvoiceRef</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="bold-font" id="code"> @Model.InvoiceCode</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p>Amount</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="bold-font" id="amount">@Model.Amount</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p>Card No</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="bold-font" id="card">@Model.Card</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p>Payment Date</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="bold-font" id="date">@Model.Date</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p>Payment Reference</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="bold-font" id="ref">@Model.PaymentCode</p>
+                            </div>
+                        </div>
+                        @*<p>Thank You For Choosing Us!  Your Payment Has Made Successfuly</p>
+                            <p>Your Payment Reference Id : <b style="color: #d40e0e;">@ViewBag.success</b></p>*@
+                    </div>
+                }
+                @if (ViewBag.error != null)
+                {
+                    <div class="content">
+                        <h1>Payment Failed !</h1>
+                        <p>Your Payment has Been Failed! Please try again Later</p>
+                        <p> @ViewBag.error</p>
+
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

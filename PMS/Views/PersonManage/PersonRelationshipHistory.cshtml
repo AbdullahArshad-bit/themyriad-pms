@@ -1,0 +1,83 @@
+﻿
+@model IEnumerable<PMS.EF.AuditLog>
+@{
+    ViewBag.Header = "Persons Relationship";
+    ViewBag.HeaderDescription = "History";
+    ViewBag.Title = "Persons Relationship | PMS";
+}
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Persons", "PersonManage")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Persons</a>
+        </div>
+    </div>
+    <div class="box-body">
+        <ul class="timeline">
+
+            @foreach (var item in Model)
+            {
+
+                <!-- timeline time label -->
+                <li class="time-label">
+                    <span class="bg-red">
+                        @item.TimeStamp.ToString("dd/MMM/yyyy")
+                    </span>
+                </li>
+                <!-- /.timeline-label -->
+                <!-- timeline item -->
+                <li>
+                    <!-- timeline icon -->
+                    <i class="fa fa-envelope bg-blue"></i>
+                    <div class="timeline-item">
+                        <span class="time"><i class="fa fa-clock-o"></i> @item.TimeStamp.ToString("h:m tt")</span>
+
+                        <h3 class="timeline-header"><a href="#">@item.CorrespondenceAction.ActionName</a> </h3>
+
+                        <div class="timeline-body">
+                            @item.CorrespondenceAction.ActionName  (@item.Reference) by @item.UserName
+                        </div>
+
+                        <div class="timeline-footer">
+                            <a class="btn btn-primary btn-xs" onclick="GetAuditLogDetails(@item.Id)">View Details</a>
+                        </div>
+                    </div>
+                </li>
+                <!-- END timeline item -->
+
+            }
+
+
+        </ul>
+        <div class="modal fade" id="modal_div" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        </div>
+    </div>
+
+
+    <script>
+
+        function GetAuditLogDetails(id) {
+            $.ajax({
+                url: GetFormatedUrl("/AuditTrail/GetAuditLogsDetailByid/" + id),
+                method: "Get",
+                dataType: "html",
+                contentType: 'application/json; charset=utf-8',
+                beforeSend: function () {
+                    $('#loader').show();
+                },
+                complete: function () {
+                    $('#loader').fadeOut('slow');
+                },
+                success: function (data) {
+                    $("#modal_div").html(data);
+                    $('#modal_div').modal('show');
+
+                    //$('#table').DataTable({});
+                },
+                error: function (xhr) {
+                    showMessage(xhr.status + " - " + xhr.statusText);
+
+                }
+            });
+        }
+    </script>

@@ -1,0 +1,682 @@
+@model IEnumerable<PMS.DTO.ViewModels.ReportingViewModels.DepositInvoicesVM>
+@using PMS.Common.Classes
+@using PMS.DTO.ViewModels
+
+@{
+    ViewBag.Header = "Deposit Invoices";
+    ViewBag.HeaderDescription = "Deposit Invoices";
+    ViewBag.Title = "Deposit Invoices | PMS";
+    var isMuscat = Model != null && Model.Any() && Model.First().LocationId == (int)PMS.Common.Classes.Enumeration.LocationEnum.Muscat;
+}
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+}
+
+<style>
+    .error-message {
+        color: #b70000;
+    }
+
+    .total-remaining {
+        color: #b70000; /* Replace "blue" with the desired color */
+    }
+
+    .mark-isPaid {
+        color: #b70000;
+        font-weight: 600;
+    }
+
+    th, td {
+        white-space: nowrap;
+    }
+
+    .dataTables_scrollFootInner {
+        overflow: visible !important;
+        padding-right: 0px !important;
+    }
+
+    .right {
+        text-align: right;
+    }
+
+    table.dataTable tfoot th {
+        text-align: right;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }@if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+            <div class="">
+                @if (ViewBag.StudentId != null)
+                {
+                    <div class="col-md-3">
+                        <label>Students</label>
+                        @Html.DropDownList("StudentId", null, "-- All Users --", htmlAttributes: new { @class = "form-control select2" })
+                    </div>
+                    <div class="col-md-3">
+                        <label>Refunded</label>
+                        <select name="Refunded" id="Refunded" class="form-control select2">
+                            <option value="0" @(ViewBag.Refunded == 0 ? "selected" : "")>All</option>
+                            <option value="1" @(ViewBag.Refunded == 1 ? "selected" : "")>Refunded</option>
+                        </select>
+                    </div>
+                }
+                <div class="col-md-1">
+                    <label> &nbsp; </label>
+                    <br />
+                    <button type="button" onclick="GetInvoicesDetail();" class="btn btn-themyriad btn-bordered waves-effect w-md"><i class="fa fa-search"></i> <span>Search</span></button>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <hr />
+            </div>
+
+            <div style="overflow: auto; width:100%">
+                <div class="col-md-12">
+
+                    <table id="DepositInvoicesTable" class="table table-bordered table-striped display now" style="width:100%">
+                        <thead>
+                            <tr>
+
+                                <th>Invoice Code</th>
+                                <th>Location</th>
+                                <th>Student</th>
+                                <th>Invoice Date</th>
+                                <th>Remarks</th>
+                                <th>Net Amount</th>
+                                <th>Total Paid Amount</th>
+                                <th>Status</th>
+                                <th>Paid/UnPaid</th>
+                                <th>Refunded</th>
+                                <th>Created Date</th>
+                                <th>Created By</th>
+                                <th>Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @if (Model != null)
+                            {
+
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.InvoiceCode</td>
+
+                                        <td>@item.LocationName</td>
+                                        <td>@item.FullName</td>
+                                        <td>@item.InvoiceDate</td>
+                                        <td>@item.Remarks</td>
+                                        @{
+                                            if (item.NetAmount < 0)
+                                            {
+
+                                                <td class="right">(@Math.Abs(item.NetAmount))</td>
+                                            }
+
+                                            else
+                                            {
+                                                <td class="right">@(item.NetAmount)</td>
+
+                                            }
+                                        }
+
+                                        @{
+                                            @*if (item.TotalCreditAmount < 0)
+                                                {
+
+                                                    <td class="right">(@Math.Abs(item.TotalCreditAmount))</td>
+                                                }*@
+                                            <td class="right">@item.TotalCreditAmount</td>
+
+
+                                            @*else
+                                                {
+                                                    <td class="right"></td>
+
+                                                }*@
+                                        }
+                                        @{
+                                            if (item.Status == Enumeration.Status.Approved.ToString())
+                                            {
+                                                <td><span class='label label-success'>@item.Status</span></td>
+                                            }
+                                            else
+                                            {
+                                                <td><span class="label label-primary">@item.Status</span></td>
+                                            }
+                                        }
+
+                                        <td>
+
+                                            @if (item.IsPaid == true)
+                                            {
+                                                <span class="text-success label label-success">Paid</span>
+                                            }
+
+                                            else
+                                            {
+                                                <span class="text-danger label label-primary ToBeApproved-@item.InvoiceId">Unpaid</span>
+                                            }
+
+                                        </td>
+
+
+
+                                        <td>
+
+                                            @if (item.Refunded == false && item.IsPaid == false)
+                                            {
+                                                <span class="text-success label label-primary">Refund Initiated</span>
+                                            }
+                                            else if (item.Refunded == false && item.IsPaid == true)
+                                            {
+                                                <span class="text-success label label-danger">Refund</span>
+                                            }
+
+                                        </td>
+                                        <td>
+                                            @if (item.Refunded == false && item.IsPaid == false)
+                                            {
+                                                <span class="text-success label label-primary">@item.InvoiceCreatedDate</span>
+                                            }
+                                            else if (item.Refunded == false && item.IsPaid == true)
+                                            {
+                                                <span class="text-success label label-danger">@item.InvoiceCreatedDate</span>
+                                            }
+
+                                        </td>
+                                        <td>
+                                            @if (item.Refunded == false && item.IsPaid == false)
+                                            {
+                                                <span class="text-success label label-primary">@item.InvoiceCreatedBy</span>
+                                            }
+                                            else if (item.Refunded == false && item.IsPaid == true)
+                                            {
+                                                <span class="text-success label label-danger">@item.InvoiceCreatedBy</span>
+                                            }
+
+                                        </td>
+                                        <td>
+
+                                            @if (User.IsInRole(AppUserRoles.Refund_Deposit_Invoices))
+                                            {
+                                                if (item.Refunded != true && item.InvoiceTypeId != (int)PMS.Common.Classes.Enumeration.InvoiceTypes.Refund && isMuscat)
+                                                {
+                                                    <a title="Create Refund" @("onclick=OpenRefundInvoiceModal(" + item.InvoiceId + ")") href="#"><i class=""></i>Create Refund</a>
+                                                }
+                                            }
+                                            @if (User.IsInRole(AppUserRoles.Payment_Cloned_Invoices))
+                                            {
+                                                if (item.InvoiceTypeId == (int)PMS.Common.Classes.Enumeration.InvoiceTypes.Refund && item.IsPaid != true && isMuscat)
+                                                {
+                                                    <a title="Payment" @("onclick=OpenPaymentModal(" + item.InvoiceId + ")") href="#"><i class="fa fa-money"></i> Generate Payment</a>
+                                                }
+                                            }
+
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+
+                        <tfoot style="width: 100%">
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th class="right">@Model.Sum(x => x.NetAmount)</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- /Invoice clone modal -->
+            <div class="modal" id="CloneModal">
+                <form method="post" id="invoiceCloneForm" action="@Url.Action("CreateRefundInvoice", "Invoicings")">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel">Confirm refund Inoivce</h4>
+                            </div>
+
+                            <div class="modal-body">
+                                <p>You are about to refund an invoice. This process is irreversible.</p>
+                                <p class="debug-url"></p>
+                                <div class="col-md-12 empty-body">
+                                    <div class="form-group">
+                                        <label for="Remarks">Enter remarks</label>
+                                        <textarea id="Remarks" class="form-control" name="Remarks" required placeholder="Remarks" style="min-height:70px"></textarea>
+                                    </div>
+
+                                    <textarea class="emp" id="InvoiceId" name="InvoiceId" hidden></textarea>
+                                    <textarea class="emp" id="InvoiceCode" name="InvoiceCode" hidden></textarea>
+                                    <textarea class="emp" id="InvoiceDate" name="InvoiceDate" hidden></textarea>
+                                    <textarea class="emp" id="personId" name="personId" hidden></textarea>
+                                    <textarea class="emp" id="InvoicePrice" name="InvoicePrice" hidden></textarea>
+                                    <textarea class="emp" id="TaxAmount" name="TaxAmount" hidden></textarea>
+                                    <textarea class="emp" id="NetAmount" name="NetAmount" hidden></textarea>
+                                    <textarea class="emp" id="TaxIds" name="TaxIds" hidden></textarea>
+                                    <textarea class="emp" id="Status" name="Status" hidden></textarea>
+                                    <textarea class="emp" id="CreatedDate" name="CreatedDate" hidden></textarea>
+                                    <textarea class="emp" id="UpdatedDate" name="UpdatedDate" hidden></textarea>
+                                    <textarea class="emp" id="LocationId" name="LocationId" hidden></textarea>
+                                    <textarea class="emp" id="IsPaid" name="IsPaid" hidden></textarea>
+                                    <textarea class="emp" id="InvoiceTypeId" name="InvoiceTypeId" hidden></textarea>
+                                    <textarea class="emp" id="Refunded" name="Refunded" hidden></textarea>
+                                    <textarea class="emp" id="ParentInvoiceId" name="ParentInvoiceId" hidden></textarea>
+                                    <textarea class="emp" id="LocationId" name="LocationId" hidden></textarea>
+                                    <textarea class="emp" id="TermID" name="TermID" hidden></textarea>
+                                    <textarea class="emp" id="TotalDiscountAmount" name="TotalDiscountAmount" hidden></textarea>
+
+                                </div>
+
+                                <div id="invoice-data"></div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                                    <button class="btn btn-themyriad btn-ok" onclick="PostCloneInvoice()" type="submit"> Yes</button>
+                                </div>
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                    </div>
+                    <!-- /.modal-dialog -->
+                </form>
+            </div>
+
+            <!-- /Payment modal -->
+            <div class="modal" id="PaymentModal">
+
+                <form method="post" id="paymentModalFrom" action="@Url.Action("RefundedInvoicePayment", "Invoicings")">
+                    <!-- Modal -->
+
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel">Confirm Payment</h4>
+                            </div>
+
+                            <div class="modal-body">
+                                <p>You are about to make a payment for an invoice. This process is irreversible.</p>
+                                <div class="row">
+
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="DebitAmountLabel"></label>
+                                            <input type="number" class="form-control" name="DebitAmount" id="DebitAmount" required placeholder="Enter Debit Amount">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>Payment Method</label>
+                                            @Html.DropDownList("PaymentTypeId", null, "--- Select Payment Method ---", htmlAttributes: new { @class = "form-control select", @required = "required", Id = "PaymentTypeId" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="Remarks">Enter remarks</label>
+                                            <textarea id="Remarks" class="form-control" name="Remarks" required placeholder="Remarks" style="min-height:70px"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="info" class="InformationLabel"></label>
+                                            <div id="info" class="well"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div id="paymentConfirmation" style="display: none;">
+                                            <p class="mark-isPaid">The Debit Amount is less than the Invoice Price. Do you want to mark this invoice as paid?</p>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="IsPaid" value="true"> Yes
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="IsPaid" value="false"> No
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <p class="debug-url"></p>
+
+                                <div class="col-md-12 empty-body">
+                                    <input type="hidden" name="IsPaid" id="IsPaid" value="">
+                                    <textarea class="InvoiceId emp" name="InvoiceId" hidden></textarea>
+                                    <textarea class="InvoiceCode emp" name="InvoiceCode" hidden></textarea>
+                                    <textarea class="personId emp" name="personId" hidden></textarea>
+                                    <textarea class="InvoicePrice emp" name="InvoicePrice" hidden></textarea>
+                                    <textarea class="NetAmount emp" name="NetAmount" hidden></textarea>
+                                    <textarea class="LocationId emp" name="LocationId" hidden></textarea>
+                                    <textarea class="ParentInvoiceId emp" name="ParentInvoiceId" hidden></textarea>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                                    <button class="btn btn-themyriad btn-ok" type="button" onclick="PostPaymentModal()">Yes</button>
+                                </div>
+
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                    </div>
+                    <!-- /.modal-dialog -->
+                </form>
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    @*<script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>*@
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#DepositInvoicesTable').DataTable({
+                "scrollY": "70vh",
+                "scrollCollapse": true,
+                "scrollX": "auto",
+                "pageLength": -1,
+                buttons: [
+                    'excelHtml5'
+                ],
+                dom: 'Blfrtip',
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                columnDefs: [
+                    { type: 'date-euro', targets: 6 }
+                ]
+            });
+            $('.dataTables_length').addClass('bs-select');
+
+        });
+        function GetInvoicesDetail() {
+            var StudentId = $('#StudentId').val();
+            var Refunded = $('#Refunded').val();
+            window.location.href = GetFormatedUrl("/Invoicings/GetDepositInvoices?StudentId=" + StudentId + "&Refunded=" + Refunded);
+        };
+        function OpenRefundInvoiceModal(Id) {
+            $.ajax({
+                url: "/Invoicings/DepositInvoices?InvoiceId=" + Id,
+                method: "Get",
+                success: function (data) {
+                    $('.emp').html('');
+                    var data = data.res;
+                    $("#InvoiceId").val(data.InvoiceId);
+                    $("#InvoiceCode").val(data.InvoiceCode);
+                    $("#InvoiceDate").val(data.InvoiceDate);
+                    $("#personId").val(data.personId);
+                    $("#InvoicePrice").val(data.InvoicePrice);
+                    $("#TaxAmount").val(data.TaxAmount);
+                    $("#NetAmount").val(data.NetAmount);
+                    $("#TaxIds").val(data.TaxIds);
+                    $("#Status").val(data.Status);
+                    $("#CreatedDate").val(data.CreatedDate);
+                    $("#UpdatedDate").val(data.UpdatedDate);
+                    $("#IsPaid").val(data.IsPaid);
+                    $("#InvoiceTypeId").val(data.InvoiceTypeId);
+                    $("#Refunded").val(data.Refunded);
+                    $("#ParentInvoiceId").val(data.ParentInvoiceId);
+                    $("#LocationId").val(data.LocationId);
+                    $("#TermID").val(data.TermID);
+                    $("#TotalDiscountAmount").val(data.TotalDiscountAmount);
+                    $("#CloneModal").modal();
+                    $('#form').find("textarea").val("");
+                }
+            });
+        }
+
+        function PostCloneInvoice() {
+            // Validate the form
+            if (!$('#invoiceCloneForm').valid()) {
+                $('.error').addClass('text-danger');
+                return; // Don't proceed if validation fails
+            }
+
+            // Disable the "Yes" button to prevent multiple clicks
+            $('.btn-ok').prop('disabled', true);
+
+            // Show the loader while the form is being processed
+            $('.Customoverlay, .Customloader').show();
+
+            // Submit the form
+            $('#invoiceCloneForm').submit();
+
+            // Hide the modal after the form is submitted successfully (optional)
+            $('#CloneModal').modal('hide');
+        }
+
+
+
+        $('#invoiceCloneForm').validate({
+            rules: {
+
+                Remarks: {
+                    required: true,
+                },
+            },
+            errorElement: 'div',
+            errorClass: 'error-message',
+        });
+
+        function OpenPaymentModal(Id) {
+            $.ajax({
+                url: "/Invoicings/DepositInvoices?InvoiceId=" + Id,
+                method: "GET",
+                success: function (data) {
+
+                    $('.emp').html('');
+                    var data = data.res;
+                    $("#PaymentModal .InvoiceId").val(data.InvoiceId);
+                    $("#PaymentModal .InvoiceCode").val(data.InvoiceCode);
+                    $("#PaymentModal .personId").val(data.personId);
+                    $("#PaymentModal .InvoicePrice").val(data.InvoicePrice);
+                    $("#PaymentModal .NetAmount").val(data.NetAmount);
+                    $("#PaymentModal .DebitAmount").val(data.CreditAmount);
+                    $("#PaymentModal .ParentInvoiceId").val(data.ParentInvoiceId);
+                    $("#PaymentModal .LocationId").val(data.LocationId);
+                    $("#PaymentModal .IsPaid").val(data.IsPaid.toString()); // Set the IsPaid value in the hidden input field
+
+                    var remainingAmount = data.NetAmount; // Use NetAmount as the remaining amount by default
+                    var debitAmountLabel = 'Amount';
+
+                    // Check if DebitAmount and CreditAmount are both negative
+                    remainingAmount = data.DebitAmount - data.CreditAmount; // Calculate the remaining amount
+                    remainingAmount = Math.abs(remainingAmount).toFixed(2)
+                    if (data.CreditAmount < 0) {
+                        debitAmountLabel = debitAmountLabel + ' (<span class="total-remaining">Total Remaining: ' + Math.abs(remainingAmount).toFixed(2) + '</span>)';
+                        var infoContent = "NetAmount = " + '(' + data.NetAmount.toFixed(2) * -1 + ')' + "<br>" +
+                            "Total Paid = " + '(' + data.CreditAmount.toFixed(2) * -1 + ')' + "<br>" +
+                            "Remaining = " + '(' + remainingAmount * -1 + ')';
+                    }
+                    else {
+
+                        debitAmountLabel = debitAmountLabel + ' (<span class="total-remaining">Total Remaining: ' + Math.abs(remainingAmount) + '</span>)';
+                        var infoContent = "NetAmount = " + '(' + data.NetAmount * -1 + ')' + "<br>" +
+                            "Total Paid = " + '(' + data.CreditAmount * -1 + ')' + "<br>" +
+                            "Remaining = " + '(' + remainingAmount * -1 + ')';
+                    }
+                    $("#PaymentModal .NetAmount").val(remainingAmount);
+                    $('.DebitAmountLabel').html(debitAmountLabel); // Use .html() instead of .text()
+
+                    // Update the information container with the desired values
+                    var informationLabel = 'Information of Invoice: ' + data.InvoiceCode;
+                    $('.InformationLabel').text(informationLabel).css('color', '##448b18');;
+
+
+
+                    $("#info").html(infoContent);
+
+                    $("#PaymentModal").modal();
+                    $('#form').find("textarea").val("");
+                }
+            });
+        }
+
+        $("#DebitAmount").on("keyup change", function (e) {
+            var invoiceNetAmount = parseFloat($("#PaymentModal .NetAmount").val());
+            var debitAmount = parseFloat($("#DebitAmount").val());
+
+            // Check if the debitAmount is less than invoiceNetAmount
+            if (debitAmount > 0 && invoiceNetAmount < 0) {
+                invoiceNetAmount = invoiceNetAmount * -1;
+            }
+
+            if (debitAmount < invoiceNetAmount) {
+                $('#paymentConfirmation').show();
+
+                // Disable the Yes button by default
+                $('input[name=IsPaid][value="true"]').prop('disabled', false);
+
+                // Enable the Yes button if any radio button is clicked
+                $('input[name=IsPaid]').on('change', function () {
+                    $('input[name=IsPaid][value="true"]').prop('disabled', false);
+                });
+            }
+
+            else if (debitAmount > invoiceNetAmount) {
+                //var modalMessage = creditAmount + " The Debit Amount is greater than the Invoice Price.";
+                //showModal(modalMessage);
+                $('#paymentConfirmation').hide();
+                // Empty the value of the "DebitAmount" input field
+                $("#DebitAmount").val("");
+            }
+
+            else if (debitAmount === invoiceNetAmount) {
+                $('#paymentConfirmation').hide();
+                // Set the value of the hidden input "IsPaid" to true
+                $('input[name=IsPaid][value="true"]').prop('checked', true);
+            }
+
+            if (isNaN(debitAmount) || debitAmount === 0) {
+                // Hide the "paymentConfirmation" element if the "DebitAmount" input field is empty or null
+                $('#paymentConfirmation').hide();
+            }
+
+
+        });
+
+        $("#OpenPaymentModal").on("hide.bs.modal", function () {
+
+            $("#CreditAmount").val("");
+        });
+        // Event handler for the modal hide event to hide the "#paymentConfirmation" element immediately before the modal is closed
+
+        $("#DebitAmount").on("blur", function () {
+            var debitAmount = parseInt($(this).val());
+            if (isNaN(debitAmount) || debitAmount === 0) {
+                // Hide the modal if the "DebitAmount" input field is empty or not a valid number
+                $('#paymentConfirmation').modal('hide');
+            }
+        });
+        function PostPaymentModal() {
+            // Validate the form
+            if (!$('#paymentModalFrom').valid()) {
+                // Add the error class if validation fails
+                $('.error').addClass('text-danger');
+                return; // Exit if validation fails
+            }
+
+            // Prevent duplicate submits from rapid clicks.
+            if ($('#paymentModalFrom').data('isSubmitting') === true) {
+                return;
+            }
+            $('#paymentModalFrom').data('isSubmitting', true);
+
+            // Disable the "Yes" button to prevent multiple clicks
+            $('#PaymentModal .btn-ok').prop('disabled', true);
+
+            // Show the loader while the form is being processed
+            $('.Customoverlay, .Customloader').show();
+
+            // Optionally hide the modal after form submission
+            $('#PaymentModal').modal('hide');
+
+            // Submit the form
+            $('#paymentModalFrom').submit();
+        }
+
+
+        $('#paymentModalFrom').validate({
+            rules: {
+                DebitAmount: {
+                    required: true,
+                },
+                PaymentTypeId: {
+                    required: true,
+                },
+                Remarks: {
+                    required: true,
+                },
+            },
+
+            errorElement: 'div',
+            errorClass: 'error-message',
+        });
+
+
+
+    </script>
+}

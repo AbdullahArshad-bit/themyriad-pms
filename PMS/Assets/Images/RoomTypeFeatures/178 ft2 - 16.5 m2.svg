@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <g id="_178_ft2_16.5_m2" data-name="178 ft2 / 16.5 m2" transform="translate(-93 -96)">
+    <rect id="Rectangle_472" data-name="Rectangle 472" width="40" height="40" transform="translate(93 96)" fill="none"/>
+    <g id="_178_ft2_16.5_m2-2" data-name="178 ft2 / 16.5 m2" transform="translate(3.782 4.782)">
+      <g id="Rectangle_66" data-name="Rectangle 66" transform="translate(96.218 104.218)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="27" height="27" stroke="none"/>
+        <rect x="0.5" y="0.5" width="26" height="26" fill="none"/>
+      </g>
+      <g id="Group_187" data-name="Group 187" transform="translate(98.346 108.093)">
+        <g id="Group_184" data-name="Group 184" transform="translate(0)">
+          <path id="Path_92" data-name="Path 92" d="M2641.676,468.5v17.943" transform="translate(-2639.178 -468.016)" fill="none" stroke="#000" stroke-width="1"/>
+          <path id="Path_93" data-name="Path 93" d="M2633.8,472.383l2.465-2.465,2.465,2.465" transform="translate(-2633.8 -469.918)" fill="none" stroke="#000" stroke-width="1"/>
+        </g>
+        <g id="Group_185" data-name="Group 185" transform="translate(2.053 20.735) rotate(-90)">
+          <path id="Path_92-2" data-name="Path 92" d="M0,0V18.575" transform="translate(2.498 0)" fill="none" stroke="#000" stroke-width="1"/>
+          <path id="Path_94" data-name="Path 94" d="M0,2.465,2.465,0,4.931,2.465" transform="translate(4.931 18.885) rotate(180)" fill="none" stroke="#000" stroke-width="1"/>
+        </g>
+      </g>
+      <g id="Group_186" data-name="Group 186" transform="translate(103.867 127.257) rotate(-135)">
+        <path id="Path_92-3" data-name="Path 92" d="M0,0V19.873" transform="translate(2.816 -0.273)" fill="none" stroke="#c20e1a" stroke-width="1" stroke-dasharray="2"/>
+        <path id="Path_94-2" data-name="Path 94" d="M0,2.78,2.779,0,5.559,2.78" transform="translate(5.559 19.847) rotate(180)" fill="none" stroke="#c20e1a" stroke-width="1"/>
+      </g>
+    </g>
+  </g>
+</svg>

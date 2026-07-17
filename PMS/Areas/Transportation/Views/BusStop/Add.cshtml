@@ -1,0 +1,128 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Header = "Bus Stop";
+    ViewBag.HeaderDescription = "Add Stop";
+    ViewBag.Title = "Add Bus Stop | PMS";
+}
+
+
+
+<div class="box box-danger">
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("AllStops", "BusStop")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Stops</a>
+        </div>
+    </div>
+
+    <!-- form start -->
+    @using (Html.BeginForm("Add", "BusStop", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_BusStop_form" }))
+    {
+        @*@Html.AntiForgeryToken()*@
+        @*@Html.HiddenFor(x => x.BusID)*@
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+
+                        <label>Active</label>
+
+                        <div>
+                            <label class="switch">
+                                <input type="checkbox" name="IsActive" id="IsActive"
+                                       @*value="@Model.IsActive" @(Model.IsActive ? "checked" : "")*@>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        @*@Html.ValidationMessageFor(x => x.IsActive)*@
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <label for="Title">Name</label>
+                        <input type="text" class="form-control" placeholder="Enter Name" />
+                        @*@Html.TextBoxFor(x => x., new { @class = "form-control", placeholder = "Enter  Name" })
+                            @Html.ValidationMessageFor(x => x.)*@
+                    </div>
+                </div>
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <label for="Title">Latitude</label>
+                        <input type="text" class="form-control" placeholder="Enter Latitude" />
+                        @*@Html.TextBoxFor(x => x., new { @class = "form-control", placeholder = "Enter " })
+                            @Html.ValidationMessageFor(x => x.)*@
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="Title">Longitude</label>
+                        <input type="text" class="form-control" placeholder="Enter Longitude" />
+                        @*@Html.TextBoxFor(x => x., new { @class = "form-control", placeholder = "Enter " })
+                            @Html.ValidationMessageFor(x => x.)*@
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="Title">Routes</label>
+                        <select name="cars" class="form-control" id="cars">
+                            <option value="volvo">--Select Routes--</option>
+                        </select>
+                        @*@Html.TextBoxFor(x => x., new { @class = "form-control", placeholder = "Enter " })
+                            @Html.ValidationMessageFor(x => x.)*@
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="Title">Total Time Travel</label>
+                        <input type="text" class="form-control" placeholder="Enter Time" />
+                        @*@Html.TextBoxFor(x => x., new { @class = "form-control", placeholder = "Enter " })
+                            @Html.ValidationMessageFor(x => x.)*@
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+    <script>
+
+    </script>
+}
+
+

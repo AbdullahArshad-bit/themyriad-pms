@@ -1,0 +1,284 @@
+﻿@model PMS.DTO.ViewModels.InspectionViewModels.AddRatingListVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Inspection";
+    ViewBag.HeaderDescription = "Add/Edit Rating List";
+    ViewBag.Title = "Add/Edit Rating List | PMS";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+
+
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("RatingList", "Inspection")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Rating List</a>
+        </div>
+    </div>
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddRatingList", "Inspection", FormMethod.Post, new { enctype = "multipart/form-data", id = "inspection_fields_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.InspectionRatingListID)
+
+
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+           
+            <div class="row col-md-12">
+                <div class="col-md-12">
+                    <div class="form-group">
+
+                        <label>Active</label>
+
+                        <div>
+                            <label class="switch">
+                                <input type="checkbox" name="IsActive" id="IsActive" value="@Model.IsActive" @(Model.IsActive ? "checked" : "")>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        @Html.ValidationMessageFor(x => x.IsActive)
+                    </div>
+                </div>
+
+
+
+                <div class="col-md-9">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Name)
+                        @Html.TextBoxFor(x => x.Name, new { @class = "form-control pull-right", @autocomplete = "off", placeholder = "Enter name" })
+                    </div>
+                    @Html.ValidationMessageFor(x => x.Name)
+                </div>
+
+
+
+                <div class="col-md-10">
+                    <div class=" form-group ">
+                        <label style="font-weight:normal">
+                            @*<input checked="checked" data-val="true" data-val-required="The IsActive field is required." id="IsActive" name="IsActive" type="checkbox" value="true">*@  @*Values in this list are displayed alphabetically*@
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            @*Adding inputField button*@
+            <div class="field_wrapper">
+                @{
+                    if (Model.RatingListItem.Count > 0)
+                    {
+                        var i = 0;
+                        foreach (var item in Model.RatingListItem)
+                        {
+                            string index = Guid.NewGuid().ToString();
+                            <div class="myslf row col-md-12" style="margin-top:5px;">
+                                @{
+                                    if (i == 0)
+                                    {
+                                        <a href="javascript:void(0);" class="add_button"><i class="fa fa-plus"></i></a>
+                                        i++;
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:void(0);" class="remove_button"><i class="fa fa-minus"></i></a>
+                                    }
+                                }
+
+
+                                <div class="col-md-3 "  style="padding-bottom:26px!important;" >
+                                    <div class="form-group">
+                                        <input type='hidden' name='RatingListItem.Index' value='@index' />
+                                        <input type='hidden' name='RatingListItem[@index].RatingListItemDetailID' value='@item.RatingListItemDetailID' />
+
+                                        <input type="text" name="RatingListItem[@index].RatingListItemName" class="form-control pull-right" autocomplete="off" placeholder="Enter item name" required value="@item.RatingListItemName" />
+                                    </div>
+                                    <span class="field-validation-valid" data-valmsg-for="RatingListItem[@index].RatingListItemName" data-valmsg-replace="true"></span>
+                                </div>
+                                <div class="col-md-3"  style="padding-bottom:26px!important;" >
+                                    <div class="form-group">
+                                        <input type="text" name="RatingListItem[@index].RatingListItemDescripttion" class="form-control pull-right" autocomplete="off" placeholder="Enter Description" value="@item.RatingListItemDescripttion" />
+                                    </div>
+                                    <span class="field-validation-valid" data-valmsg-for="RatingListItem[@index].RatingListItemDescripttion" data-valmsg-replace="true"></span>
+                                </div>
+                                <div class="col-md-3"  style="padding-bottom:26px!important;" >
+                                    <div class="form-group">
+                                        <input type="number" name="RatingListItem[@index].RatingListItemPercent" class="form-control pull-right" autocomplete="off" placeholder="Enter percent of charge" value="@item.RatingListItemPercent" />
+                                    </div>
+                                    <span class="field-validation-valid" data-valmsg-for="RatingListItem[@index].RatingListItemPercent" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="myslf row col-md-12" style="margin-top:5px;">
+                            <a href="javascript:void(0);" class="add_button"><i class="fa fa-plus"></i></a>
+                            <div class="col-md-3" style="padding-bottom:26px!important;">
+                                <div class="form-group">
+                                    <input type='hidden' name='RatingListItem.Index' value='adil' />
+                                    <input type='hidden' name='RatingListItem[adil].RatingListItemDetailID' value='0' />
+                                    <input type="text" name="RatingListItem[adil].RatingListItemName" class="form-control pull-right" autocomplete="off" placeholder="Enter item name" required />
+                                </div>
+                                <span class="field-validation-valid" data-valmsg-for="RatingListItem[adil].RatingListItemName" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="col-md-3" style="padding-bottom:26px!important;">
+                                <div class="form-group">
+                                    <input type="text" name="RatingListItem[adil].RatingListItemDescripttion" class="form-control pull-right" autocomplete="off" placeholder="Enter Description" required />
+                                </div>
+                                <span class="field-validation-valid" data-valmsg-for="RatingListItem[adil].RatingListItemDescripttion" data-valmsg-replace="true"></span>
+
+                            </div>
+                            <div class="col-md-3" style="padding-bottom:26px!important;">
+                                <div class="form-group">
+                                    <input type="number" name="RatingListItem[adil].RatingListItemPercent" class="form-control pull-right" autocomplete="off" placeholder="Enter percent of charge" required />
+                                </div>
+                                <span class="field-validation-valid" data-valmsg-for="RatingListItem[adil].RatingListItemPercent" data-valmsg-replace="true"></span>
+
+                            </div>
+                        </div>
+                    }
+
+                }
+            </div>
+        </div>
+
+
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad btnSave" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+    <script>
+        $(function () {
+            //Date picker
+            $('.datepicker').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy",
+                startDate: new Date()
+            })
+
+            $('.select2').select2()
+        })
+
+        $(document).ready(function () {
+
+        });
+    </script>
+
+
+    <script type="text/javascript">
+
+        function makeid() {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for (var i = 0; i < 5; i++)
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            return text;
+        }
+
+
+        $(document).ready(function () {
+            $(".btnSave").click(function () {
+                //$("#add_contracts_form").data("validator").settings.ignore = "";
+                var validator = $("#inspection_fields_form").validate();
+                var isValid = $("#inspection_fields_form").valid();
+                if (!isValid) {
+
+                }
+                else {
+
+                }
+
+            });
+
+            var maxField = 10; //Input fields increment limitation
+            var addButton = $('.add_button'); //Add button selector
+            var wrapper = $('.field_wrapper'); //Input field wrapper
+            var index = makeid();
+            var fieldHTML = '<div class="myslf row col-md-12" style="margin-top:5px;">' +
+                '<a href = "javascript:void(0);" class="remove_button" >' +
+                '<i class="fa fa-minus" ></i >' +
+                '</a >' +
+                '<div class= "col-md-3" style="padding-bottom:26px;" >' +
+                '<input type="hidden" name="RatingListItem.Index" value="' + index + '" />' +
+                '<input type="hidden" name="RatingListItem[' + index + '].RatingListItemDetailID" value="0" />' +
+                '<div class="form-group">' +
+                '<input type="text" name="RatingListItem[' + index + '].RatingListItemName" class="form-control pull-right" autocomplete="off" placeholder="Enter item name" required />' +
+                '</div >' +
+                '<span class="field-validation-valid" data-valmsg-for="RatingListItem[' + index + '].RatingListItemName" data-valmsg-replace="true"></span>' +
+                '</div >' +
+                '<div class="col-md-3"  style="padding-bottom:26px;" >' +
+                '<div class="form-group">' +
+                '<input type="text" name="RatingListItem[' + index + '].RatingListItemDescripttion" class="form-control pull-right" autocomplete="off" placeholder="Enter Description" required />' +
+                '</div >' +
+                '<span class="field-validation-valid" data-valmsg-for="RatingListItem[' + index + '].RatingListItemDescripttion" data-valmsg-replace="true"></span>' +
+                '</div > ' +
+                '<div class="col-md-3"  style="padding-bottom:26px;" >' +
+                '<div class="form-group">' +
+                '<input type="number" name="RatingListItem[' + index + '].RatingListItemPercent" class="form-control pull-right" autocomplete="off" placeholder="Enter percent of charge" required />' +
+                '</div >' +
+                '<span class="field-validation-valid" data-valmsg-for="RatingListItem[' + index + '].RatingListItemPercent" data-valmsg-replace="true"></span>' +
+                '</div >' +
+                '</div > '
+            var x = 1; //Initial field counter is 1
+
+            //Once add button is clicked
+            $(addButton).click(function () {
+                //Check maximum number of input fields
+                if (x < maxField) {
+                    x++; //Increment field counter
+                    $(wrapper).append(fieldHTML); //Add field html
+                }
+            });
+
+            //Once remove button is clicked
+            $(wrapper).on('click', '.remove_button', function (e) {
+                e.preventDefault();
+                $(this).parent('div').remove(); //Remove field html
+                x--; //Decrement field counter
+            });
+        });
+    </script>
+}

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <g id="Dedicated_WIFI_Access_Point" data-name="Dedicated WIFI Access Point" transform="translate(-501 -96)">
+    <rect id="Rectangle_481" data-name="Rectangle 481" width="40" height="40" transform="translate(501 96)" fill="none"/>
+    <g id="Dedicated_WIFI_Access_Point-2" data-name="Dedicated WIFI Access Point" transform="translate(-2128 -523)">
+      <g id="Rectangle_75" data-name="Rectangle 75" transform="translate(2632 648)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="32" height="9" stroke="none"/>
+        <rect x="0.5" y="0.5" width="31" height="8" fill="none"/>
+      </g>
+      <path id="Path_101" data-name="Path 101" d="M2655.594,632.809v9.94" transform="translate(-7.594 4)" fill="none" stroke="#c20e1a" stroke-width="1"/>
+      <g id="Rectangle_76" data-name="Rectangle 76" transform="translate(2648.03 631) rotate(45)" fill="#fff" stroke="#c20e1a" stroke-width="1">
+        <rect width="5" height="5" stroke="none"/>
+        <rect x="0.5" y="0.5" width="4" height="4" fill="none"/>
+      </g>
+      <g id="Group_190" data-name="Group 190" transform="translate(2652 631)">
+        <path id="Path_102" data-name="Path 102" d="M2650.857,629.364l1.737,1.737-1.737,1.737" transform="translate(-2650.857 -627.216)" fill="none" stroke="#000" stroke-width="1"/>
+        <path id="Path_103" data-name="Path 103" d="M2650.857,629.364l2.909,2.909-2.909,2.909" transform="translate(-2647.443 -628.388)" fill="none" stroke="#000" stroke-width="1"/>
+        <path id="Path_104" data-name="Path 104" d="M2650.857,629.364l3.884,3.884-3.884,3.884" transform="translate(-2643.931 -629.364)" fill="none" stroke="#000" stroke-width="1"/>
+      </g>
+      <g id="Group_191" data-name="Group 191" transform="translate(2633 631)">
+        <path id="Path_107" data-name="Path 107" d="M2652.594,629.364l-1.737,1.737,1.737,1.737" transform="translate(-2641.783 -627.216)" fill="none" stroke="#000" stroke-width="1"/>
+        <path id="Path_106" data-name="Path 106" d="M2653.766,629.364l-2.909,2.909,2.909,2.909" transform="translate(-2646.369 -628.388)" fill="none" stroke="#000" stroke-width="1"/>
+        <path id="Path_105" data-name="Path 105" d="M2654.741,629.364l-3.884,3.884,3.884,3.884" transform="translate(-2650.857 -629.364)" fill="none" stroke="#000" stroke-width="1"/>
+      </g>
+      <g id="Rectangle_77" data-name="Rectangle 77" transform="translate(2637 656)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="5" height="3" stroke="none"/>
+        <rect x="0.5" y="0.5" width="4" height="2" fill="none"/>
+      </g>
+      <g id="Rectangle_78" data-name="Rectangle 78" transform="translate(2654 656)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="5" height="3" stroke="none"/>
+        <rect x="0.5" y="0.5" width="4" height="2" fill="none"/>
+      </g>
+      <g id="Rectangle_79" data-name="Rectangle 79" transform="translate(2635 651)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="3" height="3" stroke="none"/>
+        <rect x="0.5" y="0.5" width="2" height="2" fill="none"/>
+      </g>
+    </g>
+  </g>
+</svg>

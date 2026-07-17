@@ -1,0 +1,399 @@
+﻿@model IEnumerable<PMS.DTO.ViewModels.ContractViewModels.StudentConractsListVM>
+@using PMS.Common.Classes
+
+
+@{
+    ViewBag.Header = "Student Contracts List";
+    ViewBag.HeaderDescription = "All Student Contracts";
+    ViewBag.Title = "All Student Contracts | PMS";
+
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+            <div class="">
+                <div class="">
+                    <div class="col-md-3">
+                        <label>From Date</label>
+                        <input name="daterange" id="FromDate" class="form-control from_date" value="@ViewBag.FromDate" placeholder="From Date" autocomplete="off" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>To Date</label>
+                        <input name="daterange" id="ToDate" class="form-control to_date" value="@ViewBag.ToDate" placeholder="To Date" autocomplete="off" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label>Status</label>
+                        <select id="Status" class="form-control">
+                            <option value="" @(ViewBag.SelectedStatus == null ? "selected" : "")>All</option>
+                            <option value="checkin" @(ViewBag.SelectedStatus == "checkin" ? "selected" : "")>Check-In</option>
+                            <option value="checkedout" @(ViewBag.SelectedStatus == "checkedout" ? "selected" : "")>Checked-Out</option>
+                            <option value="pending" @(ViewBag.SelectedStatus == "pending" ? "selected" : "")>Pending</option>
+                            <option value="signed" @(ViewBag.SelectedStatus == "signed" ? "selected" : "")>Signed</option>
+                            <option value="cancelled" @(ViewBag.SelectedStatus == "cancelled" ? "selected" : "")>Cancelled</option>
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="col-md-1">
+                        <label> &nbsp; </label>
+                        <br />
+                        <button type="button" onclick="GetContracts();" class="btn btn-themyriad btn-bordered waves-effect w-md"><i class="fa fa-search"></i> <span>Search</span></button>
+                    </div>
+                </div>
+                <br />
+
+            </div>
+
+            <div class="col-md-12">
+                <hr />
+            </div>
+
+
+            @*<div class="col-sm-12 " style="margin-bottom:30px ; padding:0px;">
+                    <div class="input-group-btn">
+                        <a href="@Url.Action("AddContracts", "ContractsManage")" class="btn btn-themyriad"><i class="fa fa-plus" style="padding-right: 5px;"></i> Add New Contract</a>
+                    </div>
+                </div>*@
+
+            <div style="overflow: auto; width:100%">
+
+                <table class="table table-bordered table-striped data-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>MyriadID</th>
+                            <th>FullName</th>
+                            <th>Contract Name</th>
+                            <th>Occupancy</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                            <th>Created By</th>
+                            <th>Move In</th>
+                            <th>Move Out</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>In House</th>
+                            <th>Checked Out</th>
+                            <th>Cancellation Reason</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var contract in Model)
+                        {
+                            <tr>
+                                <td>@contract.PersonCode</td>
+                                <td>@contract.PersonFullName</td>
+                                <td>@contract.ContractName</td>
+                                <td>@contract.Occupancy</td>
+                                <td>
+                                    @if (contract.IsCancel)
+                                    {
+                                        if (contract.IsSigned)
+                                        {
+                                            <span class="label label-danger">Signed & Cancelled</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="label label-default">Cancelled</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (contract.IsSigned)
+                                        {
+                                            <span class="label label-success">Signed</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="label label-warning">Pending</span>
+                                        }
+                                    }
+                                </td>
+                                <td>@contract.CreatedOn.ToString("d/M/yyyy")</td>
+                                <td>@contract.CreatedBy</td>
+                                <td>@contract.MoveinFormatted</td>
+                                <td>@contract.MoveOutFormatted</td>
+                                <td>@(contract.CheckIn?.ToString("d/M/yyyy HH:mm:ss") ?? "")</td>
+                                <td>@(contract.CheckOut?.ToString("d/M/yyyy HH:mm:ss") ?? "")</td>
+
+
+                                <td>@(contract.InHouse == true? Html.Raw("<span class='text-success label label-success'>Yes</span>") : Html.Raw("<span class='text-success label label-danger'>No</span>"))</td>
+                                <td>@(contract.CheckedOut == true? Html.Raw("<span class='text-success label label-success'>Yes</span>") : Html.Raw("<span class='text-success label label-danger'>No</span>"))</td>
+                                <td>@contract.CancellationReason</td>
+                                <td class="menu-icons" style="text-align:inherit; white-space:nowrap;">
+                                    @using (Html.BeginForm("ContractDownloadPdf", "ContractsManage", new { id = contract.Id, type = "Studentcontract" }, FormMethod.Post, new { id = "revertCancelBookingForm " + contract.Id, style = "display:inline-block" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        <a title="Download Contract Editor Template" href="javascript:document.getElementById('revertCancelBookingForm @contract.Id').submit()"><i class="fa fa-download"></i></a>
+                                    }
+                                    @*<a title="View Contract PDF" target="_blank"
+                                           href="@Url.Action("ContractViewPdf", "ContractsManage", new { id = contract.Id, type = "Studentcontract", view = true })">
+                                            <i class="fa fa-eye"></i>
+                                        </a>*@
+                                    @if ((User.IsInRole(AppUserRoles.Delete_contracts) || User.IsInRole(AppUserRoles.Cancel_contracts)) && contract.IsCancel != true && !contract.IsSigned)
+                                    {
+                                        <a title="Mark as Signed" href="#" onclick="OpenConfirmSignModal(@contract.Id); return false;">
+                                            <i class="fa fa-check text-success"></i>
+                                        </a>
+                                    }
+                                    @if (User.IsInRole(AppUserRoles.Delete_contracts) && contract.IsCancel != true)
+                                    {
+                                        <a title="Cancel" href="#" onclick="OpenConfirmCancelModal(@contract.Id)">
+                                            <i class="fa fa-remove"></i>
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_div" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+</div>
+
+<div class="modal fade" id="SignBtnConfirm" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" action="@Url.Action("MarkContractAsSigned", "ContractsManage")" id="signContractForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">Mark Contract as Signed</h4>
+                </div>
+                <div class="modal-body">
+                    <p>You are about to update this pending contract to signed status.</p>
+                    <p>Are you sure you want to continue?</p>
+                    <input type="hidden" name="Id" id="SignContractId" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-themyriad btn-ok">Yes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="CancelBtnConfirm" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" action="@Url.Action("CancelContract", "ContractsManage")" id="cancelContractForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">Cancel Contract</h4>
+                </div>
+                <div class="modal-body">
+                    <p>If you cancel this contract will no longer be editable, Please review and confirm.</p>
+                    <input type="hidden" name="Id" id="ContractId" />
+
+                    <div class="form-group">
+                        <label for="Remarks">Cancelation reason</label>
+                        <textarea id="CancellationReason" class="form-control" name="CancellationReason" required placeholder="Cancellation Reason" style="min-height:70px"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-themyriad btn-ok">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+
+    <script>
+        $(function () {
+            //$('.data-table').DataTable({ "targets": [0], "searchable": false, "orderable": false, "visible": true });
+            $('.data-table').DataTable({
+                "scrollY": "70vh",
+                "scrollCollapse": true,
+                "scrollX": "auto",
+                dom: 'Blfrtip',
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                buttons: [
+                    'excelHtml5',
+                ],
+                columnDefs: [
+                    {
+                        "targets": [0, -1], //first column / numbering column
+                        "orderable": false, //set not orderable
+                    },
+                    { type: 'date-euro', targets: 4 },
+
+                ]
+            });
+        })
+        var startDate = new Date();
+        var FromEndDate = new Date();
+        var ToEndDate = new Date();
+        ToEndDate.setDate(ToEndDate.getDate() + 365);
+
+        $('.from_date').datepicker({
+            weekStart: 1,
+            startDate: '',
+            format: "dd/M/yyyy",
+            orientation: "bottom left",
+
+            autoclose: true
+        })
+            .on('changeDate', function (selected) {
+                startDate = new Date(selected.date.valueOf());
+                //startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+                $('.to_date').datepicker('setStartDate', startDate);
+            });
+        $('.to_date')
+            .datepicker({
+                weekStart: 1,
+                startDate: new Date($('.from_date').val()),
+                endDate: ToEndDate,
+                format: "dd/M/yyyy",
+                orientation: "bottom left",
+                autoclose: true,
+            })
+            .on('changeDate', function (selected) {
+                FromEndDate = new Date(selected.date.valueOf());
+                FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                $('.from_date').datepicker('setEndDate', FromEndDate);
+            });
+        function GetContracts() {
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+            var status = $('#Status').val();
+            window.location.href = GetFormatedUrl("/ContractsManage/StudentContracts?FromDate=" + SD + "&ToDate=" + ED + "&Status=" + status);
+
+        };
+
+        function OpenConfirmSignModal(Id) {
+            $('#SignContractId').val(Id);
+            $('#SignBtnConfirm').modal('show');
+
+            $('#signContractForm').off('submit').on('submit', function (e) {
+                e.preventDefault();
+
+                $('#SignBtnConfirm .btn-ok').prop('disabled', true);
+                $('.Customoverlay, .Customloader').show();
+
+                $.ajax({
+                    type: "POST",
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.status === false) {
+                            showMessage(response.error || 'An error occurred');
+                            $('#SignBtnConfirm .btn-ok').prop('disabled', false);
+                        } else {
+                            window.location.reload();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        showMessage('Some error occurred: ' + error);
+                        $('#SignBtnConfirm .btn-ok').prop('disabled', false);
+                    },
+                    complete: function () {
+                        $('.Customoverlay, .Customloader').hide();
+                    }
+                });
+            });
+        }
+
+        function OpenConfirmCancelModal(Id) {
+            $('#ContractId').val(Id);
+
+            // Show the modal
+            $('#CancelBtnConfirm').modal('show');
+
+            $('#cancelContractForm').off('submit').on('submit', function (e) {
+                e.preventDefault();
+
+                $('#CancelBtnConfirm .btn-ok').prop('disabled', true);
+
+                // Show loading indicator
+                $('.Customoverlay, .Customloader').show();
+
+                // Perform AJAX request
+                $.ajax({
+                    type: "POST",
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.status === false) {
+                            // Show validation error
+                            showMessage(response.error || 'An error occurred', 'error');
+                            $('#CancelBtnConfirm .btn-ok').prop('disabled', false);
+                        } else {
+                            // Success - redirect
+                            window.location.href = GetFormatedUrl('/ContractsManage/StudentContracts');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        showMessage('Some error occurred: ' + error, 'error');
+                        $('#CancelBtnConfirm .btn-ok').prop('disabled', false);
+                    },
+                    complete: function () {
+                        $('.Customoverlay, .Customloader').hide();
+                    }
+                });
+            });
+        }
+
+    </script>
+}

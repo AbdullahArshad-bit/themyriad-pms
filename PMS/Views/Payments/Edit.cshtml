@@ -1,0 +1,227 @@
+﻿@model PMS.EF.StudentLedger
+
+@{
+    ViewBag.Header = "Payments";
+    ViewBag.HeaderDescription = "Update Payment";
+    ViewBag.Title = "Payments | PMS";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.Code)
+    @Html.HiddenFor(x => x.LocationId, new { @id = "locationId", @name = "LocationId" })
+    @Html.HiddenFor(x => x.StudentId, new { @id = "studentId", @name = "StudentId" })
+    @*@Html.HiddenFor(x => x.InvoiceId, new { @id = "invoiceId", @name = "InvoiceId" })*@
+
+    @Html.Partial("_CreateOrUPdate")
+}
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/datepicker/Js")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#LocationId').attr("disabled", true);
+            $('#StudentId').attr("disabled", true);
+            //$('#InvoiceId').attr("disabled", true);
+            var studentid = $("#StudentId").select2().find(":selected").val();
+            var invID = $("#InvoiceId").select2().find(":selected").val();
+            var url = GetFormatedUrl("/Invoicings/GetEditInvoicesByInvoiceId")
+            $.ajax({
+                type: "Get",
+                url: url,
+                data: {
+                    Id: InvoiceId
+                },
+                success: function (data) {
+                    $('#InvoiceId').html('');
+                    var html = "<option value=''>--- Select Invoice ---</option>";
+                    var amount = 0;
+                    $.each(data.data, function (key, value) {
+                        if (value.Id == invID) {
+                            html = html + "<option selected data-attr='" + parseFloat(value.Amount) + "' Value='" + value.Id + "'>" + value.Value + "</option>"
+                        }
+                        else {
+                            html = html + "<option data-attr='" + parseFloat(value.Amount) + "' Value='" + value.Id + "'>" + value.Value + "</option>"
+                        }
+
+                        amount = value.Amount;
+
+                    })
+                    $('#InvoiceId').html(html);
+
+
+                }
+            });
+
+
+        });
+
+        window.onload = function () {
+            loadTotalPayable(this.parseFloat($('#CreditAmount').val()))
+            function loadTotalPayable(amount) {
+                var invoiceid = $("#InvoiceId").select2().find(":selected").val();
+                var url = GetFormatedUrl("/Payment/checkpayables");
+                $.ajax({
+                    type: "Get",
+                    url: url,
+                    data: {
+                        InvoiceId: invoiceid
+                    },
+                    success: function (data) {
+
+                        $('.CreditAmountLabel').text('Amount Received (' + "Total Payable: " + ((amount || 0) + parseFloat(data.Amount)) + ")");
+                        $("#InvoiceId").select2().find(":selected").attr("data-attr", ((amount || 0) + parseFloat(data.Amount)));
+                    }
+                });
+            }
+
+        }
+
+        $(function () {
+            //Date picker
+            $('#datepicker').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy"
+            })
+        })
+
+        $('.SubmitWithApprove').on('click', function () {
+            $('#IsApproved').val(true);
+            $(this).attr('type', 'submit');
+            $(this).submit();
+        })
+
+        $('.SubmitWithOutApprove').on('click', function () {
+            $('#IsApproved').val(false);
+            $(this).attr('type', 'submit');
+            $(this).submit();
+        })
+
+
+        $('#LocationId').on('change', function () {
+
+            var Code = $('#Code').val()
+            var LocationId = $(this).val()
+            var url = GetFormatedUrl("/Payments/GetLocationBYId")
+            $.ajax({
+                type: "Get",
+                url: url,
+                data: {
+                    Id: LocationId
+                },
+                success: function (data) {
+                    var data = data;
+                    $('#Code').val(data.Code);
+                    $('#StudentId').html('');
+                    var html = "<option value=''>--- Select Resident Id ---</option>";
+                    $.each(data.Students, function (key, value) {
+                        html = html + "<option Value='" + value.PersonID + "'>" + value.FullName + "</option>"
+                    })
+                    $('#StudentId').html(html);
+                }
+            });
+        });
+        $('#StudentId').on('change', function () {
+            var studentid = $(this).val()
+            var url = GetFormatedUrl("/Invoicings/GetInvoicesByPersonId")
+            $.ajax({
+                type: "Get",
+                url: url,
+                data: {
+                    PersonId: studentid
+                },
+                success: function (data) {
+                    $('#InvoiceId').html('');
+                    var html = "<option value=''>--- Select Invoice ---</option>";
+                    $.each(data.data, function (key, value) {
+                        html = html + "<option data-attr='" + value.Amount + "' Value='" + value.Id + "'>" + value.Value + "</option>"
+                    })
+                    $('#InvoiceId').html(html);
+                }
+            });
+        });
+
+        $('#InvoiceId').on('change', function () {
+            $("#CreditAmount").val('');
+            var invoiceid = $('#InvoiceId').val();
+            var url = GetFormatedUrl("/Payment/checkpayables");
+            $.ajax({
+                type: "Get",
+                url: url,
+                data: {
+                    InvoiceId: invoiceid
+                },
+                success: function (data) {
+                    $('.CreditAmountLabel').text('Amount Received (' + "Total Payable: " + parseFloat(data.Amount + ")"));
+                    $("#InvoiceId").select2().find(":selected").attr("data-attr", parseFloat(data.Amount));
+                    //alert(data.Amount);
+                }
+            });
+
+
+        });
+
+        function CheckAmount() {
+            var Amount = $('#CreditAmount').val();
+            var InvAmount = $("#InvoiceId").select2().find(":selected").attr("data-attr");
+            var errorMsg = $('#DebitAmountValidation');
+
+            if (parseFloat(Amount) > parseFloat(InvAmount)) {
+                $('#InvAmountValidation').removeAttr('hidden');
+                $('#CreditAmount').val("");
+            }
+            else {
+                $('#InvAmountValidation').attr("hidden", true);
+            }
+            if (Amount < 0 || isNaN(Amount)) {
+                // Clear the invalid input
+                $('#CreditAmount').val('');
+
+                if (errorMsg.length === 0) {
+                    // Create error message if it doesn't exist
+                    $('#CreditAmount').after('<span class="text-danger" id="DebitAmountValidation" style="color: #c20e1a;">Amount must be greater than 0</span>');
+                } else {
+                    errorMsg.show();
+                }
+                return false;
+            } else {
+                // Hide error message if amount is valid
+                if (errorMsg.length > 0) {
+                    errorMsg.hide();
+                }
+                return true;
+            }
+        }
+
+        function RestrictAmount() {
+            var debitAmount = parseFloat($('#DebitAmount').val());
+            var errorMsg = $('#DebitAmountValidation');
+
+            // Check if the value is less than or equal to 0
+            if (debitAmount <= 0 || isNaN(debitAmount)) {
+                // Clear the invalid input
+                $('#DebitAmount').val('');
+
+                if (errorMsg.length === 0) {
+                    // Create error message if it doesn't exist
+                    $('#DebitAmount').after('<span class="text-danger" id="DebitAmountValidation" style="color: #c20e1a;">Amount must be greater than 0</span>');
+                } else {
+                    errorMsg.show();
+                }
+                return false;
+            } else {
+                // Hide error message if amount is valid
+                if (errorMsg.length > 0) {
+                    errorMsg.hide();
+                }
+                return true;
+            }
+        }
+
+    </script>
+
+}

@@ -1,0 +1,395 @@
+﻿@model PMS.EF.UserMaster
+@{
+    ViewBag.Header = "Profile";
+    ViewBag.HeaderDescription = "Profile Information";
+    ViewBag.Title = "Profile";
+}
+
+<style>
+    /* ── Section labels ── */
+    .section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #c20e1a;
+        margin-bottom: 20px;
+        padding-left: 15px;
+        position: relative;
+    }
+
+        .section-label::after {
+            content: "";
+            position: absolute;
+            left: 15px;
+            bottom: -8px;
+            width: calc(100% - 15px);
+            height: 1px;
+            background: linear-gradient(90deg, #c20e1a 0%, transparent 100%);
+        }
+
+    /* ── Avatar zone ── */
+    .pp-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 16px 16px;
+        gap: 20px;
+    }
+
+    .pp-avatar-zone {
+        position: relative;
+        width: 210px;
+        height: 210px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .pp-img-ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        padding: 3px;
+        background: #ddd;
+        transition: background .35s ease;
+    }
+
+    .pp-avatar-zone:hover .pp-img-ring {
+        background: linear-gradient(135deg, #c20e1a 0%, #ff7b7b 50%, #c20e1a 100%);
+    }
+
+    .pp-img-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #f0f0f0;
+    }
+
+        .pp-img-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform .4s ease, filter .35s ease;
+        }
+
+    .pp-avatar-zone:hover .pp-img-inner img {
+        transform: scale(1.05);
+        filter: brightness(.65);
+    }
+
+    .pp-overlay {
+        position: absolute;
+        inset: 3px;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        opacity: 0;
+        transition: opacity .25s ease;
+        pointer-events: none;
+    }
+
+    .pp-avatar-zone:hover .pp-overlay {
+        opacity: 1;
+    }
+
+    .pp-overlay svg {
+        width: 32px;
+        height: 32px;
+        fill: none;
+        stroke: #fff;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .pp-overlay span {
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+    }
+
+    /* action bar slides in after file chosen */
+    .pp-action-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fff8f7;
+        border: 1px solid #f5c2c7;
+        border-radius: 12px;
+        padding: 9px 14px;
+        width: 100%;
+        max-width: 210px;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity .25s ease, transform .25s ease;
+        pointer-events: none;
+    }
+
+        .pp-action-bar.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+    .pp-fname {
+        font-size: 12px;
+        color: #666;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .pp-save-btn {
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 8px;
+        border: none;
+        background: linear-gradient(135deg, #d01020, #9b0d18);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .4px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: opacity .15s, transform .1s;
+    }
+
+        .pp-save-btn:hover {
+            opacity: .9;
+        }
+
+        .pp-save-btn:active {
+            transform: translateY(1px);
+        }
+
+    .pp-hint {
+        font-size: 12px;
+        color: #aaa;
+        text-align: center;
+        transition: opacity .2s;
+        margin: 0;
+    }
+
+        .pp-hint.hide {
+            opacity: 0;
+        }
+
+    /* ── Note box ── */
+    .profile-note {
+        background: #fff8f7;
+        border-left: 3px solid #c20e1a;
+        border-radius: 0 8px 8px 0;
+        padding: 12px 16px;
+        margin-top: 18px;
+        margin-left: 15px;
+    }
+</style>
+
+<div class="box box-danger">
+    <div class="box-body">
+        <div class="row">
+
+            @using (Html.BeginForm("updateImage", "User", FormMethod.Post, new { enctype = "multipart/form-data", id = "profil_form" }))
+            {
+                <div class="col-sm-3">
+
+                    @if (ViewBag.error != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                            @ViewBag.error
+                        </div>
+                    }
+                    @if (ViewBag.success != null)
+                    {
+                        <div class="alert alert-success alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                            @ViewBag.success
+                        </div>
+                    }
+
+                    <div class="pp-col">
+
+                        <div class="pp-avatar-zone" id="ppZone" title="Change profile photo">
+                            <div class="pp-img-ring">
+                                <div class="pp-img-inner">
+                                    @{
+                                        var path = "/Assets/dist/img/profile.png";
+                                        if (Model.ImageUrl != null) { path = Model.ImageUrl; }
+                                        <img src="@path" id="ppPreview" alt="Profile photo" />
+                                    }
+                                </div>
+                            </div>
+                            <div class="pp-overlay">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                    <circle cx="12" cy="13" r="4" />
+                                </svg>
+                                <span>Edit photo</span>
+                            </div>
+                        </div>
+
+                        <input type="file" id="ppFile" name="file" accept="image/*" style="display:none;" />
+
+                        <div class="pp-action-bar" id="ppActionBar">
+                            <span class="pp-fname" id="ppFname">photo.jpg</span>
+                            <button type="submit" class="pp-save-btn">Save</button>
+                        </div>
+
+                        <p class="pp-hint" id="ppHint">Click your photo to change it</p>
+
+                    </div>
+                </div>
+            }
+
+            <div class="col-sm-9">
+                <div class="form-group"></div>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="home">
+                        <form class="form" action="##" method="post" id="registrationForm">
+
+                            <div class="section-label">Personal Information</div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Myriad ID</label>
+                                        @Html.TextBoxFor(x => x.Person.Code, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Full Name</label>
+                                        @Html.TextBoxFor(x => x.FullName, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        @Html.TextBoxFor(x => x.Email, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Nationality</label>
+                                        @Html.TextBoxFor(x => x.Person.Nationality, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Phone</label>
+                                        @Html.TextBoxFor(x => x.Phone, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Date Of Birth</label>
+                                        @Html.TextBoxFor(x => x.DOB, new { @Value = Model.DOB.Value.ToString("dd-MMM-yyyy"), @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>University</label>
+                                        @Html.TextBoxFor(x => x.Person.University.UniversityName, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+                            <div class="section-label">Emergency Contact Information</div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Guardian Full Name</label>
+                                        @Html.TextBoxFor(x => x.Person.EmergencyContacts.FirstOrDefault().FullName, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Relation</label>
+                                        @Html.TextBoxFor(x => x.Person.EmergencyContacts.FirstOrDefault().Relation, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Guardian Phone No</label>
+                                        @Html.TextBoxFor(x => x.Person.EmergencyContacts.FirstOrDefault().Phone, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Guardian Email</label>
+                                        @Html.TextBoxFor(x => x.Person.EmergencyContacts.FirstOrDefault().Email, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+
+                        <br />
+                        <div class="profile-note">
+                            <strong style="font-size:14px;">Note:</strong>
+                            <span style="color:#c20e1a; font-size:14px;"> In case of any errors in the details above, please contact Resident Support Team.</span>
+                            <br />
+                            <strong style="font-size:14px;">Referral Code: </strong>
+                            <span style="color:#c20e1a; font-size:15px;">
+                                @Html.TextBoxFor(x => x.Person.ReferralCode, new { @readonly = "readonly", style = "border:none; background:transparent; color:#c20e1a; font-size:15px;" })
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            var zone = document.getElementById('ppZone');
+            var file = document.getElementById('ppFile');
+            var preview = document.getElementById('ppPreview');
+            var bar = document.getElementById('ppActionBar');
+            var fname = document.getElementById('ppFname');
+            var hint = document.getElementById('ppHint');
+
+            zone.addEventListener('click', function () {
+                file.click();
+            });
+
+            file.addEventListener('change', function () {
+                if (!this.files || !this.files[0]) return;
+                var f = this.files[0];
+                var reader = new FileReader();
+                reader.onload = function (e) { preview.src = e.target.result; };
+                reader.readAsDataURL(f);
+                var name = f.name.length > 22 ? f.name.substring(0, 20) + '…' : f.name;
+                fname.textContent = name;
+                bar.classList.add('visible');
+                hint.classList.add('hide');
+            });
+        });
+    </script>
+}

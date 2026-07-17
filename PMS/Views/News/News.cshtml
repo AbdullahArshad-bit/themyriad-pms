@@ -1,0 +1,352 @@
+﻿@model PMS.DTO.ViewModels.NewsViewModels.NewsVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "News";
+    ViewBag.HeaderDescription = "Add New News";
+    ViewBag.Title = "Add News | PMS";
+}
+
+@section styles
+{
+    <!-- bootstrap datepicker -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+}
+
+<div class="box box-danger">
+
+    @if (User.IsInRole(AppUserRoles.view_news))
+    {
+        <div class="box-header with-border">
+            <div class="input-group-btn">
+                <a href="@Url.Action("All", "News")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All News</a>
+            </div>
+        </div>
+    }
+
+
+    <div class="box-header with-border">
+        <h3 class="box-title">Add News</h3>
+    </div>
+    <!-- /.box-header -->
+    <!-- form start -->
+
+    @using (Html.BeginForm("AddNews", "News", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_news_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.NewsId)
+        @Html.HiddenFor(x => x.IsEnable)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Select Category</label>
+
+                    @Html.DropDownListFor(model => model.SelectedCategory,
+    new SelectList(Model.NewsCategories, "NewsCategoryID", "Description"),
+    "-- Category --",
+    new { @Class = "form-control" })
+
+                    @Html.ValidationMessageFor(x => x.SelectedCategory)
+
+                </div>
+
+                <div class="form-group ">
+                    <label for="exampleInputPassword1">Headline</label>
+                    @Html.TextBoxFor(x => x.Headline, new { @class = "form-control", placeholder = "Enter Headline" })
+
+                    @Html.ValidationMessageFor(x => x.Headline)
+
+                </div>
+
+                <div class="form-group ">
+                    <label for="exampleInputFile">Headline Image</label>
+                    @Html.TextBoxFor(x => x.HeadlineImage, new { @class = "form-control", type = "file" })
+                    <p class="help-block ">image size should be 811x350 pixels</p>
+
+                    @Html.ValidationMessageFor(x => x.HeadlineImage)
+
+                    <img id="headlineUpload" src="@(!string.IsNullOrEmpty(Model.HeadlineImageUrl) ? Model.HeadlineImageUrl : "")" class="img-responsive" />
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Heading</label>
+
+                    @Html.TextBoxFor(x => x.Heading, new { @class = "form-control", placeholder = "Enter Heading" })
+
+                    @Html.ValidationMessageFor(x => x.Heading)
+
+                </div>
+
+
+
+                <div class="form-group ">
+                    <label for="exampleInputPassword1">Arabic Headline</label>
+                    @Html.TextBoxFor(x => x.Ar_Headline, new { @class = "form-control", placeholder = "Enter Headline" })
+
+                    @Html.ValidationMessageFor(x => x.Ar_Headline)
+
+                </div>
+
+
+
+
+                <div class="form-group ">
+                    <label for="exampleInputFile">Arabic Headline Image</label>
+                    @Html.TextBoxFor(x => x.Ar_HeadlineImage, new { @class = "form-control", type = "file" })
+                    <p class="help-block ">image size should be 811x350 pixels</p>
+
+                    @Html.ValidationMessageFor(x => x.Ar_HeadlineImage)
+
+                    <img id="Ar_headlineUpload" src="@(!string.IsNullOrEmpty(Model.Ar_HeadlineImageUrl) ? Model.Ar_HeadlineImageUrl : "")" class="img-responsive" />
+
+                </div>
+            </div>
+
+
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Arabic Heading</label>
+
+                    @Html.TextBoxFor(x => x.Ar_Heading, new { @class = "form-control", placeholder = "Enter Heading" })
+
+                    @Html.ValidationMessageFor(x => x.Ar_Heading)
+
+                </div>
+
+
+
+
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Source Link</label>
+                    @Html.TextBoxFor(x => x.SourceLink, new { @class = "form-control", placeholder = "Enter Source Link" })
+
+                    @Html.ValidationMessageFor(x => x.SourceLink)
+
+                </div>
+
+
+                <div class="form-group ">
+
+                    <label for="exampleInputFile">News Thumbnail</label>
+                    @{
+                        if (Model.NewsId > 0)
+                        {
+                            Html.EnableClientValidation(false);
+                        }
+                    }
+                    @Html.TextBoxFor(x => x.ThumbnailImage, new { @class = "form-control", type = "file" })
+                    <p class="help-block ">image size should be 570x403 pixels</p>
+
+                    @Html.ValidationMessageFor(x => x.ThumbnailImage)
+
+                    <img id="thumbUpload" src="@(!string.IsNullOrEmpty(Model.ThumbnailImageUrl) ? Model.ThumbnailImageUrl : "")" class="img-responsive" />
+
+                    @{ Html.EnableClientValidation(true);}
+                </div>
+
+
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="form-group ">
+                    <label>Publish Date:</label>
+
+                    <div class="input-group date">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        @Html.TextBoxFor(x => x.NewsDate, new { id = "datepicker", @Value = Model.NewsDate.ToString("dd/MMM/yyyy"), type = "datetime", @class = "form-control pull-right", autocomplete = "off", @readonly = "", placeholder = "Select Date" })
+
+
+                    </div>
+                    <!-- /.input group -->
+
+                    @Html.ValidationMessageFor(x => x.NewsDate)
+                </div>
+
+
+                <div class=" form-group ">
+                    <label for="exampleInputEmail1" style="width:100%">Activate News</label>
+
+                    <label style="font-weight:normal">
+                        @Html.CheckBoxFor(x => x.IsActive) Is Active
+                    </label>
+
+                    @Html.ValidationMessageFor(x => x.IsActive)
+
+                </div>
+
+                <div class="form-group ">
+                    <label for="exampleInputFile">Arabic News Thumbnail</label>
+                    @{
+                        if (Model.NewsId > 0)
+                        {
+                            Html.EnableClientValidation(false);
+                        }
+                    }
+                    @Html.TextBoxFor(x => x.Ar_ThumbnailImage, new { @class = "form-control", type = "file" })
+                    <p class="help-block ">image size should be 570x403 pixels</p>
+
+                    @Html.ValidationMessageFor(x => x.Ar_ThumbnailImageUrl)
+
+                    <img id="Ar_thumbUpload" src="@(!string.IsNullOrEmpty(Model.Ar_ThumbnailImageUrl) ? Model.Ar_ThumbnailImageUrl : "")" class="img-responsive" />
+
+                    @{ Html.EnableClientValidation(true);}
+                </div>
+
+
+            </div>
+
+        </div>
+
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+
+
+
+
+
+
+
+
+@section scripts {
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+    <script>
+
+        $(function () {
+            function readURL(input) {
+                $('#thumbUpload').attr('src', '');
+                if (input.files && input.files[0]) {
+                    var size = input.files[0].size / 1024 / 1024;
+                    if (size > 1) {
+                        $('#fileSizeMessage').modal('show');
+                        $("#ThumbnailImage").val(null);
+                        return;
+                    }
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#thumbUpload').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            };
+            function ArabicReadURL(input) {
+                $('#Ar_thumbUpload').attr('src', '');
+                if (input.files && input.files[0]) {
+                    var size = input.files[0].size / 1024 / 1024;
+                    if (size > 1) {
+                        $('#fileSizeMessage').modal('show');
+                        $("#Ar_ThumbnailImage").val(null);
+                        return;
+                    }
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#Ar_thumbUpload').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            };
+            $("#ThumbnailImage").change(function () {
+                readURL(this);
+            });
+            $("#Ar_ThumbnailImage").change(function () {
+                ArabicReadURL(this);
+            });
+            $("#thumbUpload").click(function () {
+                $("input[id='ThumbnailImage']").click();
+            });
+
+
+            function readURL1(input) {
+                $('#headlineUpload').attr('src', '');
+                if (input.files && input.files[0]) {
+                    var size = input.files[0].size / 1024 / 1024;
+                    if (size > 1) {
+                        $('#fileSizeMessage').modal('show');
+                        $("#HeadlineImage").val(null);
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#headlineUpload').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            };
+            function readURL2(input) {
+                $('#Ar_headlineUpload').attr('src', '');
+                if (input.files && input.files[0]) {
+                    var size = input.files[0].size / 1024 / 1024;
+                    if (size > 1) {
+                        $('#fileSizeMessage').modal('show');
+                        $("#Ar_HeadlineImage").val(null);
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#Ar_headlineUpload').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            };
+            $("#HeadlineImage").change(function () {
+                readURL1(this);
+            });
+            $("#Ar_HeadlineImage").change(function () {
+                readURL2(this);
+            });
+            $("#headlineUpload").click(function () {
+                $("input[id='HeadlineImage']").click();
+            });
+            $("#Ar_headlineUpload").click(function () {
+                $("input[id='Ar_HeadlineImage']").click();
+            });
+        });
+
+
+        $(function () {
+            //Date picker
+            $('#datepicker').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy"
+            })
+        })
+    </script>
+
+
+} 

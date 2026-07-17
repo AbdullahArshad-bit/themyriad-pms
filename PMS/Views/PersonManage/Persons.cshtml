@@ -1,0 +1,624 @@
+﻿@model PMS.DTO.ViewModels.PersonManageViewModels.ImportFromExcelVM
+
+@using PMS.Common.Classes
+
+@{ var per = ViewBag.Persons as List<PMS.EF.Person>;
+    ViewBag.Header = "Persons";
+    ViewBag.HeaderDescription = "All Persons";
+    ViewBag.Title = "All Persons | PMS";
+}
+
+@{
+    var RunAFeeAssessment = User.IsInRole(AppUserRoles.Run_A_Fee_Assessment);
+    var EditProfileAction = User.IsInRole(AppUserRoles.Add_Profile);
+    var viewBookingAction = User.IsInRole(AppUserRoles.View_BookingList);
+    var AddBookingAction = User.IsInRole(AppUserRoles.Add_Booking);
+    var viewBedSpacePlacementAction = User.IsInRole(AppUserRoles.View_BedSpacePlacement);
+    var CreateUserAction = User.IsInRole(AppUserRoles.create_resident_Acount);
+    var viewPartnetLedgerAction = User.IsInRole(AppUserRoles.view_acc_PartnetLedger);
+    var ViewPersonRelationshipHistoryAction = User.IsInRole(AppUserRoles.View_PersonRelationshipHistory);
+    var ViewPersonDocumentAction = User.IsInRole(AppUserRoles.View_PersonDocument);
+    var DeleteProfileAction = User.IsInRole(AppUserRoles.Delete_Profile);
+}
+@{
+    var LocationID = HttpContext.Current.Session["locationid"];
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+}
+
+@{ var query = Request.Params["queryby"];
+    if (query == "Notcreatedbooking")
+    {
+        ViewBag.Header = "";
+        ViewBag.HeaderDescription = "";
+        ViewBag.Title = "";
+    }
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Error!</h4>
+                    @Html.Raw(ViewBag.error)
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Success!</h4>
+                    @Html.Raw(ViewBag.success)
+                </div>
+            }
+
+            <div class="col-sm-12 " style="margin-bottom:30px ; padding:0px;">
+                @*<div class="input-group-btn">
+                        <a href="        ion("AddPerson", "PersonManage")" class="btn btn-themyriad"><i class="fa fa-plus" style="padding-right: 5px;"></i> Add New Person</a>
+                    </div>*@
+                @if (User.IsInRole(AppUserRoles.Add_Profile))
+                {
+                    <a href="@Url.Action("AddPerson", "PersonManage")" class="btn btn-themyriad waves-effect button-effect">
+                        <i class="fa fa-plus" style="padding-right: 5px;"></i>
+                        Add New Person
+                    </a>
+                }
+
+                @*@if (User.IsInRole(AppUserRoles.Import_ProfileExcel))
+                    {
+                        <a href="javascript:void(0)" data-toggle="modal" data-target="#import-from-excel-modal" class="btn btn-themyriad">
+                            <i class="fa  fa-file-excel-o" style="padding-right: 5px;"></i>
+                            Import Profiles From Excel
+                        </a>
+                    }*@
+
+                    @if (User.IsInRole(AppUserRoles.Import_ProfileWithBookingExcel))
+                    {
+                        <a href="javascript:void(0)" data-toggle="modal" data-target="#import-from-excel-WithBooking-modal" class="btn btn-themyriad">
+                            <i class="fa  fa-file-excel-o" style="padding-right: 5px;"></i>
+                            Import Profiles From Excel With Booking
+                        </a>
+                    }
+
+                    @if (User.IsInRole(AppUserRoles.Import_ProfileFormat))
+                    {
+                        <a href="https://pms.themyriad.com/Upload/Files/ExcelImportFormats/ProfileWithBookingFormat.xlsx" class="btn btn-themyriad">
+                            <i class="fa  fa-file-excel-o" style="padding-right: 5px;"></i>
+                            Import Profiles From Excel With Booking Format
+                        </a>
+
+                    }
+
+                @if (query == null)
+                {
+                    <a onclick="GetExcel()" class="btn btn-success btn-bordered waves-effect w-md button-effect">
+                        <i class="fa fa-download" style="padding-right: 5px;"> </i> <span> Export Report </span>
+                    </a>
+                }
+            </div>
+
+
+            <div class="row" style="margin-bottom: 30px">
+                <div class="col-md-3">
+                    <label>Search By Column:</label>
+                    <select class="form-control" id="column-filter">
+                        <option value="">All Columns</option>
+                        <option value="Location">Location</option>
+                        <option value="MyriadID">Myriad ID</option>
+                        <option value="FullName">Full Name</option>
+                        <option value="ResidentID">Resident ID</option>
+                        <option value="ReferralCode">Referral Code</option>
+                        <option value="Title">Title</option>
+                        <option value="Gender">Gender</option>
+                        <option value="Email">Email</option>
+                        <option value="University">University</option>
+                        <option value="Phone">Phone</option>
+                        <option value="DOB">DOB</option>
+                        <option value="VehicleNumber">Vehicle Plate Number</option>
+                        <option value="MercuryID" class="mercury-column">MercuryID</option>
+                        @*<option value="PassportNumber">PassportNumber</option>
+                            <option value="ProfileNotes">ProfileNotes</option>
+                            <option value="UniversityStudentID">UniversityStudentID</option>*@
+
+
+                    </select>
+                </div>
+                <div class="col-md-3" style="width: 200px;">
+                    <label>Column Visibilty:</label>
+                    <select multiple class="form-control" id="columnvisibilty-filter">
+                        <option value="Location">Location</option>
+                        <option value="MyriadID">Myriad ID</option>
+                        <option value="FullName">Full Name</option>
+                        <option value="ResidentID">Resident ID</option>
+                        <option selected value="ReferralCode">Referral Code</option>
+                        <option value="Title">Title</option>
+                        <option value="Gender">Gender</option>
+                        <option value="Email">Email</option>
+                        <option value="University">University</option>
+                        <option value="Phone">Phone</option>
+                        <option value="DOB">DOB</option>
+                        <option selected value="VehicleNumber">Vehicle Plate Number</option>
+                        <option value="MercuryID" class="mercury-column">MercuryID</option>
+                        @*<option value="PassportNumber">Passport Number</option>
+                            <option v        ofileNotes">Profile Notes</option>
+                            <option v        iversityStudentID">University Student ID</option>*@
+
+                    </select>
+                </div>
+
+            </div>
+            <div style="overflow: auto; width:100%">
+                <table id="PersonTable" class="table table-bordered table-striped">
+
+                    <thead>
+
+                        <tr>
+
+                            @*<th></th>*@
+                            <th style="color:black !important">Action</th>
+                            <th>Location</th>
+                            <th>MyriadID</th>
+                            <th>FullName</th>
+                            <th>Resident ID</th>
+                            <th>Referral Code</th>
+                            <th>Title</th>
+                            <th>Gender</th>
+                            <th>Email</th>
+                            <th>University</th>
+                            <th>DOB</th>
+                            <th>Phone</th>
+                            <th>Vehicle Plate Number</th>
+                            <th class="mercury-column">MercuryID</th>
+                            @*<th>PassportNumber</th>
+                                <th>ProfileNotes</th>
+                                <th>UniversityStudentID</th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="import-from-excel-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+    @using (Html.BeginForm("ImportFromExcel", "PersonManage", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken();
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Import persons from excel file</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Excel File</label>
+
+                        @Html.TextBoxFor(x => x.fileBase, new { @class = "form-control", type = "file" })
+
+                        @Html.ValidationMessageFor(x => x.fileBase)
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-themyriad">Save</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="import-from-excel-WithBooking-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+    @using (Html.BeginForm("ImportFromExcelWithBooking", "PersonManage", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken();
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Import persons from excel file with booking</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Excel File</label>
+
+                        @Html.TextBoxFor(x => x.fileBase, new { @class = "form-control", type = "file" })
+
+                        @Html.ValidationMessageFor(x => x.fileBase)
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-themyriad">Save</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="modal" id="confirmUserModal">
+
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "confirm_Userform" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">Are you sure you wanna Create User?</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Credential Of User Send By Email.</p>
+                    <p>Are you sure?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-themyriad btn-ok">Yes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>}
+    <!-- /.modal-dialog -->
+</div>
+
+@section scripts{
+
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.min.js"></script>
+    <script>
+
+        var dataTable;
+        $(document).ready(function () {
+            $('#columnvisibilty-filter').multiselect({
+                nonSelectedText: 'Select columns to hide',
+                maxHeight: 100,
+                onChange: GetPersons
+            });
+
+            function updateVisibility() {
+                let selectedLocation = parseInt(localStorage.getItem("selectedLocation")) || 0;
+                $('.mercury-column').toggle(selectedLocation === 17);
+                $('#columnvisibilty-filter').multiselect('refresh');
+            }
+
+            function setInitialLocation() {
+                let initialLocation = localStorage.getItem("selectedLocation");
+                if (initialLocation) $('#LocationId').val(initialLocation);
+                updateVisibility();
+            }
+
+            $('#LocationId').change(function () {
+                localStorage.setItem("selectedLocation", $(this).val());
+                updateVisibility();
+            });
+
+            setInitialLocation();
+            GetPersons();
+        });
+
+
+
+        function PersonAction() {
+
+            var actions = new Array();
+            if ('@RunAFeeAssessment' == 'True') actions.push("runAFeeAssessment-action");
+            if ('@EditProfileAction' == 'True') actions.push("editProfile-action");
+            if ('@viewBookingAction' == 'True') actions.push("viewBooking-Action");
+            if ('@AddBookingAction' == 'True') actions.push("AddBooking-Action");
+            if ('@viewBedSpacePlacementAction' == 'True') actions.push("viewBedSpacePlacement-Action");
+            if ('@CreateUserAction' == 'True') actions.push("CreateUser-Action");
+            if ('@viewPartnetLedgerAction' == 'True') actions.push("viewPartnetLedger-Action");
+            if ('@ViewPersonRelationshipHistoryAction' == 'True') actions.push("ViewPersonRelationshipHistory-Action");
+            if ('@ViewPersonDocumentAction' == 'True') actions.push("ViewPersonDocument-Action");
+            if ('@DeleteProfileAction' == 'True') actions.push("DeleteProfile-Action");
+
+            return actions;
+        }
+
+        function GetPersons() {
+            if ($.fn.DataTable.isDataTable('#PersonTable')) {
+                $('#PersonTable').DataTable().destroy(); // Destroy existing DataTable instance
+            }
+            loadPersonsTable();
+        };
+
+        function loadPersonsTable() {
+            ShowLoader();
+            if (dataTable) {
+                dataTable.destroy();
+            }
+            var urlParams = new URLSearchParams(window.location.search);
+            var query = urlParams.get('queryby');
+            var actions = PersonAction();
+
+            var selectedColumns = $('#columnvisibilty-filter').val();
+            var columns = [];
+            if (selectedColumns) {
+                selectedColumns.forEach(function (columnName) {
+                    var columnDef = {
+                        "data": columnName
+                    };
+                    columns.push(columnDef);
+                });
+            }
+
+            $('#PersonTable').DataTable({
+                processing: false,
+                serverSide: true,
+                filter: true,
+                paging: true,
+                searching: true,
+                lengthChange: true,
+                scrollCollapse: true,
+                scrollY: '70vh',
+                scrollX: true,
+                scroller: true,
+                ordering: true,
+                info: true,
+                iDisplayLength: 100,
+                autoWidth: true,
+                responsive: true,
+                columns: columns,
+                language: {
+                    emptyTable: "No record found.",
+                },
+
+                "ajax": {
+                    "url": "/PersonManage/LoadPersons",
+                    "type": "POST",
+
+                    "data": function (d) {
+
+                        d.query = query;
+                        d.SelectedColumns = selectedColumns;
+
+                        var selectedColumn = $('#column-filter').val();
+                        if (selectedColumn) {
+                            d.search = {
+                                value: $('#PersonTable_filter input').val(), // Include the search query
+                                column: selectedColumn // Include the selected column
+                            };
+                        }
+                        else {
+                            d.search
+                        }
+
+                        var columnIndex = d.order[0].column;
+
+                        if (columnIndex === 0) {
+                            d.orderBy = d.order[0].column;
+                            d.orderDir = d.order[0].dir;
+                        } else {
+                            var columnName = d.columns[columnIndex].data;
+                            d.orderBy = columnName;
+                            d.orderDir = d.order[0].dir;
+                        }
+                    },
+                    "datatype": "json",
+                    beforeSend: function () {
+                        ShowLoader(); // Show loader before AJAX request
+                    },
+                    complete: function () {
+                        HideLoader(); // Hide loader after AJAX request
+                    },
+                    error: function (xhr, error, thrown) {
+                        console.error('AJAX error:', error, thrown);
+                        HideLoader();
+                    }
+                },
+
+
+                "columns": [
+                    {
+                        "data": "PersonID",
+                        visible: !selectedColumns.includes("PersonID"),
+                        "className": "menu-icons",
+
+                        render: function (data, type, full, meta) {
+                            var availableActions = '';
+
+                            if (actions.includes("editProfile-action"))
+                                availableActions += `<a class = "editProfile-action menu-icons" style="text-align:inherit" title="Edit Profile ${full.FullName}" href="/PersonManage/AddPerson?id=${full.PersonID}">
+                                <i class="fa fa-edit action-for-Person"></i></a>`
+
+                            if (actions.includes("viewBooking-Action"))
+                                availableActions += `<a class = "viewBooking-Action menu-icons" style="text-align:inherit" title="Booking List ${full.FullName}" href="/Booking/BookingList?personId=${full.PersonID}">
+                                <i class="fa fa-list action-for-Person"></i></i></a>`
+
+                            if (actions.includes("AddBooking-Action"))
+                                availableActions += `<a class = "AddBooking-Action menu-icons" style="text-align:inherit" title="Add Booking  ${full.FullName}" href="/Booking/AddBooking?PersonID=${full.PersonID}">
+                                <i class="fa  fa-plus-circle"></i></a>`
+
+                            if (actions.includes("viewBedSpacePlacement-Action"))
+                                availableActions += `<a class = "viewBedSpacePlacement-Action menu-icons" style="text-align:inherit" title="Bed Space Placement List ${full.FullName}" href="/BedSpacePlacement/PlacementsList?id=${full.PersonID}">
+                                <i class="fa fa-bed"></i></a>`
+
+                            if (actions.includes("CreateUser-Action"))
+                                availableActions += `<a class = "CreateUser-Action menu-icons" id="deleteForm" style="text-align:inherit" title="Create User ${full.FullName}" ${'onclick="CheckUser(' + full.PersonID + ')"'}" >
+                                <i class="fa fa-user-plus"></i></a>`
+
+                            if (actions.includes("viewPartnetLedger-Action"))
+                                availableActions += `<a class = "viewPartnetLedger-Action menu-icons" style="text-align:inherit" title="View Transactions for ${full.FullName}" href="/payments/PartnerLedger?PersonId=${full.PersonID}">
+                                <i class="fa fa-money"></i></a>`
+
+                            if (actions.includes("ViewPersonRelationshipHistory-Action"))
+                                availableActions += `<a class = "ViewPersonRelationshipHistory-Action menu-icons" style="text-align:inherit" title="View Relation History for ${full.FullName}" href="/PersonManage/PersonRelationshipHistory?PersonID=${full.PersonID}">
+                                <i class="fa  fa-history"></i></a>`
+
+                            if (actions.includes("ViewPersonDocument-Action"))
+                                availableActions += `<a class = "ViewPersonDocument-Action menu-icons" style="text-align:inherit" title="Upload Images ${full.FullName}" href="/PersonManage/UploadPersonDocumentImages?PersonID=${full.PersonID}">
+                                <i class="fa fa-upload"></i></a>`
+
+                            if (actions.includes("DeleteProfile-Action"))
+                                availableActions += `<a class = "DeleteProfile-Action menu-icons" style="text-align:inherit" title="Check Referrals ${full.ReferralCode}" href="/PersonManage/GetRefferals?id=${full.PersonID}">
+                                <i class="fa fa-link"></i></a>`
+
+                            if (actions.includes("DeleteProfile-Action")) {
+                                availableActions += `<a class="DeleteProfile-Action menu-icons" style="text-align:inherit" title="Delete ${full.FullName}" href="#" data-href="/PersonManage/DeletePerson?id=${full.PersonID}" data-toggle="modal" data-target="#confirm-delete">
+                                <i class="fa fa-trash"></i></a>`;
+                            }
+
+                            return availableActions;
+                        },
+                    },
+                    { "data": "Location", visible: !selectedColumns.includes("Location") },
+                    { "data": "MyriadID", visible: !selectedColumns.includes("MyriadID") },
+                    { "data": "FullName", visible: !selectedColumns.includes("FullName") },
+                    { "data": "ResidentID", visible: !selectedColumns.includes("ResidentID") },
+                    { "data": "ReferralCode", visible: !selectedColumns.includes("ReferralCode") },
+                    { "data": "Title", visible: !selectedColumns.includes("Title") },
+                    { "data": "Gender", visible: !selectedColumns.includes("Gender") },
+                    { "data": "Email", visible: !selectedColumns.includes("Email") },
+                    { "data": "University", visible: !selectedColumns.includes("University") },
+
+                    {
+                        "data": "DOB",
+                        "visible": !selectedColumns.includes("DOB"),
+                        render: function (data, type, full, meta) {
+                            return '<span>' + movedateformate(full.DOB) + '</span>'
+                        }
+                    },
+
+                    { "data": "Phone", visible: !selectedColumns.includes("Phone") },
+                    { "data": "VehicleNumber", visible: !selectedColumns.includes("VehicleNumber") },
+
+                    { "data": "MercuryID", visible: !selectedColumns.includes("MercuryID") },
+                    //{ "data": "PassportNumber", visible: !selectedColumns.includes("PassportNumber") },
+                    //{ "data": "ProfileNotes", visible: !selectedColumns.includes("ProfileNotes") },
+                    //{ "data": "UniversityStudentID", visible: !selectedColumns.includes("UniversityStudentID") }
+
+                ],
+            });
+        };
+
+        function movedateformate(date) {
+            if (date == '' || date == null) {
+                return '';
+            } else {
+                let d = new Date(parseInt(date.substr(6)));
+                let _month = parseInt(d.getMonth()) + 1;
+                let _date = d.getDate() + "/" + _month + "/" + d.getFullYear();
+
+                return _date;
+            }
+        }
+
+        function CheckUser(id) {
+            $.ajax({
+                url: GetFormatedUrl('/PersonManage/CheckUser'),
+                data: { id: id },
+                type: "Get",
+                success: function (response) {
+                    if (response.data != null) {
+                        var data = response.data;
+                        if (data.IsActive == false) {
+                            $("#confirmUserModal .modal-content").html("");
+                            var html = `<div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                    <h4 class="modal-title">User Already Exists</h4>
+                                </div>
+                                <div class="modal-body">
+
+                                    <p>User is Inactive.</p>
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Ok</button>
+
+                                </div>`
+                            $("#confirmUserModal .modal-content").append(html);
+                            $("#confirmUserModal").modal();
+                        }
+                        else {
+                            $("#confirmUserModal .modal-content").html("");
+
+
+                            var html = `<div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                    <h4 class="modal-title">User already exists</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>An email is already sent to <b>${data.Email}</b></p>
+                                    <p>If you want to resend the email click on Resend Email</p>
+                                    <strong>Note: </strong><span style="color:red;">Your Password will be reset</span>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-themyriad btn-ok">Resend Email</button>
+                                </div>`
+                            $("#confirmUserModal .modal-content").append(html);
+                            $('#confirm_Userform').attr('action', "/PersonManage/ResendEmail?id=" + data.UserID);
+                            $("#confirmUserModal").modal();
+                        }
+                    }
+
+                    else {
+                        var html = `<div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                    <h4 class="modal-title">Resident Self-Service Account</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to create the account?</p>
+                                    <p>Credentials will be sent on the registered email.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-themyriad btn-ok">Yes</button>
+                                </div>`;
+                        $('#confirmUserModal .modal-content').html('').html(html);
+                        $("#confirmUserModal").modal();
+                        $('#confirm_Userform').attr('action', "/PersonManage/GenrateUser?id=" + id);
+                    }
+                }
+            })
+        }
+
+        function GetExcel() {
+            window.location.href = GetFormatedUrl("/PersonManage/ExportPersonReport");
+        }
+
+    </script>
+}

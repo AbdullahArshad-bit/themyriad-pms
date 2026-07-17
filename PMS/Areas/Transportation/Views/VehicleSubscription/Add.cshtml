@@ -1,0 +1,291 @@
+﻿@model PMS.DTO.ViewModels.TransportationViewModels.VehicleSubscriptionVM
+@using PMS.Common.Classes
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Header = "Vehicle Subscription";
+    ViewBag.HeaderDescription = "Add Vehicle Subscription";
+    ViewBag.Title = "Add Vehicle Subscriptions | The Myriad Admin";
+
+}
+@section styles{
+    <!-- bootstrap datepicker -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Bootstrap time Picker -->
+    <link rel="stylesheet" href="~/Assets/plugins/timepicker/bootstrap-timepicker.css">
+}
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("Index", "VehicleSubscription")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Subscriptions</a>
+        </div>
+    </div>
+
+    <!-- form start -->
+    @using (Html.BeginForm("Add", "VehicleSubscription", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_VehiclePrice_form" }))
+    {
+        @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.SubscriptionId)
+<div class="box-body">
+    <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.LocationId, "Location")
+                    @Html.DropDownList("LocationId", null, "--- Select Location ---", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                    @Html.ValidationMessageFor(x => x.LocationId)
+
+                </div>
+            </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.StudentID, "Persons")
+                @Html.DropDownList("StudentID", null, "--- Select Person ---", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                @Html.ValidationMessageFor(x => x.StudentID)
+
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.FrequencyId, "Frequency")
+                @Html.DropDownList("FrequencyId", null, "--- Select Frequency ---", htmlAttributes: new { @class = "form-control ", @required = "required" })
+                @Html.ValidationMessageFor(x => x.FrequencyId)
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group" id="NEwkustun">
+                @Html.LabelFor(x => x.VehiclePriceID, "Packages")
+                @Html.DropDownList("VehiclePriceID", null, "--- Select Package ---", htmlAttributes: new { @Id = "VehiclePriceID", @class = "form-control select2", @required = "required" })
+                @Html.ValidationMessageFor(x => x.VehiclePriceID)
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group ">
+                @Html.LabelFor(x => x.FromDate, "From Date", new { style = "padding-left:inherit !important" })
+                <div class="input-group date">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    @Html.TextBoxFor(x => x.FromDate, new { type = "datetime", @id = "FromDate", @class = "subscriptionDate_date from_date form-control pull-right", autocomplete = "off", @readonly = "", placeholder = "Select Date" })
+                    @Html.ValidationMessageFor(x => x.FromDate)
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group ">
+                @Html.LabelFor(x => x.ToDate, "TO Date", new { style = "padding-left:inherit !important" })
+                <div class="input-group date">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    @Html.TextBoxFor(x => x.ToDate, new { type = "datetime", @id = "ToDate", @class = "subscriptionDate_date to_date form-control pull-right", autocomplete = "off", @readonly = "", placeholder = "Select Date" })
+                    @Html.ValidationMessageFor(x => x.ToDate)
+
+                </div>
+
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group ">
+                    @Html.LabelFor(x => x.SubscriptionPrice, "Price")
+                    @Html.TextBoxFor(x => x.SubscriptionPrice, new { @class = "form-control", @readonly = "readonly" })
+
+                </div>
+            </div>
+            <input type="text" id="Price" hidden />
+            <input type="text" id="TestPrice" hidden />
+        </div>
+    </div>
+</div>
+
+
+
+    <!-- /.box-body -->
+
+    <div class="box-footer">
+        <input type="submit" class="btn btn-themyriad" value="Save">
+    </div>
+    }
+</div>
+
+@section scripts
+{
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- bootstrap time picker -->
+    <script src="~/Assets/plugins/timepicker/bootstrap-timepicker.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            if ('@Model.SubscriptionId' == 0) {
+                $('.subscriptionDate_date').datepicker().val('');
+            }
+            if ('@Model.SubscriptionId' > 0) {
+                $('#FromDate').val('@Model.FromDate.ToString("MM/dd/yyyy")');
+                $('#ToDate').val('@Model.ToDate.ToString("MM/dd/yyyy")');
+                var VehiclePriceId = $('#VehiclePriceID').val();
+                var url = GetFormatedUrl("/Transportation/VehicleSubscription/GetVehiclePricesByPriceId?priceID=" + VehiclePriceId)
+                $.ajax({
+                    type: "Get",
+                    url: url,
+                    success: function (data) {
+                        if (data) {
+
+                            var price = data.prices.Price;
+                            $('#Price').val(price);
+                        }
+                    }
+
+                });
+
+            }
+            if ('@Model.SubscriptionId' == 0) {
+                $('#SubscriptionPrice').val('');
+            }
+            $('.from_date').datepicker({
+                orientation: 'bottom',
+                autoclose: true,
+            })
+                .on('changeDate', function (selected) {
+                    var startDate = new Date();
+                    startDate = new Date(selected.date.valueOf());
+                    var FrequencyId = $("#FrequencyId").val();
+                    
+                    if (FrequencyId == '1') {
+                        startDate.setDate(startDate.getDate() + 1);
+                        $('.to_date').datepicker('setEndDate', null);
+
+                    }
+                    if (FrequencyId == '2') {
+                        startDate.setDate(startDate.getDate() + 30);
+                        $('.to_date').datepicker('setEndDate', startDate);
+                    }
+                    if (FrequencyId == '3') {
+                        startDate.setDate(startDate.getDate() + 7);
+                        $('.to_date').datepicker('setEndDate', startDate);
+                    }
+                    $('.datepicker').hide();
+                    $('#ToDate').val('');
+                    var td = $('#ToDate').val()
+                    var price = $('#Price').val();
+                    if (td != null && td != undefined && td!="") {
+                        $('#SubscriptionPrice').val(price);
+                    }
+                    $('.to_date').datepicker('setStartDate', startDate);
+                });
+            $('.to_date').datepicker({
+                FromEndDate: new Date(),
+                autoclose: true,
+                "format": 'mm/dd/yyyy'
+            })
+                .on('changeDate', function (selected) {
+                    
+
+                    var FromEndDate = new Date(selected.date.valueOf());
+                    FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                    $('.datepicker').hide();
+                    var days = 0;
+                    var FromDate = $('#FromDate').val();
+                    var ToDate = $('#ToDate').val();
+                    var frmDt = new Date(FromDate);
+                    var todt = new Date(ToDate);
+                    var frequency = $("#FrequencyId").val();
+                    var total = $('#SubscriptionPrice').val();
+                    var price=$('#Price').val();
+
+                    if (frequency == 1) {
+                        todt = new Date(todt.setDate(todt.getDate()));
+                        var diff = todt - frmDt;
+                        days = diff / (1000 * 3600 * 24);
+                        total = price * days;
+                    }
+                    $('#SubscriptionPrice').val(total);
+                });
+            
+            $('#FrequencyId').on('change', function () {
+                $('.from_date').datepicker().val('');
+                $('.to_date').datepicker().val('');
+                $('#SubscriptionPrice').val('');
+                var FrequencyId = $("#FrequencyId").val();
+                var FrequencyId = $(this).val();
+                if (FrequencyId == "") {
+                    $('#VehiclePriceID').html('');
+                }
+                var url = GetFormatedUrl("/Transportation/VehicleSubscription/GetVehiclePricesNameByFrequencyId?Id=" + FrequencyId)
+                $.ajax({
+                    type: "Get",
+                    url: url,
+                    success: function (data) {
+                        var data = data;
+                        $('#VehiclePriceID').html('');
+                        var html = "<option value=''>--- Select Package ---</option>";
+                        $.each(data.prices, function (key, value) {
+                            html = html + "<option Value='" + value.VehiclePriceId + "'>" + value.PriceName + "</option>"
+                        })
+                        $('#VehiclePriceID').html(html);
+                    }
+                });
+                return true;
+            });
+            $('#VehiclePriceID').on('change', function () {
+                var VehiclePriceId = $(this).val();
+                if (VehiclePriceId == "") {
+                    $('#SubscriptionPrice').val('');
+                }
+                var url = GetFormatedUrl("/Transportation/VehicleSubscription/GetVehiclePricesByPriceId?priceID=" + VehiclePriceId)
+                $.ajax({
+                    type: "Get",
+                    url: url,
+                    success: function (data) {
+                        if (data) {
+                            
+                            var price = data.prices.Price;
+                            $('#Price').val(price);
+                            $('#SubscriptionPrice').val(price);
+                           
+                        }
+                        
+                        //if (frequency == 2) {
+                        //    $('.to_date').datepicker({
+                        //        FromEndDate: new Date(),
+                        //        autoclose: true,
+                        //        "format": 'dd/mm/yyyy'
+                        //    })
+                        //        .on('changeDate', function (selected) {
+                        //            FromEndDate = new Date(selected.date.valueOf());
+                        //            FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                        //            $('.from_date').datepicker('setEndDate', FromEndDate);
+                        //            $('.datepicker').hide();
+                        //            $('#SubscriptionPrice').val(price);
+                        //        });
+                        //}
+                    }
+
+                });
+            });
+        })
+
+    </script>
+    <script>
+
+        $('#VehiclePriceID').click(function () {
+            FrequencyId = $('#FrequencyId').val();
+            if (FrequencyId == null || FrequencyId == "" || FrequencyId == undefined) {
+                showMessage("Please select Frequency First");
+            }
+        });
+
+
+    </script>
+}

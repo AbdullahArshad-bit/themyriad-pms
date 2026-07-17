@@ -1,0 +1,191 @@
+﻿@model PMS.DTO.ViewModels.MovieNightsViewModels.MovieVoteCampaignDetailVM
+
+@using PMS.Common.Classes
+
+@{
+    /**/
+
+    ViewBag.Header = "Movies Vote Campaign";
+    ViewBag.HeaderDescription = "Campaign Detail";
+    ViewBag.Title = "Campaign Detail | Movies Vote Campaign | PMS";
+
+    int count = 0;
+}
+<div class="box box-danger">
+    <div class="box-header with-border">
+        @{
+            if (Model.MovieVoteCampaignDetailID == 0)
+            {
+                if (User.IsInRole(AppUserRoles.view_movie_vote_campaign))
+                {
+                    <div class="input-group-btn">
+                        <a href="@Url.Action("MovieVoteCampaign", "MovieNights")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Campaigns</a>
+                    </div>
+                }
+
+            }
+            else
+            {
+                if (User.IsInRole(AppUserRoles.view_movie_vote_campaign_detail))
+                {
+                    <div class="input-group-btn">
+                        <a href="@Url.Action("MovieVoteCampaignDetail", "MovieNights", new { movieVoteCampaignID = Model.MovieVoteCampaignID })" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> Back to Details</a>
+                    </div>
+                }
+
+            }
+        }
+    </div>
+    <div class="box-header with-border">
+
+        <h3 class="box-title">Movie Vote Campaign Detail</h3>
+    </div>
+    <!-- /.box-header -->
+    <!-- form start -->
+    @if (User.IsInRole(AppUserRoles.add_movie_vote_campaign_detail))
+    {
+        using (Html.BeginForm("AddMovieVoteCampaignDetail", "MovieNights", FormMethod.Post, new { enctype = "multipart/form-data", id = "news_detail_form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(x => x.MovieVoteCampaignID)
+            @Html.HiddenFor(x => x.MovieVoteCampaignDetailID)
+
+            <div class="box-body">
+                @if (ViewBag.error != null)
+                {
+                    <div class="alert alert-danger alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                        @ViewBag.error
+                    </div>
+                }
+                @if (ViewBag.success != null)
+                {
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                        @ViewBag.success
+                    </div>
+                }
+
+                <div class="no-padding col-md-12">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Movie</label>
+
+                            @Html.DropDownListFor(model => Model.MovieID,
+                       new SelectList(Model.MoviesList, "MovieID", "MovieTitle"),
+                       "-- Please Select Movie --",
+                       new { @Class = "form-control", id="selected_movie" })
+
+                            @Html.ValidationMessageFor(x => x.MovieID)
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="no-padding col-md-12">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-themyriad">Submit</button>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+            <!-- /.box-body -->
+
+        }
+    }
+
+
+
+
+    <div class="col-md-12 no-padding">
+        <div class="box">
+
+            @if (ViewBag.CampaignDetail != null)
+            {
+                <!-- /.box-header -->
+                <div class="box-body no-padding" style="overflow: auto;width:100%;">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+
+                                <th>Movie</th>
+                                <th>Likes</th>
+                                <th>Dislikes</th>
+                                <th>Action</th>
+
+                            </tr>
+
+                        </tbody>
+
+                        @foreach (var camp in ViewBag.CampaignDetail as List<PMS.DTO.ViewModels.MovieNightsViewModels.MovieVoteCampaignDetailVM>)
+                        {
+                            <tr>
+
+                                <td>@camp.MovieTitle</td>
+                                @{
+                                    if (count == 0)
+                                    {
+                                        <td><span class="label label-success">@camp.Likes</span></td>
+                                    }
+                                    else if (count == 1)
+                                    {
+                                        <td><span class="label label-warning">@camp.Likes</span></td>
+                                    }
+                                    else
+                                    {
+                                        <td><span class="label label-danger">@camp.Likes</span></td>
+                                    }
+                                    count = count + 1;
+                                }
+
+                                <td><span class="label label-warning">@camp.DisLikes</span></td>
+
+
+                                <td class="menu-icons" style="text-align:inherit">
+                                    @if (User.IsInRole(AppUserRoles.add_movie_vote_campaign_detail))
+                                    {
+                                        <a title="Edit" href="@Url.Action("AddMovieVoteCampaignDetail", "MovieNights", new { movieVoteCampaignID = camp.MovieVoteCampaignID, movieVoteCampaignDetailID = camp.MovieVoteCampaignDetailID })"><i class="fa fa-edit"></i></a>
+                                    }
+                                    @if (User.IsInRole(AppUserRoles.delete_movie_vote_campaign_detail))
+                                    {
+                                        <a title="Delete" href="#" data-href="@Url.Action("DeleteMovieVoteCampaignDetail" ,"MovieNights", new { movieVoteCampaignID = camp.MovieVoteCampaignID, movieVoteCampaignDetailID = camp.MovieVoteCampaignDetailID })" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-remove"></i></a>
+                                    }
+
+                                </td>
+                            </tr>
+
+
+                        }
+
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            }
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+@section scripts {
+  
+    <script>
+        
+    </script>
+
+
+}
+

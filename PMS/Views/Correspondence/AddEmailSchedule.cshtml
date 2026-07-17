@@ -1,0 +1,246 @@
+﻿@model PMS.DTO.ViewModels.CorrespondenceViewModels.AddEmailSchedulerVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Correspondence";
+    ViewBag.HeaderDescription = "Add/Edit Email Senders";
+    ViewBag.Title = "Add/Edit Email Senders | PMS";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="~/Assets/plugins/timepicker/bootstrap-timepicker.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+
+<div class="box box-danger">
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("EmailSchedulers", "Correspondence")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Email EmailSchedulers</a>
+        </div>
+    </div>
+
+    @using (Html.BeginForm("AddEmailSchedule", "Correspondence", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_email_sender_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.ID)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.IsActive)
+                    <div>
+                        <label class="switch">
+                            <input type="checkbox" name="IsActive" id="IsActive" value="@Model.IsActive" @(@Model.IsActive ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    @Html.ValidationMessageFor(x => x.IsActive)
+                </div>
+            </div>
+            <div class="col-md-12">
+
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Recurrence)
+                    <div>
+                        <label class="switch">
+                            <input type="checkbox" name="Recurrence" id="Recurrence" value="@Model.Recurrence" @(@Model.Recurrence ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    @Html.ValidationMessageFor(x => x.Recurrence)
+                </div>
+            </div>
+            <div class="row col-md-12">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocationId, "Location", new { @class = "control-label required" })
+
+                        @Html.DropDownList("LocationId", null, "-- Location --", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                        @Html.ValidationMessageFor(x => x.LocationId)
+                    </div>
+                </div>
+                <div id="dateRangeContainer" style="display: none;">
+                    @*<div class="col-md-3">
+                        <div class="form-group">
+                            <label>@Html.LabelFor(x => x.FromDate)</label>
+                            @Html.TextBoxFor(x => x.FromDate, "{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control", type = "datetime-local", placeholder = "Enter FromDate" })
+                            @Html.ValidationMessageFor(x => x.FromDate)
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>@Html.LabelFor(x => x.ToDate)</label>
+                            @Html.TextBoxFor(x => x.ToDate, "{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control", type = "datetime-local", placeholder = "Enter ToDate" })
+                            @Html.ValidationMessageFor(x => x.ToDate)
+                        </div>
+                    </div>*@
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>@Html.LabelFor(x => x.NextRun)</label>
+                            @Html.TextBoxFor(x => x.NextRun, "{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control", type = "datetime-local", placeholder = "Enter ToDate" })
+                            @Html.ValidationMessageFor(x => x.NextRun)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.ScheduleName, "Schedule Name")</label>
+                        @Html.TextBoxFor(x => x.ScheduleName, new { @class = "form-control", placeholder = "Enter Schedule Name" })
+                        @Html.ValidationMessageFor(x => x.ScheduleName)
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.Type)</label>
+                        @Html.TextBoxFor(x => x.Type, new { @class = "form-control", placeholder = "Enter Type" })
+                        @Html.ValidationMessageFor(x => x.Type)
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.SubType, "Sub Type")</label>
+                        @Html.TextBoxFor(x => x.SubType, new { @class = "form-control", placeholder = "Enter Sub Type" })
+                        @Html.ValidationMessageFor(x => x.SubType)
+                    </div>
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.TaskName, "Task Name")</label>
+                        @Html.TextBoxFor(x => x.TaskName, new { @class = "form-control", placeholder = "Enter Task Name" })
+                        @Html.ValidationMessageFor(x => x.TaskName)
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.ExecutionTime)</label>
+                        @Html.TextBoxFor(x => x.ExecutionTime, "{0:yyyy-MM-ddTHH:mm}", new { @class = "form-control", type = "datetime-local", placeholder = "Enter Date to NextRun" })
+                        @Html.ValidationMessageFor(x => x.ExecutionTime)
+                    </div>
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.EmailSenderID)</label>
+                        @Html.DropDownListFor(model => model.EmailSenderID, new SelectList(Model.EmailMessageSendersList, "Value", "Text"), "-- Sender --", new { @Class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.EmailSenderID)
+                    </div>
+                </div>
+               
+                <div class="col-md-9">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.SendTo)</label>
+                        @Html.DropDownListFor(model => model.SendTo, (MultiSelectList)ViewBag.SendTo, new { @class = "form-control select2-sendto", @multiple = "multiple", @required = "required", @autocomplete = "off" })
+                        @Html.ValidationMessageFor(x => x.SendTo)
+                    </div>
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EmailMessageBody)
+                        @Html.TextAreaFor(x => x.EmailMessageBody, new { @class = "form-control", id = "MessageBody", name = "MessageBody", placeholder = "Enter Message", style = "min-height:125px;" })
+                        @Html.ValidationMessageFor(x => x.EmailMessageBody)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts{
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/Assets/plugins/timepicker/bootstrap-timepicker.min.js"></script>
+    <script src="https://cdn.ckeditor.com/4.15.0/full/ckeditor.js"></script>
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.select2-sendto').select2();
+
+            var selectedSendToValues = @Html.Raw(Json.Encode(Model.SendTo));
+            $('.select2-sendto').val(selectedSendToValues);
+
+
+            CKEDITOR.replace('MessageBody', {
+                uiColor: '#CCEAEE',
+                removePlugins: 'elementspath',
+                allowedContent: true,
+                extraAllowedContent: 'style[type]{}()'
+            });
+            if ($('#Recurrence').is(':checked')) {
+                $('#dateRangeContainer').show();
+            }
+
+            // Toggle visibility on checkbox change
+            $('#Recurrence').change(function () {
+                if ($(this).is(':checked')) {
+                    $('#dateRangeContainer').slideDown();
+                } else {
+                    $('#dateRangeContainer').slideUp();
+                }
+            });
+        });
+
+    </script>
+
+    <script>
+
+        function setInitialLocation() {
+            var initialLocation = localStorage.getItem("selectedLocation");
+            if (initialLocation) {
+                $('#LocationId').val(initialLocation);
+                $("#LocationId").prop('disabled', true);
+            }
+        }
+        $('form').submit(function () {
+            var locationId = $('#LocationId').val();
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'LocationId',
+                value: locationId
+            }).appendTo('form');
+
+            return true;
+        });
+
+        setInitialLocation();
+
+    </script>
+
+}
+

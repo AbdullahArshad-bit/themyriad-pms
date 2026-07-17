@@ -1,0 +1,266 @@
+﻿@model PMS.DTO.ViewModels.CorrespondenceViewModels.AddEmailSendersVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Correspondence";
+    ViewBag.HeaderDescription = "Add/Edit Email Senders";
+    ViewBag.Title = "Add/Edit Email Senders | Correspondence | PMS";
+}
+
+
+@section styles{
+    <!-- bootstrap datepicker -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Bootstrap time Picker -->
+    <link rel="stylesheet" href="~/Assets/plugins/timepicker/bootstrap-timepicker.css">
+}
+
+
+<div class="box box-danger">
+
+    <div class="box-header with-border">
+        <div class="input-group-btn">
+            <a href="@Url.Action("EmailSenders", "Correspondence")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Email Senders</a>
+        </div>
+    </div>
+
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddEmailSenders", "Correspondence", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_email_sender_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.EmailSenderID)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            <div class="col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(x => x.IsActive)
+
+                    <div>
+                        <label class="switch">
+                            <input type="checkbox" name="IsActive" id="IsActive" value="@Model.IsActive" @(@Model.IsActive ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    @Html.ValidationMessageFor(x => x.IsActive)
+
+                </div>
+            </div>
+
+            <div class="row col-md-12">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.EmailSenderName)</label>
+
+                        @Html.TextBoxFor(x => x.EmailSenderName, new { @class = "form-control", placeholder = "Enter Name" })
+
+                        @Html.ValidationMessageFor(x => x.EmailSenderName)
+
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.EmailSenderDescription)</label>
+                        @Html.TextAreaFor(x => x.EmailSenderDescription, new { @class = "form-control", placeholder = "Enter Description"@*, style = "min-height:75px"*@ })
+                        @Html.ValidationMessageFor(x => x.EmailSenderDescription)
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row col-md-12">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.FromName)</label>
+
+                        @Html.TextBoxFor(x => x.FromName, new { @class = "form-control", placeholder = "Enter From Friendly Name" })
+
+                        @Html.ValidationMessageFor(x => x.FromName)
+
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.FromAddress)</label>
+
+                        @Html.TextBoxFor(x => x.FromAddress, new { @class = "form-control", placeholder = "Enter From Email" })
+
+                        @Html.ValidationMessageFor(x => x.FromAddress)
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row col-md-12">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.EmailPassword)</label>
+
+                        <div class="input-group">
+                            @Html.PasswordFor(x => x.EmailPassword, new { @class = "form-control", placeholder = "Enter Email Password", value = Model.EmailPassword })
+                            <div class="input-group-addon">
+                                <i class="fa fa-eye toggle-password" data-element="input[name='EmailPassword']"></i>
+                            </div>
+                        </div>
+
+                        @Html.ValidationMessageFor(x => x.EmailPassword)
+
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.ConfirmEmailPassword)</label>
+
+                        <div class="input-group">
+                            @Html.PasswordFor(x => x.ConfirmEmailPassword, new { @class = "form-control", placeholder = "Enter Email Password Again", value = Model.ConfirmEmailPassword })
+                            <div class="input-group-addon">
+                                <i class="fa fa-eye toggle-password" data-element="input[name='ConfirmEmailPassword']"></i>
+                            </div>
+                        </div>
+
+
+                        @Html.ValidationMessageFor(x => x.ConfirmEmailPassword)
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row col-md-12">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.CC)</label>
+
+                        @Html.TextBoxFor(x => x.CC, new { @class = "form-control", placeholder = "Enter CC Addresses" })
+
+                        @Html.ValidationMessageFor(x => x.CC)
+
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.BCC)</label>
+
+                        @Html.TextBoxFor(x => x.BCC, new { @class = "form-control", placeholder = "Enter BCC Addresses" })
+
+                        @Html.ValidationMessageFor(x => x.BCC)
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row col-md-12">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Html.LabelFor(x => x.ReplyToAddress)</label>
+
+                        @Html.TextBoxFor(x => x.ReplyToAddress, new { @class = "form-control", placeholder = "Enter Reply To Address" })
+
+                        @Html.ValidationMessageFor(x => x.ReplyToAddress)
+
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="row col-md-12">
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EmailSignature)
+                        @Html.TextAreaFor(x => x.EmailSignature, new { @class = "form-control", id = "Signature", name = "Signature", placeholder = "Enter Signature", style = "min-height:125px;" })
+                        @Html.ValidationMessageFor(x => x.EmailSignature)
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- bootstrap time picker -->
+    <script src="~/Assets/plugins/timepicker/bootstrap-timepicker.min.js"></script>
+
+    <script src="https://cdn.ckeditor.com/4.15.0/full/ckeditor.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+        });
+
+        CKEDITOR.replace('Signature', {
+            uiColor: '#CCEAEE',
+            removePlugins: 'elementspath'
+        });
+
+        $(function () {
+            //Date picker
+            $('.term_date').datepicker({
+                autoclose: true,
+                format: "dd/M/yyyy"
+            });
+
+            //$('#show_time').timepicker({
+            //    showInputs: false
+            //})
+        })
+        $(".toggle-password").click(function () {
+
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            //var input = $($(this).attr("toggle"));
+            var input = $($(this).data('element'));
+            console.log(input);
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
+            }
+        });
+
+     
+    </script>
+}
+

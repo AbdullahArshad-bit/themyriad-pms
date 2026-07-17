@@ -1,0 +1,371 @@
+﻿@model PMS.DTO.ViewModels.SetupViewModels.AddTermVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Term";
+    ViewBag.HeaderDescription = "Add New Term";
+    ViewBag.Title = "Add Term | PMS";
+}
+
+
+@section styles{
+    <!-- bootstrap datepicker -->
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Bootstrap time Picker -->
+    <link rel="stylesheet" href="~/Assets/plugins/timepicker/bootstrap-timepicker.css">
+    <style>
+        .checkbox label, .radio label {
+            font-weight: 700 !important;
+        }
+    </style>
+}
+
+
+<div class="box box-danger">
+    @if (User.IsInRole(AppUserRoles.view_terms))
+    {
+        <div class="box-header with-border">
+            <div class="input-group-btn">
+                <a href="@Url.Action("Terms", "Setup")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Terms</a>
+            </div>
+        </div>
+    }
+
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddTerm", "Setup", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_term_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.TermID)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="IsPublished">Is Published</label>
+
+                    <div>
+
+                        <label class="switch">
+                            @Html.HiddenFor(x => x.IsPublished, new { id = "IsPublished" })
+                            <input type="checkbox" name="IsPublisheds" id="IsPublished_Switch" value="@Model.IsPublished" @(Model.IsPublished ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.LocationId, "Location")
+                            @Html.DropDownList("LocationId", null, "Select...", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                            @Html.ValidationMessageFor(x => x.LocationId)
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.UniversityId, "University")
+                            @Html.DropDownList("UniversityId", null, "Select...", htmlAttributes: new { @class = "form-control select2" })
+                        </div>
+                    </div><div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.FrequencyId, "Frequency")
+                            @Html.DropDownList("FrequencyId", null, "Select...", htmlAttributes: new { @class = "form-control select2", @required = "required" })
+                            @Html.ValidationMessageFor(x => x.FrequencyId)
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Title">Name</label>
+
+                            @Html.TextBoxFor(x => x.TermName, new { @class = "form-control", placeholder = "Enter Name" })
+
+                            @Html.ValidationMessageFor(x => x.TermName)
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Title">Arabic Name</label>
+
+                            @Html.TextBoxFor(x => x.Ar_TermName, new { @class = "form-control", placeholder = "Enter Name in Arabic" })
+
+                            @Html.ValidationMessageFor(x => x.Ar_TermName)
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Title">Room Occupancy</label>
+
+                            @Html.TextBoxFor(x => x.Room_Occupancy, new { @class = "form-control", placeholder = "Enter Room Occupancy" })
+
+                            @Html.ValidationMessageFor(x => x.Room_Occupancy)
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Title">Arabic Room Occupancy</label>
+
+                            @Html.TextBoxFor(x => x.Ar_Room_Occupancy, new { @class = "form-control", placeholder = "Enter Room Occupancy in Arabic" })
+
+                            @Html.ValidationMessageFor(x => x.Ar_Room_Occupancy)
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Title">Room Standard</label>
+
+                            @Html.TextBoxFor(x => x.Room_Standared, new { @class = "form-control", placeholder = "Enter Room Standared" })
+
+                            @Html.ValidationMessageFor(x => x.Room_Standared)
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Title">Arabic Room Standard</label>
+
+                            @Html.TextBoxFor(x => x.Ar_Room_Standared, new { @class = "form-control", placeholder = "Enter Room Standard in Arabic" })
+
+                            @Html.ValidationMessageFor(x => x.Ar_Room_Standared)
+
+                        </div>
+                    </div>
+                </div>
+
+                @*<div class="radio row">
+                        <div class="radio col-md-6" style="font-weight: 700 !important;">
+                            <label>
+                                <input type="radio" class="Duration Active" name="DurationType" checked value="1">
+                                Minimum Duration
+                            </label>
+                        </div>
+
+                    </div>*@
+                @*<div class="radio row">
+
+                        <div class="radio col-md-6" style="font-weight: 700 !important;">
+                            <label>
+                                <input type="radio" class="Duration" name="DurationType" value="2">
+                                Start and End Date
+                            </label>
+                        </div>
+                    </div>*@
+                <div class="radio row StartEndDiv">
+                    <div class="col-md-6">
+                        <div class="form-group ">
+
+                            @Html.LabelFor(x => x.TermStartDate, new { style = "padding-left:inherit !important" })
+
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                @Html.TextBoxFor(x => x.TermStartDate, new { @Value = Model.TermStartDate, type = "datetime", @class = "term_date from_date form-control pull-right", autocomplete = "off", @readonly = "", placeholder = "Select Date" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group ">
+
+                            @Html.LabelFor(x => x.TermEndDate, new { style = "padding-left:inherit !important" })
+
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                @Html.TextBoxFor(x => x.TermEndDate, new { @Value = Model.TermEndDate, type = "datetime", @class = "term_date to_date form-control pull-right", autocomplete = "off", @readonly = "", placeholder = "Select Date" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="radio row DurationDiv">
+                    <div class="col-md-6">
+                        <div class="form-group">
+
+                            <label for="Title" style="padding-left:inherit">Min Duration</label>
+
+                            @Html.TextBoxFor(x => x.Min_Duration, new { @class = "form-control", placeholder = "Enter min duration" })
+
+                            @Html.ValidationMessageFor(x => x.Min_Duration)
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Description</label>
+                            @Html.TextAreaFor(x => x.TermDescription, new { @class = "form-control", placeholder = "Enter Term Details", style = "min-height:125px" })
+                            @Html.ValidationMessageFor(x => x.TermDescription)
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="Ar_RoomDescription">Arabic Description</label>
+                            @Html.TextAreaFor(x => x.Ar_TermDescription, new { @class = "form-control", placeholder = "Enter Term Details", style = "min-height:125px" })
+                            @Html.ValidationMessageFor(x => x.Ar_TermDescription)
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <!-- /.box-body -->
+
+            <div class="box-footer">
+                <input type="submit" class="btn btn-themyriad" value="Save">
+            </div>
+
+        </div>
+    }
+</div>
+
+
+
+
+
+@section scripts
+{
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- bootstrap time picker -->
+    <script src="~/Assets/plugins/timepicker/bootstrap-timepicker.min.js"></script>
+
+    <script>
+        /*$(document).ready(function () {*/
+                    @*if ('@Model.TermID' == 0 || '@Model.TermStartDate' == null) {
+                        $('.term_date').datepicker().val('');
+                    }
+                    $('.StartEndDiv').hide();
+                    $("Active").checked = true;
+
+                    //$('#TermStartDate').datepicker().val('');
+                    //$('#TermEndDate').datepicker().val('');
+
+                });*@
+                //    $('.term_date').datepicker({
+
+                //    autoclose: true,
+                //    format: 'dd/M/yyyy',
+                //});
+
+
+    </script>
+    <script>
+
+            //$('.Duration').click(function () {
+            //    var value = $('.StartEndDiv');
+            //    var durationdiv = $('.DurationDiv');
+            //    $('input[name=DurationType]:checked').val() == 1 ? value.hide() : value.show();
+            //    $('input[name=DurationType]:checked').val() == 1 ? durationdiv.show() : durationdiv.hide();
+
+            //});
+    </script>
+    <script>
+       
+            var startDate = new Date();
+            var FromEndDate = new Date();
+            var ToEndDate = new Date();
+
+            $('.from_date').datepicker({
+                weekStart: 1,
+                format: 'dd/M/yyyy',
+                autoclose: true,
+            })
+                .on('changeDate', function (selected) {
+                    startDate = new Date(selected.date.valueOf());
+                    startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+                    $('.to_date').datepicker('setStartDate', startDate);
+                });
+
+            $('.to_date').datepicker({
+                weekStart: 1,
+                format: 'dd/M/yyyy',
+                autoclose: true,
+
+            })
+                .on('changeDate', function (selected) {
+                    FromEndDate = new Date(selected.date.valueOf());
+                    FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                    $('.from_date').datepicker('setEndDate', FromEndDate);
+                });
+            $('#IsPublished_Switch').change('change', function () {
+                if ($(this).is(':checked'))
+                    $('#IsPublished').val(true);
+                else
+                    $('#IsPublished').val(false);
+
+            });
+
+            function setInitialLocation() {
+                
+                var initialLocation = localStorage.getItem("selectedLocation");
+
+                if (initialLocation) {
+
+                    $('#LocationId').val(initialLocation);
+                    $("#LocationId").prop('disabled', true);
+
+
+                }
+            }
+        $('form').submit(function () {
+            
+
+            var locationId = $('#LocationId').val();
+
+
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'LocationId',
+                value: locationId
+            }).appendTo('form');
+
+            return true;
+       });
+
+        setInitialLocation();
+
+    </script>
+
+}
+

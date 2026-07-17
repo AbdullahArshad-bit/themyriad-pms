@@ -1,0 +1,157 @@
+﻿@model PMS.DTO.ViewModels.BookingViewModels.UploadReceiptVM
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "View Receipt";
+    ViewBag.HeaderDescription = "View Receipt";
+    ViewBag.Title = "View Receipt | PMS";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+<style>
+    .overlay-image:hover {
+        opacity: 0.5;
+    }
+
+        .overlay-image:hover .profilepic__content {
+            opacity: 1;
+        }
+
+    .overlay-image {
+        overflow: hidden;
+    }
+
+    .profilepic__content {
+        position: absolute;
+        top: 10%;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        opacity: 0;
+        transition: opacity .2s ease-in-out;
+    }
+
+    .profilepic__icon {
+        color: white;
+        padding-bottom: 8px;
+    }
+
+    .profilepic__content .fa {
+        font-size: 20px;
+        color: white;
+    }
+
+    .profilepic__text {
+        text-transform: uppercase;
+        font-size: 12px;
+        width: 50%;
+        text-align: center;
+        color: white;
+    }
+
+    .option1 {
+        display: inline-block; /* show on the same line */
+        padding-right: 5px; /* small gap on the right of each header */
+    }
+
+    .img-wrapper:hover img {
+        opacity: 0.8; /* Reduce opacity on hover */
+    }
+
+    .img-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgb(0 0 0 / 5%); /* Semi-transparent black overlay */
+        opacity: 0; /* Initially hidden */
+        transition: opacity 0.3s ease; /* Smooth transition */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .img-wrapper:hover .img-overlay {
+        opacity: 1; /* Show overlay on hover */
+    }
+
+    .overlay-text {
+        color: white;
+        font-size: 18px;
+    }
+
+    /* Style for the text when no image URL found */
+    .no-image-text {
+        color: #888;
+        font-size: 18px;
+        text-align: center;
+        padding-top: 20px;
+    }
+</style>
+
+
+<div class="box box-danger">
+
+
+    <div class="box-body">
+        <br />
+        <br />
+        <br />
+     
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="form-group">
+                    @{
+                        if (Model.BookingId > 0)
+                        {
+                            Html.EnableClientValidation(false);
+                        }
+                    }
+
+                    <div class="img-wrapper">
+                        <!-- Check if ThumbnailImageUrl is not empty -->
+                        @if (!string.IsNullOrEmpty(Model.ThumbnailImageUrl))
+                        {
+                            <!-- Anchor tag for clickable behavior -->
+                            <a href="@Model.ThumbnailImageUrl" target="_blank">
+                                <!-- Image -->
+                                <img id="thumbUpload" src="@Model.ThumbnailImageUrl" class="img-responsive" />
+                                <!-- Overlay for hover effect -->
+                                <div class="img-overlay">
+                                    <div class="overlay-text">View Image</div>
+                                </div>
+                            </a>
+                        }
+                        else
+                        {
+                            <!-- Show beautiful text when no image URL found -->
+                            <div class="no-image-text">
+                                Oops! No receipt found.
+                            </div>
+                        }
+                    </div>
+
+                    @{ Html.EnableClientValidation(true);}
+                </div>
+            </div>
+        </div>
+        <br />
+        <br />
+        <br />
+    </div>
+</div>
+
+
+
+
+

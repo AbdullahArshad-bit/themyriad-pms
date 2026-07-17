@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <g id="Built-in_Wadrobe" data-name="Built-in Wadrobe" transform="translate(-700 -96)">
+    <rect id="Rectangle_484" data-name="Rectangle 484" width="40" height="40" transform="translate(700 96)" fill="none"/>
+    <g id="Built-in_Wadrobe-2" data-name="Built-in Wadrobe" transform="translate(-1927.346 -687.649)">
+      <g id="Rectangle_72" data-name="Rectangle 72" transform="translate(2633.346 794.649)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="10" height="25" stroke="none"/>
+        <rect x="0.5" y="0.5" width="9" height="24" fill="none"/>
+      </g>
+      <g id="Rectangle_87" data-name="Rectangle 87" transform="translate(2642.346 794.649)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="10" height="25" stroke="none"/>
+        <rect x="0.5" y="0.5" width="9" height="24" fill="none"/>
+      </g>
+      <g id="Rectangle_88" data-name="Rectangle 88" transform="translate(2651.346 794.649)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="10" height="25" stroke="none"/>
+        <rect x="0.5" y="0.5" width="9" height="24" fill="none"/>
+      </g>
+      <g id="Rectangle_73" data-name="Rectangle 73" transform="translate(2631.346 791.649)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="32" height="4" stroke="none"/>
+        <rect x="0.5" y="0.5" width="31" height="3" fill="none"/>
+      </g>
+      <g id="Rectangle_89" data-name="Rectangle 89" transform="translate(2631.346 818.649)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="32" height="3" stroke="none"/>
+        <rect x="0.5" y="0.5" width="31" height="2" fill="none"/>
+      </g>
+      <path id="Path_112" data-name="Path 112" d="M2645.429,808.338v4.733" transform="translate(-4.869 -4.679)" fill="none" stroke="#c20e1a" stroke-width="1"/>
+      <path id="Path_113" data-name="Path 113" d="M2645.429,808.338v4.733" transform="translate(4.057 -4.679)" fill="none" stroke="#c20e1a" stroke-width="1"/>
+      <g id="Rectangle_90" data-name="Rectangle 90" transform="translate(2653.346 797.649)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="6" height="15" stroke="none"/>
+        <rect x="0.5" y="0.5" width="5" height="14" fill="none"/>
+      </g>
+      <path id="Path_114" data-name="Path 114" d="M2663.76,806.7l1.5-1.566" transform="translate(-8.611 -5.59)" fill="none" stroke="#c20e1a" stroke-width="1"/>
+      <path id="Path_115" data-name="Path 115" d="M2663.614,807.469l2.362-2.338" transform="translate(-8.333 -3.497)" fill="none" stroke="#c20e1a" stroke-width="1"/>
+      <g id="Rectangle_91" data-name="Rectangle 91" transform="translate(2634.346 820.649)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="3" height="3" stroke="none"/>
+        <rect x="0.5" y="0.5" width="2" height="2" fill="none"/>
+      </g>
+      <g id="Rectangle_92" data-name="Rectangle 92" transform="translate(2657.346 820.649)" fill="#fff" stroke="#000" stroke-width="1">
+        <rect width="3" height="3" stroke="none"/>
+        <rect x="0.5" y="0.5" width="2" height="2" fill="none"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,128 @@
+﻿@model List<PMS.DTO.ViewModels.CorrespondenceViewModels.AddEmailSettingsVM>
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Email";
+    ViewBag.HeaderDescription = "All Emails";
+    ViewBag.Title = "All Emails | PMS";
+}
+
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+    </div>
+    <div class="box box-danger">
+        <div class="box-header">
+            <h3 class="box-title"></h3>
+        </div>
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }@if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+            @if (User.IsInRole(AppUserRoles.add_users))
+            {
+                <div class="col-sm-12 " style="margin-bottom:30px ; padding:0px;">
+                    <div class="input-group-btn">
+                        <a href="@Url.Action("AddEmailSettings", "Correspondence")" class="btn btn-themyriad"><i class="fa fa-plus" style="padding-right: 5px;"></i> Add New Email Setting</a>
+                    </div>
+                </div>
+            }
+
+
+
+            <div style="overflow: auto; width:100%">
+
+                <table id="email-table" class="table table-bordered table-striped">
+
+                    <thead>
+
+                        <tr>
+                            <th>Email Server</th>
+                            <th>Email Port</th>
+                            <th>Email Enabled</th>
+                            <th>UseSSl</th>
+                            <th>CreatedBy</th>
+                            <th>UpdatedBy</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var email in Model)
+                        {
+                            <tr>
+                                <td>@email.EmailServer</td>
+                                <td>@email.EmailServerPort</td>
+                                <td>@(email.EnableEmail == true ? Html.Raw("<span class='label label-success'>Active</span>") : Html.Raw("<span class='label label-danger'>Not Active</span>"))</td>
+                                <td>@(email.UseSSL == true ? Html.Raw("<span class='label label-success'>Active</span>") : Html.Raw("<span class='label label-danger'>Not Active</span>"))</td>
+                                <td>@email.CreatedBy</td>
+                                <td>@email.UpdatedBy</td>
+                                <td class="menu-icons" style="text-align:inherit">
+                                    @*@if (User.IsInRole(AppUserRoles.add_users))*@
+                                    <a title="Edit" href="@Url.Action("AddEmailSettings", "Correspondence", new { id = email.EmailSettingsID })"><i class="fa fa-edit"></i></a>
+                                    @if (User.IsInRole(AppUserRoles.delete_users))
+                                    {
+                                        <a title="Delete" href="#" data-href="@Url.Action("DeleteEmailSettings" ,"Correspondence", new { id = email.EmailSettingsID })" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-remove"></i></a>
+                                    }
+                                    @*<a title="Assigned Location" href="@Url.Action("AddLocationRights", "UserManage", new { id = email.EmailSettingsID })"><i class="fa fa-location-arrow"></i></a>*@
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                    </tfoot>
+                </table>
+
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+
+    <script>
+        $(function () {
+            $('#email-table').DataTable({
+                "scrollY": "70vh",
+                "scrollCollapse": true,
+                "scrollX": "auto",
+                "iDisplayLength": 100,
+                dom: 'Blfrtip',
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                buttons: [
+                    'excelHtml5',
+                ],
+            });
+        })
+
+
+    </script>
+}

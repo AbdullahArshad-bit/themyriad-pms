@@ -1,0 +1,289 @@
+﻿@model PMS.EF.StudentLedger
+@using PMS.Common.Classes
+@using PMS.DTO.ViewModels.SetupViewModels
+@{
+    ViewBag.Header = "Payments";
+    ViewBag.HeaderDescription = "Payment Receipt";
+    ViewBag.Title = "Payment Receipt | PMS";
+    var invoice = ViewBag.Invoice as PMS.DTO.ViewModels.OutputInvoicingVM;
+}
+@{
+    var locationSetting = (LocationSettingsVM)ViewBag.LocationSetting;
+    var isDubai = Model.LocationId == (int)PMS.Common.Classes.Enumeration.LocationEnum.Dubai;
+}
+
+<div class="box-header with-border no-print">
+    <div class="input-group-btn">
+        <a href="@Url.Action("Index", "Payments")" class="btn btn-themyriad"><i class="fa fa-arrow-left" style="padding-right: 5px;"></i>Back to Payments</a>
+    </div>
+</div>
+<section class="invoice">
+    <!-- title row -->
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="page-header">
+                <span class="logo-lg"><img src="~/Assets/Images/logo.png" alt="logo"></span>
+            </h2>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- info row -->
+    <div class="row invoice-info">
+        <div class="col-sm-4 invoice-col">
+            <b>Transaction#: @Model.Code </b><br>
+            <b>Invoice#:</b>
+            @if (invoice != null && !string.IsNullOrEmpty(invoice.Code))
+            {
+                <a href="@Url.Action("Details", "Invoicings", new { id = invoice.Id })">@invoice.Code</a><br>
+            }
+            else
+            {
+                <span>Advance Payment</span><br>
+            }
+            <b>Location: </b> @Model.Location.LocationName<br>
+            <b>Myriad ID: </b><a href="@Url.Action("PartnerLedger","payments", new { personId= Model.StudentId })">@Model.Person.Code: @Model.Person.FullName</a><br>
+            <b>Phone Number: </b> @Model.Person.Phone<br>
+            <b>Payment Date: </b>  @Model.PaymentDate.ToString("dd/MM/yyyy")<br>
+            <b>Currency: </b> @Model.Location.Currencies.Select(x => x.Name).FirstOrDefault()<br>
+
+
+            <b>Status:</b> @{
+                if (Model.IsApproved)
+                {
+                    <span class="label label-success">Approved</span>
+                }
+                else
+                {
+                    <span class="label label-primary">Pending</span>
+
+                }
+
+            } <br>
+
+        </div>
+        <div class="col-md-8" style="text-align: right">
+            <span style="color: #c20e1a;">@locationSetting.CompanyName</span><br>
+            @if (Model.LocationId == ((int)Enumeration.LocationEnum.Muscat))
+            {
+                <b>VATIN: </b><span style="color: #c20e1a;">@locationSetting.VATNo</span>
+            }
+            else
+            {
+                <b>TRN: </b><span style="color: #c20e1a;">@locationSetting.VATNo</span>
+            }
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+    <!-- Table row -->
+    <div class="row">
+        <div class="col-xs-12 table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Sr#</th>
+                        <th>Payment Method</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>@Model.PaymentTypeName</td>
+                        @{
+                            if (Model.CreditAmount < 0 && Model.DebitAmount == null)
+                            {
+
+                                <td>(@Math.Abs(Model.CreditAmount ?? 0))</td>
+                            }
+                            else if (Model.DebitAmount < 0 && Model.CreditAmount == null)
+                            {
+
+                                <td>@Model.DebitAmount</td>
+                            }
+                            else if (Model.DebitAmount > 0 && Model.CreditAmount == null)
+                            {
+
+                                <td>@Model.DebitAmount</td>
+                            }
+                            else
+                            {
+                                <td>@Model.CreditAmount</td>
+
+                            }
+                        }
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+    <div class="row">
+        <!-- accepted payments column -->
+        <div class="col-xs-8">
+            <p class="lead">Remarks:</p>
+            <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
+                @Model.Remarks
+            </p>
+        </div>
+        <div class="col-xs-4">
+            <div class="table-responsive">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th style="width:50%">Amount:</th>
+                            @{
+                                if (Model.CreditAmount < 0 && Model.DebitAmount == null)
+                                {
+
+                                    <td>(@Math.Abs(Model.CreditAmount ?? 0))</td>
+                                }
+                                else if (Model.DebitAmount < 0 && Model.CreditAmount == null)
+                                {
+
+                                    <td>(@Math.Abs(Model.DebitAmount ?? 0))</td>
+ }
+                                else if (Model.DebitAmount > 0 && Model.CreditAmount == null)
+                                {
+
+                                    <td>@Model.DebitAmount</td>
+                                }
+                                else
+                                {
+                                    <td>@Model.CreditAmount</td>
+
+                                }
+                            }
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- /.row -->
+    <!-- this row will not appear when printing -->
+    <div class="row no-print">
+        <div class="col-xs-12">
+            <a href="#" onclick="window.print();" class="btn btn-default"><i class="fa fa-print"></i> Print</a>
+            <a href="#" onclick="Print()" class="btn btn-primary"><i class="fa fa-download"></i> Download Report</a>
+            @if (isDubai)
+            {
+                <a href="#" onclick="GetHtml('#Pdf2')" id="printBtn" class="btn btn-default"><i class="fa fa-envelope"></i> Email Payment Receipt</a>
+            }
+
+            @if (Model.IsApproved != true)
+            {
+                if (User.IsInRole(AppUserRoles.Approve_acc_PaymentTransection))
+                {
+                    <button type="button" id="Approve" onclick="ApproveConform('@Model.Id')" class="btn btn-success pull-right">
+                        <i class="fa fa-thumbs-up"></i> Approve
+                    </button>
+                }
+            }
+        </div>
+    </div>
+
+
+
+
+
+    <div class="modal" id="ApproveConformation">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">Are you sure you want to Approve?</h4>
+                </div>
+                <div class="modal-body">
+                    <p>If you Approve this invoice will no longer be editable, Please review and confirm.</p>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" onclick="ApproveInvoice();" class="btn btn-primary">Approve</button>
+                    </div>
+
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+</section>
+
+@section scripts{
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="/PMS/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+    <script src="~/Scripts/Common.js"></script>
+    <script>
+
+        var Id = 0;
+        function ApproveConform(Code) {
+            Id = Code;
+            $('#ApproveConformation').modal('show');
+        }
+
+        function ApproveInvoice() {
+            $('#ApproveConformation').modal('hide');
+            $.ajax({
+                type: "Get",
+                url: GetFormatedUrl('/Payments/ApprovePayment/') + Id,
+                async: true,
+                success: function (data) {
+                    var data = data.status;
+                    if (data == true) {
+                        window.location.reload();
+                        $('#Approve').addClass('hide');
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        };
+         function Print() {
+             window.open('/Reporting/GetPaymentTransactionDetailReport?Id='+@Model.Id,'_blank');
+         }
+
+
+        function GetHtml(selector) {
+            $('.Customoverlay, .Customloader').show();
+
+            $.ajax({
+                type: "Post",
+                url: GetFormatedUrl('/Payments/SendPaymentReceiptEmail'),
+                async: true,
+                data: {
+                    paymentId: @Model.Id
+                },
+                success: function (data) {
+                    $('.Customoverlay, .Customloader').hide();
+
+                    if (data.status) {
+                        swal("Success!", data.Message, "success");
+                    } else {
+                        swal("Error!", data.Message, "error");
+                    }
+                },
+                error: function (data) {
+                    $('.Customoverlay, .Customloader').hide();
+                    swal("Error!", "Some error occurred while sending email!", "error");
+                }
+            });
+        }
+
+
+    </script>
+}

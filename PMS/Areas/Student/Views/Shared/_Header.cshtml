@@ -1,0 +1,97 @@
+﻿
+@{
+    Layout = null;
+}
+<style>
+    .notifications-menu p{
+        word-wrap:break-word;
+    }
+    #noti_descriptions a {
+        white-space: normal;
+    }
+</style>
+<header class="main-header">
+    <!-- Logo -->
+    <a href="@Url.Action("Index", "Home")" class="logo">
+        <!-- mini logo for sidebar mini 50x50 pixels -->
+        <span class="logo-mini btn-themyriad"><b>PMS</b></span>
+        <!-- logo for regular state and mobile devices -->
+        <span class="logo-lg"><img src="https://www.themyriad.com/Assets/images/logo.png" alt="logo"></span>
+    </a>
+    <!-- Header Navbar -->
+    <nav class="navbar navbar-static-top" role="navigation">
+        <!-- Sidebar toggle button-->
+        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+            <span class="sr-only">Toggle navigation</span>
+        </a>
+        <!-- Navbar Right Menu -->
+        <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+                <!-- Bell Notification -->
+                <li class="dropdown notifications-menu" >
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" onclick="UpdateNotification()">
+                        <i class="fa fa-bell-o counter" style="color: #161515; font-size: 20px; "></i>
+                        <span class="label label-warning noti_count" style=" background-color: #d10e0e !important;"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="header total_noti" style="text-align: center; color: #c20e1a"></li>
+                        <li>
+                            <!-- inner menu: contains the actual data -->
+                            <ul class="menu" id="noti_descriptions">
+                            </ul>
+                        </li>
+                        
+                        <li class="footer"><a href="@Url.Action("Index","Notification")">View all</a></li>
+                    </ul>
+                </li>
+
+                <!-- User Account Menu -->
+                <li class="dropdown user user-menu">
+                    <!-- Menu Toggle Button -->
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <!-- The user image in the navbar-->
+
+                        <img src="/Assets/dist/img/profile.png" class="user-image profileImage" alt="User Image">
+
+                        <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                        <span class="hidden-xs">@PMS.Common.Globals.User.Name</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <!-- The user image in the menu -->
+                        <li class="user-header">
+
+                            <img src="/Assets/dist/img/profile.png" class="img-circle profileImage" alt="User Image">
+
+                            <p>
+                                @PMS.Common.Globals.User.Name @*- Web Developer*@
+                                <small>Member since @PMS.Common.Globals.User.CreatedDate.ToString("MMM yyyy")</small>
+                            </p>
+                        </li>
+
+                        <!-- Menu Footer-->
+                        <li class="user-footer">
+                            <div class="pull-left">
+                                @*<a href="#" class="btn btn-default btn-flat">Profile</a>*@
+                            </div>
+                            <div class="pull-left">
+                                <a href="@Url.Action("ChangePassword","User",new {area="Student" })" class="btn btn-default btn-flat">Change Password</a>
+                            </div>
+                            @using (Html.BeginForm("LogOut", "Account", new { area = "" }, FormMethod.Post, new { id = "logoutForm", @class = "pull-right" }))
+                            {
+
+                                @Html.AntiForgeryToken()
+                                <a href="javascript:document.getElementById('logoutForm').submit()" class="btn btn-themyriad btn-flat">Sign out</a>
+
+
+                            }
+                        </li>
+                    </ul>
+                </li>
+                <!-- Control Sidebar Toggle Button -->
+                @*<li>
+            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+        </li>*@
+            </ul>
+        </div>
+    </nav>
+</header>

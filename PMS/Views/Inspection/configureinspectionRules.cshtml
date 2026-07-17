@@ -1,0 +1,218 @@
+﻿@model PMS.DTO.ViewModels.BedSpacePlacementViewModels.AddBedSpacePlacementVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Inspection";
+    ViewBag.HeaderDescription = "Add/Edit Inspection Buisness Rules";
+    ViewBag.Title = "Add/Edit Inspection Buisness Rules | PMS";
+}
+
+@section styles{
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+
+
+
+<div class="box box-danger">
+
+    @if (User.IsInRole(AppUserRoles.view_users))
+    {
+        <div class="box-header with-border">
+            <div class="input-group-btn">
+                <a href="@Url.Action("AddNewInspection", "Inspection")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> Back</a>
+            </div>
+        </div>
+    }
+
+    <!-- form start -->
+    @using (Html.BeginForm("", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.BedSpacePlacementID)
+        @Html.HiddenFor(x => x.BookingID)
+
+        <div class="box-body">
+            @if (ViewBag.error != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                    @ViewBag.error
+                </div>
+            }
+            @if (ViewBag.success != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                    @ViewBag.success
+                </div>
+            }
+
+                <div class="row col-md-12">
+                    <div class="col-md-12">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Inspection type</label>
+                                <select class="form-control" id="exampleFormControlSelect1">
+                                    <option>Select</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Inspection to compare against</label>
+                                <select class="form-control" id="exampleFormControlSelect1">
+                                    <option>Select</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label style="display:inline !important;">Inspections generated from this definition will be valid for</label>
+                                <input type="text" name="ItemName" class="form-control" autocomplete="off" placeholder="Enter Description" value="60" style="display:inline !important;" />
+                                <label style="display:inline !important;">days</label>
+
+                            </div>
+                        </div>
+                    </div>
+                   
+
+                    <div class="col-md-12">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Staff changes require student review</label>
+                                <select class="form-control" id="exampleFormControlSelect1">
+                                    <option>Select</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Student changes require staff review</label>
+                                <select class="form-control" id="exampleFormControlSelect1">
+                                    <option>Select</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            <!-- /.box-body -->
+
+            <div class="box-footer">
+                <input type="submit" class="btn btn-themyriad" value="Save">
+            </div>
+            
+        </div>
+
+
+
+
+
+
+    }
+
+        @section scripts
+{
+
+            <!-- bootstrap datepicker -->
+            <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+            <!-- Select2 -->
+            <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+            <script>
+                $(function () {
+                    //Date picker
+                    $('.datepicker').datepicker({
+                        autoclose: true,
+                        format: "dd/M/yyyy",
+                        startDate: new Date()
+                    })
+
+                    $('.select2').select2()
+                })
+
+                $(document).ready(function () {
+
+                });
+            </script>
+
+
+            <script>
+                var count = 0;
+                $("#btn").click(function () {
+                    //$("#newDiv").append('<div class="col-md-12"><div class= "form-group" ><label>Active</label><div><label class="switch"><input type="checkbox" checked="checked" name="IsActive" id="IsActive" value="true"><span class="slider round"></span></label></div></div></div ><div class="col-md-7"><div class="form-group"><label>Description</label><input type="text" name="ItemName" class="form-control pull-right" autocomplete="off" placeholder="Enter Description" value="" /></div></div><div class="col-md-7"><div class="form-group"><label>Group 1</label><select class="form-control" id="exampleFormControlSelect1"><option>Select</option></select></div></div><div class="col-md-7"><div class="form-group"><label>Group 2</label><select class="form-control" id="exampleFormControlSelect1"><option>Select</option></select></div></div>');
+                    $("#Create").toggle(500);
+                    if (count == 0) {
+                        $(".chnge").removeClass("fa fa-plus");
+                        $(".chnge").addClass("fa fa-minus");
+                        count = 1;
+                    }
+                    else {
+                        $(".chnge").removeClass("fa fa-minus");
+                        $(".chnge").addClass("fa fa-plus");
+                        count = 0;
+                    }
+
+                });
+            </script>
+
+            <script>
+                var count2 = 0;
+                $("#btn2").click(function () {
+                    //$("#newDiv").append('<div class="col-md-12"><div class= "form-group" ><label>Active</label><div><label class="switch"><input type="checkbox" checked="checked" name="IsActive" id="IsActive" value="true"><span class="slider round"></span></label></div></div></div ><div class="col-md-7"><div class="form-group"><label>Description</label><input type="text" name="ItemName" class="form-control pull-right" autocomplete="off" placeholder="Enter Description" value="" /></div></div><div class="col-md-7"><div class="form-group"><label>Group 1</label><select class="form-control" id="exampleFormControlSelect1"><option>Select</option></select></div></div><div class="col-md-7"><div class="form-group"><label>Group 2</label><select class="form-control" id="exampleFormControlSelect1"><option>Select</option></select></div></div>');
+                    $("#Create2").toggle(500);
+                    if (count2 == 0) {
+                        $(".chngee").removeClass("fa fa-plus");
+                        $(".chngee").addClass("fa fa-minus");
+                        count2 = 1;
+                    }
+                    else {
+                        $(".chngee").removeClass("fa fa-minus");
+                        $(".chngee").addClass("fa fa-plus");
+                        count2 = 0;
+                    }
+
+                });
+            </script>
+
+
+
+            <script>
+                $("#btn3").click(function () {
+                    $("#group").append('<div class="col-md-12"><div class= "col-md-3" style="margin-bottom:10px!important"><div class="form-group"><input type="text" name="ItemName" class="form-control pull-right" autocomplete="off" placeholder="Group name" value="" /></div></div></div>');
+                });
+            </script>
+            <script>
+                $("#btn4").click(function () {
+                    $("#group").append('<div class="col-md-12"><div class= "col-md-7"><div class="form-group"><select class="form-control" id="exampleFormControlSelect1"><option>Select</option></select></div></div></div> ');
+                });
+            </script>
+
+
+
+
+
+
+            <script>
+                $("#remve").click(function () {
+                    $(".myslf").parent().remove();
+                });
+            </script>
+        }
+

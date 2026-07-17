@@ -1,0 +1,219 @@
+﻿@model PMS.DTO.ViewModels.SetupViewModels.AddRoomTypeVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Room Types";
+    ViewBag.HeaderDescription = "Add/Update Room Type";
+    ViewBag.Title = "Add Room Type | PMS";
+}
+
+@section styles
+{
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/Assets/bower_components/select2/dist/css/select2.min.css">
+}
+
+<div class="box box-danger">
+    @if (User.IsInRole(AppUserRoles.view_room_types))
+    {
+        <div class="box-header with-border">
+            <div class="input-group-btn">
+                <a href="@Url.Action("RoomTypes", "Setup")" class="btn btn-themyriad"><i class="fa fa-arrow-circle-left" style="padding-right: 5px;"></i> All Room Types</a>
+            </div>
+        </div>
+    }
+
+    <!-- form start -->
+    @using (Html.BeginForm("AddRoomType", "Setup", FormMethod.Post, new { enctype = "multipart/form-data", id = "add_room_type_form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.RoomTypeID)
+
+<div class="box-body">
+    @if (ViewBag.error != null)
+    {
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+            @ViewBag.error
+        </div>
+    }
+    @if (ViewBag.success != null)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-check"></i> Alert!</h4>
+            @ViewBag.success
+        </div>
+    }
+
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.LocationId, "Location")
+                @Html.DropDownList("LocationId", null, "Select...", htmlAttributes: new { @class = "form-control", @required = "required" })
+                @Html.ValidationMessageFor(x => x.LocationId)
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Title">Code</label>
+
+                @Html.TextBoxFor(x => x.RoomCode, new { @class = "form-control", placeholder = "Enter Code" })
+
+                @Html.ValidationMessageFor(x => x.RoomCode)
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Title">Name</label>
+
+                @Html.TextBoxFor(x => x.RoomName, new { @class = "form-control", placeholder = "Enter Name" })
+
+                @Html.ValidationMessageFor(x => x.RoomName)
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Title">Arabic Name</label>
+
+                @Html.TextBoxFor(x => x.Ar_RoomName, new { @class = "form-control", placeholder = "Enter Name in Arabic" })
+
+                @Html.ValidationMessageFor(x => x.Ar_RoomName)
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row ">
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Title">Area</label>
+
+                @Html.TextBoxFor(x => x.RoomArea, new { @class = "form-control", placeholder = "Enter Area" })
+
+                @Html.ValidationMessageFor(x => x.RoomArea)
+
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Room Features</label>
+
+                @Html.ListBoxFor(model => model.SelectedFeatures,
+new SelectList(Model.AllRoomFeaturesList, "AllRoomFeatureId", "FeatureName"),
+new { @Class = "form-control select2", @multiple = "multiple", @data_placeholder = "  Please Select Room Features" })
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="exampleInputEmail1">Description</label>
+                @Html.TextAreaFor(x => x.RoomDescription, new { @class = "form-control", placeholder = "Enter Room Type Details", style = "min-height:125px" })
+                @Html.ValidationMessageFor(x => x.RoomDescription)
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Ar_RoomDescription">Arabic Description</label>
+                @Html.TextAreaFor(x => x.Ar_RoomDescription, new { @class = "form-control", placeholder = "Enter Room Type Details in Arabic", style = "min-height:125px" })
+                @Html.ValidationMessageFor(x => x.Ar_RoomDescription)
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="exampleInputEmail1">Instruction (Bottom)</label>
+                @Html.TextAreaFor(x => x.RoomInstruction, new { @class = "form-control", placeholder = "Enter Room Type Instruction", style = "min-height:125px" })
+                @Html.ValidationMessageFor(x => x.RoomInstruction)
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Ar_RoomDescription">Arabic Instruction</label>
+                @Html.TextAreaFor(x => x.Ar_RoomInstruction, new { @class = "form-control", placeholder = "Enter Room Type Instructions in Arabic", style = "min-height:125px" })
+                @Html.ValidationMessageFor(x => x.Ar_RoomInstruction)
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Actual_Price">Actual Room Price</label>
+
+                @Html.TextBoxFor(x => x.Actual_Price, new { @class = "form-control", placeholder = "Enter Actual Room Price" })
+
+                @Html.ValidationMessageFor(x => x.Actual_Price)
+
+            </div>
+        </div>
+
+    </div>
+    <div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="thumbnail">Thumbnail</label>
+
+                @Html.TextBoxFor(x => x.thumbnail, new { @class = "form-control", placeholder = "Enter Thumbnail URL" })
+
+                @Html.ValidationMessageFor(x => x.thumbnail)
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Ar_thumbnail">Arabic Thumbnail</label>
+
+                @Html.TextBoxFor(x => x.Ar_thumbnail, new { @class = "form-control", placeholder = "Enter Arabic Thumbnail Url" })
+
+                @Html.ValidationMessageFor(x => x.Ar_thumbnail)
+
+            </div>
+        </div>
+    </div>
+
+</div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+            <input type="submit" class="btn btn-themyriad" value="Save">
+        </div>
+    }
+</div>
+
+@section scripts
+{
+    <!-- Select2 -->
+    <script src="~/Assets/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+
+    <script>
+        $(function () {
+            //Initialize Select2 Elements
+            $('.select2').select2()
+        })
+
+        $(document).ready(function () {
+
+        });
+    </script>
+}

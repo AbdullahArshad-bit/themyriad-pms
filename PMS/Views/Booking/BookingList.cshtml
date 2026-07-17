@@ -1,0 +1,634 @@
+﻿@model PMS.DTO.ViewModels.PersonManageViewModels.ImportFromExcelVM
+
+@using PMS.Common.Classes
+
+@{
+    ViewBag.Header = "Bookings List";
+    ViewBag.HeaderDescription = "All Bookings";
+    ViewBag.Title = "All Bookings | PMS";
+
+    var bookings = ViewBag.Bookings as List<PMS.DTO.ViewModels.BookingViewModels.BookingListVM>;
+}
+@{
+    var addBookingAction = User.IsInRole(AppUserRoles.Add_Booking);
+    var addPlacementAction = User.IsInRole(AppUserRoles.Add_BedSpacePlacement);
+    var addProfileAction = User.IsInRole(AppUserRoles.Add_Profile);
+    var canecelBookingAction = User.IsInRole(AppUserRoles.Cancel_Booking);
+    var deleteBookingAction = User.IsInRole(AppUserRoles.Delete_Booking);
+    var viewBankTransferReceiptAction = User.IsInRole(AppUserRoles.View_BankTransfer_Receipt);
+}
+@section styles{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+
+}
+@{ var query = Request.Params["queryby"];
+    if (query == "PlacementNotAssigned")
+    {
+        ViewBag.Header = "Placements not Assigned";
+        ViewBag.HeaderDescription = "Placements not Assigned";
+        ViewBag.Title = "Placements not Assigned";
+    }
+}
+<div class="page-container">
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"></h3>
+        </div>
+        <div class="box box-danger">
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+            </div>
+            <div class="box-body">
+                @if (ViewBag.error != null)
+                {
+                    <div class="alert alert-danger alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+                        @ViewBag.error
+                    </div>
+                }
+
+                @if (ViewBag.success != null)
+                {
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-check"></i> Alert!</h4>
+                        @ViewBag.success
+                    </div>
+                }
+                @if (query == null)
+                {
+                    if (ViewBag.personid == null && ViewBag.place == null && ViewBag.id == null)
+                    {
+                        <div class="">
+                            <div class="row ">
+                                <div class="col-md-3">
+                                    <label>From Date</label>
+                                    <input name="daterange" id="FromDate" class="form-control from_date" value="@ViewBag.FromDate" placeholder="From Date" autocomplete="off" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>To Date</label>
+                                    <input name="daterange" id="ToDate" class="form-control to_date" value="@ViewBag.ToDate" placeholder="To Date" autocomplete="off" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Status</label>
+                                    <select class="select2" name="list1" id="list">
+                                        <option value="">--Select--</option>
+                                        <option value="Expired">Expired</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label> &nbsp; </label>
+                                    <br />
+                                    <button type="button" onclick="GetBookings();" class="btn btn-themyriad btn-bordered waves-effect w-md button-effect"><i class="fa fa-search"></i> <span>Search</span></button>
+                                    <button type="button" onclick="GetExcel()" class="btn btn-success btn-bordered waves-effect w-md button-effect" style="margin-left: 5px;"> <i class="fa fa-download"> </i> <span> Export Report </span> </button>
+
+                                </div>
+                                <div class="col-md-2">
+                                    <label> &nbsp; </label>
+                                    <br />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                <div class="col-md-12">
+                    <hr />
+                </div>
+
+                @*<div class="col-sm-12 " style="margin-bottom:30px ; padding:0px;">
+                        @if (User.IsInRole(AppUserRoles.Import_ProfileWithBookingExcel))
+                        {
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#import-from-excel-WithBooking-modal" class="btn btn-themyriad">
+                                <i class="fa  fa-file-excel-o" style="padding-right: 5px;"></i>
+                                Import Bookings From Excel
+                            </a>
+                        }
+                        <a href="https://pms.themyriad.com/Upload/Files/ExcelImportFormats/ImportBookings.xlsx" class="btn btn-themyriad">
+                            <i class="fa  fa-file-excel-o" style="padding-right: 5px;"></i>
+                            Import Bookings Format
+                        </a>
+
+                    </div>*@
+
+                <div style="overflow: auto; width:100%">
+                    <div class="row" style="margin-bottom:30px">
+                        <div class="col-md-3">
+                            <label>Search By Column:</label>
+                            <select class="form-control" id="column-filter">
+                                <option value="">All Columns</option>
+                                <option value="LocationName">Location</option>
+                                <option value="BookingNumber">Booking Number</option>
+                                <option value="Title">Title</option>
+                                <option value="MyriadID">MyriadID</option>
+                                <option value="FullName">FullName</option>
+                                <option value="Gender">Gender</option>
+                                <option value="CheckInDate">CheckInDate</option>
+                                <option value="CheckOutDate">CheckOutDate</option>
+                                <option value="Occupancy">Rate Code</option>
+                                <option value="RoomType">RoomType</option>
+                                <option value="Status">Status</option>
+                                <option value="Email">Email</option>
+                                <option value="University">University</option>
+                                <option value="Phone">Phone</option>
+                                <option value="Channel">Channel</option>
+                                <option value="Source">Source</option>
+                                <option value="UniReferenceNo">UniReferenceNo</option>
+                                <option value="PaymentType">PaymentType</option>
+                                <option value="Requests">Requests</option>
+                                <option value="BookingDate">BookingDate</option>
+                                <option value="HearFrom">HearFrom</option>
+                                <option value="Nationality">Nationality</option>
+                                <option value="TenantPassportNumber">TenantPassportNumber</option>
+                                <option value="GuardianFullName">GuardianFullName</option>
+                                <option value="GuardianPhone">GuardianPhone</option>
+                                <option value="GuardianEmail">GuardianEmail</option>
+                                <option value="GuardianRelation">GuardianRelation</option>
+                                <option value="PrefereableView">PrefereableView</option>
+                                <option value="PrefereableFloor">PrefereableFloor</option>
+                                <option value="Religions">Religions</option>
+                                <option value="Nationalities">Nationalities</option>
+                                <option value="Universities">Universities</option>
+                                <option value="AgeRange">AgeRange</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3" style="width: 200px;">
+                            <label>Column Visibilty:</label>
+                            <select multiple class="form-control" id="columnvisibilty-filter">
+                                <option value="LocationName">Location Name</option>
+                                <option value="BookingNumber">Booking Number</option>
+                                <option value="MyriadID">MyriadID</option>
+                                <option value="Title">Title</option>
+                                <option value="FullName">FullName</option>
+                                <option value="Gender">Gender</option>
+                                <option value="CheckInDate">CheckInDate</option>
+                                <option value="CheckOutDate">CheckOutDate</option>
+                                <option value="Occupancy">Rate Code</option>
+                                <option value="RoomType">RoomType</option>
+                                <option value="Status">Status</option>
+                                <option value="Email">Email</option>
+                                <option value="University">University</option>
+                                <option value="Phone">Phone</option>
+                                <option value="Channel">Channel</option>
+                                <option value="Source">Source</option>
+                                <option value="UniReferenceNo">UniReferenceNo</option>
+                                <option value="PaymentType">PaymentType</option>
+                                <option value="accessibilityrequest">Requests</option>
+                                <option value="BookingDate">BookingDate</option>
+                                <option value="HearFrom">HearFrom</option>
+                                <option value="Nationality">Nationality</option>
+                                <option value="TenantPassportNumber">TenantPassportNumber</option>
+                                <option value="GuardianFullName">GuardianFullName</option>
+                                <option value="GuardianPhone">GuardianPhone</option>
+                                <option value="GuardianEmail">GuardianEmail</option>
+                                <option value="GuardianRelation">GuardianRelation</option>
+                                <option value="PrefereableView">PrefereableView</option>
+                                <option value="PrefereableFloor">PrefereableFloor</option>
+                                <option value="Religions">Religions</option>
+                                <option value="Nationalities">Nationalities</option>
+                                <option value="Universities">Universities</option>
+                                <option value="AgeRange">AgeRange</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <table id="tblGrid" class="table table-bordered table-striped data-table">
+
+                        <thead>
+                            <tr>
+                                <th style="color:black !important">Action</th>
+                                <th>Location</th>
+                                <th>Booking Number</th>
+                                <th>Title</th>
+                                <th>MyriadID</th>
+                                <th>FullName</th>
+                                <th>Gender</th>
+                                <th>Check In date</th>
+                                <th>Check Out date</th>
+                                <th>Rate Code</th>
+                                <th>Room Type</th>
+                                <th>Status</th>
+                                <th>Email</th>
+                                <th>University</th>
+                                <th>Phone</th>
+                                <th>Channel</th>
+                                <th>Source</th>
+                                <th>Uni Ref No</th>
+                                <th>Payment Type</th>
+                                <th>Requests</th>
+                                <th>Booking Date</th>
+                                <th>HearFrom</th>
+                                <th>Nationality</th>
+                                <th>TenantPassportNumber</th>
+                                <th>GuardianFullName</th>
+                                <th>GuardianPhone</th>
+                                <th>GuardianEmail</th>
+                                <th>GuardianRelation</th>
+                                <th>PrefereableView</th>
+                                <th>PrefereableFloor</th>
+                                <th>Religions</th>
+                                <th>Nationalities</th>
+                                <th>Universities</th>
+                                <th>AgeRange</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="import-from-excel-WithBooking-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    @using (Html.BeginForm("ImportBookingFromExcel", "Booking", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken();
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Import person Bookings from excel file</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Excel File</label>
+
+                        @Html.TextBoxFor(x => x.fileBase, new { @class = "form-control", type = "file" })
+
+                        @Html.ValidationMessageFor(x => x.fileBase)
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-themyriad-black" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-themyriad">Save</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts{
+
+    <script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.colVis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.min.js"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.11.3/sorting/date-euro.js"></script>
+    <!-- bootstrap datepicker -->
+    <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        var dataTable;
+        $(document).ready(function () {
+            $('#columnvisibilty-filter').multiselect({
+                nonSelectedText: 'Select columns to hide',
+                maxHeight: 100 ,
+                onChange: function (element, checked) {
+                    // Call GetBookings function when value is selected or deselected
+                    GetBookings()
+                },
+            });
+            GetBookings();
+        });
+
+        function BookingAction() {
+
+            var actions = new Array();
+            if ('@addBookingAction' == 'True') actions.push("addBooking-action");
+            if ('@addPlacementAction' == 'True') actions.push("addPlacement-action");
+            if ('@addProfileAction' == 'True') actions.push("addProfile-action");
+            if ('@canecelBookingAction' == 'True') actions.push("canecelBooking-action");
+            if ('@deleteBookingAction' == 'True') actions.push("deleteBooking-action");
+            if ('@viewBankTransferReceiptAction' == 'True') actions.push("viewReceipt-action");
+
+            return actions;
+        }
+        function GetBookings() {
+
+            loadBookingsTable();
+        };
+
+        function loadBookingsTable() {
+            ShowLoader();
+
+
+            if (dataTable) {
+                dataTable.destroy();
+            }
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+
+            var urlParams = new URLSearchParams(window.location.search);
+            var personId = urlParams.get('personId');
+            var query = urlParams.get('queryby');
+            var exp = $("#list").val();
+            if (exp != "" && exp != null) {
+                query = exp;
+            }
+            var actions = BookingAction();
+
+            var selectedColumns = $('#columnvisibilty-filter').val();
+            var columns = [];
+
+            if (selectedColumns) {
+                selectedColumns.forEach(function (columnName) {
+                    var columnDef = {
+                        "data": columnName
+                    };
+
+                    if (columnName === "CheckInDate" || columnName === "CheckOutDate" || columnName === "BookingDate") {
+                        columnDef.render = function (data, type, full, meta) {
+                            return '<span>' + dateformate(full[columnName]) + '</span>';
+                        };
+                    }
+                    columns.push(columnDef);
+                });
+            }
+
+            dataTable = $('#tblGrid').DataTable({
+                processing: false,
+                serverSide: true,
+                filter: true,
+                paging: true,
+                searching: true,
+                lengthChange: true,
+                scrollCollapse: true,
+                scrollY: '70vh',
+                scrollX: true,
+                scroller: true,
+                ordering: true,
+                info: true,
+                iDisplayLength: 100,
+                autoWidth: true,
+                responsive: true,
+                columns: columns,
+                language: {
+                    emptyTable: "No record found."
+                },
+                "ajax": {
+                    "url": "/Booking/LoadBookingList",
+                    "type": "POST",
+                    "data": function (d) {
+                        d.FromDate = SD;
+                        d.ToDate = ED;
+                        d.query = query;
+                        d.personId = personId;
+                        d.SelectedColumns = selectedColumns;
+                        var selectedColumn = $('#column-filter').val();
+                        if (selectedColumn) {
+                            d.search = {
+                                value: $('#tblGrid_filter input').val(),
+                                column: selectedColumn
+                            };
+                        }
+                        else
+                        {
+                            d.search
+                        }
+                        var columnIndex = d.order[0].column;
+
+                        if (columnIndex === 0) {
+                            d.orderBy = d.order[0].column;
+                            d.orderDir = d.order[0].dir;
+                        }
+                        else {
+                            var columnName = d.columns[columnIndex].data;
+                            d.orderBy = columnName;
+                            d.orderDir = d.order[0].dir;
+                        }
+                    },
+
+                    "datatype": "json",
+                    beforeSend: function () {
+                        ShowLoader(); // Show loader before AJAX request
+                    },
+                    complete: function () {
+                        HideLoader(); // Hide loader after AJAX request
+                    },
+                    error: function (xhr, error, thrown) {
+                        console.error('AJAX error:', error, thrown);
+                        HideLoader();
+                    }
+                },
+
+                columns: [
+                    {
+                        "data": "id",
+                        "className": "menu-icons",
+
+                        render: function (data, type, full, meta) {
+                            var availableActions = '';
+
+                            if (full.IsCancel != true) {
+                                if (actions.includes("addBooking-action")) {
+                                    availableActions += `<a class="addBooking-action menu-icons" style="text-align:inherit" title="Edit Booking" href="/Booking/AddBooking?personId=${full.PersonID}&bookingId=${full.BookingID}"><i class="fa fa-edit"></i></a>`;
+                                }
+                                if (actions.includes("addPlacement-action") && full.Status.toLowerCase() === "pending") {
+                                    availableActions += `<a class="addPlacement-action menu-icons" style="text-align:inherit" title="Allocate Space For This Booking" href="/BedSpacePlacement/AddPlacements?bookingId=${full.BookingID}"><i class="fa fa-bed"></i></a>`;
+                                }
+
+                            }
+
+                            if (actions.includes("addProfile-action")) {
+                                availableActions += `<a class="addProfile-action menu-icons" style="text-align:inherit" title="Edit Profile" href="/PersonManage/AddPerson?id=${full.PersonID}"><i class="fa fa-user"></i></a>`;
+                            }
+
+                            if (full.Status.toLowerCase().includes("pending")) {
+                                if (actions.includes("canecelBooking-action")) {
+                                    if (full.IsCancel != true) {
+                                        availableActions += `
+                                        <form id="CancelBookingForm_${full.BookingID}" action="/Booking/CancelBooking?id=${full.BookingID}" method="post" style="display:inline-block">
+                                            <input type="hidden" name="__RequestVerificationToken" value="${$('input[name="__RequestVerificationToken"]').val()}" />
+                                            <a class="menu-icons" style="text-align:inherit" title="Cancel Booking" href="javascript:document.getElementById('CancelBookingForm_${full.BookingID}').submit()"><i class="fa fa-remove"></i></a>
+                                        </form>`;
+                                    } else {
+                                        availableActions += `
+                                        <form id="revertCancelBookingForm_${full.BookingID}" action="/Booking/CancelBooking?id=${full.BookingID}" method="post" style="display:inline-block">
+                                            <input type="hidden" name="__RequestVerificationToken" value="${$('input[name="__RequestVerificationToken"]').val()}" />
+                                            <a class="menu-icons" style="text-align:inherit" title="Revert Booking Cancellation" href="javascript:document.getElementById('revertCancelBookingForm_${full.BookingID}').submit()"><i class="fa fa-repeat"></i></a>
+                                        </form>`;
+                                    }
+                                }
+
+                                if (actions.includes("deleteBooking-action")) {
+                                    availableActions += `<a class="deleteBooking-action menu-icons" style="text-align:inherit" title="Delete" href="#" data-href="/Booking/DeleteBooking?id=${full.BookingID}" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a>`;
+                                }
+
+                            }
+                            if (actions.includes("viewReceipt-action")) {
+                                availableActions += `<a class="viewReceipt-action menu-icons" style="text-align:inherit" title="view receipt" href="/Booking/ViewReceipt?BookingID=${full.BookingID}"><i class="fa fa-picture-o"></i></a>`;
+                            }
+
+                            return availableActions;
+                        },
+                    },
+                    { "data": "LocationName", visible: !selectedColumns.includes("LocationName") },
+                    { "data": "BookingNumber", visible: !selectedColumns.includes("BookingNumber") },
+                    { "data": "Title", visible: !selectedColumns.includes("Title") },
+                    { "data": "MyriadID", visible: !selectedColumns.includes("MyriadID") },
+                    { "data": "FullName", visible: !selectedColumns.includes("FullName") },
+                    { "data": "Gender", visible: !selectedColumns.includes("Gender") },
+
+                    {
+                        "data": "CheckInDate",
+                        "visible": !selectedColumns.includes("CheckInDate"),
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.CheckInDate) + '</span>'
+                        }
+                    },
+
+                    {
+                        "data": "CheckOutDate",
+                        "visible": !selectedColumns.includes("CheckOutDate"),
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.CheckOutDate) + '</span>'
+                        }
+                    },
+
+                    { "data": "Commitment", visible: !selectedColumns.includes("Commitment") },
+                    { "data": "RoomType", visible: !selectedColumns.includes("RoomType") },
+
+                    {
+                        "data": "Status",
+                        "className": "text-left",
+                        "render": function (data, type, full, meta) {
+                            if (full.IsCancel) {
+                                return '<span class="label label-danger">Cancelled</span>';
+                            }
+                            else if (full.Status.toLowerCase().includes("pending") || full.Status.toLowerCase().includes("expired")) {
+                                return '<span class="label label-danger">' + full.Status + '</span>';
+                            }
+                            else {
+                                return '<span class="label label-success">' + full.Status + '</span>';
+                            }
+                        }
+                    },
+                    { "data": "Email", visible: !selectedColumns.includes("Email") },
+                    { "data": "University", visible: !selectedColumns.includes("University") },
+                    { "data": "Phone", visible: !selectedColumns.includes("Phone") },
+                    { "data": "Channel", visible: !selectedColumns.includes("Channel") },
+                    { "data": "Source", visible: !selectedColumns.includes("Source") },
+                    { "data": "UniReferenceNo", visible: !selectedColumns.includes("UniReferenceNo") },
+                    { "data": "PaymentType", visible: !selectedColumns.includes("PaymentType") },
+                    { "data": "AccessibilityRequest", visible: !selectedColumns.includes("AccessibilityRequest") },
+
+                    {
+                        "data": "BookingDate",
+                        "visible": !selectedColumns.includes("BookingDate"),
+                        render: function (data, type, full, meta) {
+                            return '<span>' + dateformate(full.BookingDate) + '</span>'
+                        }
+                    },
+
+                    { "data": "HearFrom", visible: !selectedColumns.includes("HearFrom") },
+                    { "data": "Nationality", visible: !selectedColumns.includes("Nationality") },
+                    { "data": "TenantPassportNumber", visible: !selectedColumns.includes("TenantPassportNumber") },
+                    { "data": "GuardianFullName", visible: !selectedColumns.includes("GuardianFullName") },
+                    { "data": "GuardianPhone", visible: !selectedColumns.includes("GuardianPhone") },
+                    { "data": "GuardianEmail", visible: !selectedColumns.includes("GuardianEmail") },
+                    { "data": "GuardianRelation", visible: !selectedColumns.includes("GuardianRelation") },
+                    { "data": "PrefereableView", visible: !selectedColumns.includes("PrefereableView") },
+                    { "data": "PrefereableFloor", visible: !selectedColumns.includes("PrefereableFloor") },
+                    { "data": "Religions", visible: !selectedColumns.includes("Religions") },
+                    { "data": "Nationalities", visible: !selectedColumns.includes("Nationalities") },
+                    { "data": "Universities", visible: !selectedColumns.includes("Universities") },
+                    { "data": "AgeRange", visible: !selectedColumns.includes("AgeRange") }
+                ],
+
+            });
+
+        };
+        var urlParams = new URLSearchParams(window.location.search);
+
+
+
+        function dateformate(date) {
+            if (date == '' || date == null) {
+                return '';
+            } else {
+                let d = new Date(parseInt(date.substr(6))); //parse json datetime to datetime
+                let _month = parseInt(d.getMonth()) + 1;
+                let _date = d.getDate() + "/" + _month + "/" + d.getFullYear();
+
+                return _date;
+            }
+        }
+
+        var startDate = new Date();
+        var FromEndDate = new Date();
+        var ToEndDate = new Date();
+        ToEndDate.setDate(ToEndDate.getDate() + 365);
+
+        $('.from_date').datepicker({
+            weekStart: 1,
+            startDate: '',
+            format: "dd/M/yyyy",
+            orientation: "bottom left",
+
+            autoclose: true
+        })
+            .on('changeDate', function (selected) {
+                startDate = new Date(selected.date.valueOf());
+                $('.to_date').datepicker('setStartDate', startDate);
+            });
+
+        $('.to_date')
+            .datepicker({
+                weekStart: 1,
+                startDate: new Date($('.from_date').val()),
+                endDate: ToEndDate,
+                format: "dd/M/yyyy",
+                orientation: "bottom left",
+                autoclose: true,
+
+            })
+
+            .on('changeDate', function (selected) {
+                FromEndDate = new Date(selected.date.valueOf());
+                FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+                $('.from_date').datepicker('setEndDate', FromEndDate);
+            });
+
+        function GetExcel() {
+
+            var SD = $('.from_date').val();
+            var ED = $('.to_date').val();
+
+            var query = urlParams.get('queryby');
+            var exp = $("#list").val();
+            if (exp != "" && exp != null) {
+                query = exp;
+            }
+
+            var encodedQuery = encodeURIComponent(query);
+
+            var url = "/Booking/ExportBookingReport?FromDate=" + SD + "&ToDate=" + ED + "&query=" + encodedQuery;
+
+            window.location.href = url;
+        }
+    </script>
+
+
+
+
+
+}
