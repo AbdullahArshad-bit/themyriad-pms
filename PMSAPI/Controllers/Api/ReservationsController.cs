@@ -94,11 +94,14 @@ namespace PMSAPI.Controllers.Api
                             Email = model.Guest.Email,
                             Phone = model.Guest.Phone ?? "-",
                             Gender = model.Guest.Gender ?? "Male",
+                            // [FIX] 'DOB' database mein Not Nullable hai. Agar API se DateOfBirth nahi aati,
+                            // toh SQL Server 'datetime2' out-of-range error se bachne ke liye 1990-01-01 pass kiya gaya.
                             DOB = model.Guest.DateOfBirth ?? new DateTime(1990, 1, 1),
                             Nationality = model.Guest.Nationality ?? "Unknown",
                             PassportNumber = model.Guest.PassportNumber ?? "-",
                             ResidentWhatsappNumber = model.Guest.WhatsappNumber,
                             UniversityId = 1,
+                            // [FIX] 'CreatedDate' bhi zaroori hai warna default 0001-01-01 pass hota aur SQL crash ho jata.
                             CreatedDate = DateTime.Now,
                             CreatedBy = createdBy,
                             IsActive = true
@@ -125,9 +128,12 @@ namespace PMSAPI.Controllers.Api
                     CheckOut = model.CheckOutDate,
                     Requests = model.SpecialRequests,
                     CreatedBy = createdByForBooking,
+                    // [FIX] Yahan bhi 'CreatedDate' explicitly pass ki gayi hai taake booking create hotay waqt datetime2 ka error na aaye.
                     CreatedDate = DateTime.Now
                 };
 
+                // [FIX] Booking aur Invoice dono ko ek sath Database Transaction mein wrap kiya gaya.
+                // Taake agar invoice generate hone mein koi error aaye toh booking bhi automatically Rollback (undo) ho jaye aur data corrupt na ho.
                 using (var transaction = uow.Context.Database.BeginTransaction())
                 {
                     try
@@ -138,7 +144,7 @@ namespace PMSAPI.Controllers.Api
                             return Fail<ReservationResponse>("Reservation could not be created.");
                         }
 
-                        // Generate invoice automatically within the same transaction without touching PMS.Services
+                        // [FIX] Naya Invoice banane ka saara logic yahan Controller mein likha gaya PMS.Services ko chhere baghair.
                         var priceConfig = uow.GenericRepository<PriceConfig>().GetById(model.PriceConfigId);
                         decimal amount = priceConfig?.InitialDeposit ?? 0;
 
@@ -147,6 +153,8 @@ namespace PMSAPI.Controllers.Api
 
                         if (depositService == null) throw new Exception("No deposit service found.");
 
+                        // [FIX] FOREIGN KEY ERROR FIX: API requests mein logged-in user nahi hota jis se User ID '0' assign hoti thi.
+                        // Isay fix karne ke liye humne web.config se 'admin' ka email utha kar uski valid ID (onlineUserId) nikali hai.
                         string onlineBookingUserEmail = System.Configuration.ConfigurationManager.AppSettings["OnlineBookingUserEmail"];
                         var onlineBookingUser = uow.GenericRepository<UserMaster>().Table.FirstOrDefault(u => u.Email == onlineBookingUserEmail) ?? uow.GenericRepository<UserMaster>().Table.FirstOrDefault();
                         int onlineUserId = onlineBookingUser?.ID ?? throw new Exception("No user found in the system to assign to invoice CreatedBy.");
@@ -156,14 +164,17 @@ namespace PMSAPI.Controllers.Api
                             StudentId = resolvedPersonId,
                             LocationId = propertyId,
                             TermID = priceConfig?.TermID ?? 0,
-                            Code = invoicingService.GetMaxInvoiceCodeString(propertyId, 2), // 2 = Deposit InvoiceType
+                            Code = invoicingService.GetMaxInvoiceCodeString(propertyId, 2), 
                             NetAmount = amount,
                             TotalPrice = amount,
                             InvoiceDate = DateTime.Now,
                             DueDate = DateTime.Now.AddDays(7),
                             CreatedDate = DateTime.Now,
-                            InvoiceTypeId = 2, // Deposit
+                            // [FIX] 'No booking details found' error fix: Invoice Type 1 (Rental) ko Type 2 (Deposit) kiya 
+                            // kyunke rental mein room placement required hoti hai jo booking ke waqt nahi hoti.
+                            InvoiceTypeId = 2, 
                             IsApproved = true,
+                            // [FIX] Foreign Key Constraint error se bachne ke liye valid Admin ki ID assign ki.
                             CreatedBy = onlineUserId,
                             ApprovedBy = onlineUserId
                         };
@@ -182,13 +193,15 @@ namespace PMSAPI.Controllers.Api
 
                         invoice.InvoicingDetails.Add(invoiceDetail);
 
+                        // [FIX] Direct database insert kiya 'SaveInvoice' method ko call kiye baghair taake user id over-write na ho.
                         uow.GenericRepository<Invoicing>().Insert(invoice);
                         uow.SaveChanges();
-                        int invoiceId = invoice.Id;
+                        int invoiceId = invoice.Id; // [FIX] Nayi generate hone wali invoice ki ID nikal li.
 
                         transaction.Commit();
 
                         var mapped = MapBooking(booking);
+                        // [FIX] Payment gateway ko pass karne ke liye nayi Invoice ID response mein bhej di.
                         mapped.InvoiceId = invoiceId;
 
                         await webhookService.DispatchAsync(propertyId, WebhookEventTypes.ReservationCreated, mapped);
