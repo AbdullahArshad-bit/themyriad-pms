@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -52,6 +52,8 @@ namespace TheMyriad.Common
                     }
                     else
                     {
+                        // [FIX] PAYMENT ERROR FIX: Pehle API silently fail ho jati thi (500 Error de kar). 
+                        // Ab hum Thawani (Payment Gateway) ke raw error ko parh kar frontend ko return karte hain.
                         var res = response.Content.ReadAsStringAsync().Result;
                         res = Newtonsoft.Json.JsonConvert.DeserializeObject<ReturnMessage>(res).Message;
                         resp = new ApiResponse<T> { Success = false, Code = 500, Message = res, Data = default(T) };

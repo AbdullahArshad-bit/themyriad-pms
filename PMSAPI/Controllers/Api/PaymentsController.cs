@@ -48,6 +48,8 @@ namespace PMSAPI.Controllers.Api
                 if (reservation == null || reservation.LocationID != propertyId) return NotFound<PaymentLinkResponse>("Reservation not found for this property.");
                 if (invoice == null || invoice.LocationId != propertyId || invoice.StudentId != reservation.PersonID) return NotFound<PaymentLinkResponse>("Invoice not found for this reservation.");
 
+                // [FIX] PAYMENT URL FIX: Agar third-party system payment request mein 'returnUrl' nahi bhejta,
+                // toh hum automatically default webhook response URL set kar dete hain taake payment fail na ho.
                 var responseUrl = string.IsNullOrWhiteSpace(model.ReturnUrl)
                     ? "/PaymentGateway/response?Respond="
                     : model.ReturnUrl;
